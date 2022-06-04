@@ -42,7 +42,7 @@ def get_view(pcd: o3d.geometry.PointCloud, cam: list):
     radius = diameter * 100
     _, pt_map = pcd.hidden_point_removal(camera, radius)
 
-    pcd_filtered = pcd.select_by_index(pt_map)
+    pcd_filtered = select_by_index(pcd, pt_map)
     camera_point = o3d.geometry.PointCloud(o3d.utility.Vector3dVector([camera]))
     camera_point.paint_uniform_color([0, 0, 1])
     
@@ -80,8 +80,6 @@ def rotate_pcd(pcd, angle, axis):
 
 def sample_pcd(pointcloud, initial_cam, cam_range, save_root, i, angles, num_points_threshold=1024):
     assert len(cam_range) < 4
-    if pointcloud.x.shape[0] < num_points_threshold:
-        return
     pcd, labels = to_pcd(pointcloud)
     
     if len(cam_range) == 2:
@@ -96,22 +94,23 @@ def sample_pcd(pointcloud, initial_cam, cam_range, save_root, i, angles, num_poi
         # pcd = rotate_pcd(pcd, angles[j + i * cam_range[1]], 0)
         pcd_filtered, _, indexes = get_view(pcd, cam)
         filtered_labels = np.asarray(labels[indexes])
-        pcd_filtered = select_by_index(pcd, indexes)
+        if len(indexes) >= num_points_threshold:
+            # pcd_filtered = select_by_index(pcd, indexes)
+            
+            if j % 4 == 0:
+                curr_folder = folder[1]
+            else:
+                curr_folder = folder[0]
 
-        if j % 4 == 0:
-            curr_folder = folder[1]
-        else:
-            curr_folder = folder[0]
+            save_path = f"{save_root}/{curr_folder}/"
+            
+            if not os.path.isdir(save_path):
+                os.mkdir(save_path)    
 
-        save_path = f"{save_root}/{curr_folder}/"
-        
-        if not os.path.isdir(save_path):
-            os.mkdir(save_path)    
-
-        file_name = save_path + f"plane_{i}_{j}.pcd"
-        lable_name = save_path + f"plane_lbl_{i}_{j}.npy"
-        np.save(lable_name, filtered_labels)
-        o3d.io.write_point_cloud(file_name, pcd_filtered)
+            file_name = save_path + f"plane_{i}_{j}.pcd"
+            lable_name = save_path + f"plane_lbl_{i}_{j}.npy"
+            np.save(lable_name, filtered_labels)
+            o3d.io.write_point_cloud(file_name, pcd_filtered)
 
 
 def visual_check(pointcloud, initial_cam, cam_range):

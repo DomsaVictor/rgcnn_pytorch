@@ -18,7 +18,7 @@ sys.path.append(str(utils_path))
 from utils_pcd import pcd_registration
 
 model_path = (curr_dir / '../../ros_ws/src/rgcnn_models/src/segmentation').resolve()
-model_name = "1024p_model_v2_5.pt"
+model_name = "1024p_model_v2_1.pt"
 
 def rotate_pcd(pcd, angle, axis):
     c = np.cos(angle)
@@ -73,7 +73,6 @@ for i in range(50):
 
 colors = rand(50, 3)
 
-
 pcd_path = (curr_dir / "../../dataset/test_pcd/airplanes").resolve()
 
 pcd_list = []
@@ -110,10 +109,10 @@ for i, pcd in enumerate(pcd_list):
     points, normals = resize_pointcloud(pcd, 1024)
         
     x = torch.cat([points, normals], 1).unsqueeze(0)
-    
     pred, _, _ = model(x.to(torch.float32).to(device), None)
     
-    labels = pred.argmax(dim=2).squeeze(0)
+    labels = pred.argmax(dim=2)
+    labels = labels.squeeze(0)
     labels = labels.to('cpu')
 
     aux_label = np.zeros([num_points, 3])

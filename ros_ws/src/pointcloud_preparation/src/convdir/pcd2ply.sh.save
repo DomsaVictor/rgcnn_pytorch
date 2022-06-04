@@ -1,0 +1,10 @@
+#!/bin/bash
+rosrun pcl_ros pointcloud_to_pcd input:=/pf_out & sleep 2 ; kill $!
+rm "$(stat -c "%Y:%n" * | sort -t: -n | tail -1 | cut -d: -f2-)"
+#last_pid=$!
+#sleep( $RANDOM )
+#kill -KILL $last_pid
+for filename in *.pcd; do
+    pcl_pcd2ply "$filename" name.ply
+    #rm "$filename"
+done

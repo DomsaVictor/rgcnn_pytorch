@@ -1,0 +1,7 @@
+\subsubsection parameters ROS parameters
+
+Reads and maintains the following parameters on the ROS server
+
+- \b "~dist_thresh" : \b [double] Outlier distance threshold min: 0.002, default: 0.01, max: 0.1
+- \b "~max_iterations" : \b [double] Max Iterations min: 1.0, default: 50.0, max: 200.0
+

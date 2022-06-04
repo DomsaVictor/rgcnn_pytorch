@@ -1,0 +1,12 @@
+\subsubsection usage Usage
+\verbatim
+<node name="pointcloud_preparation" pkg="pointcloud_preparation" type="pointcloud_preparation">
+  <param name="z_lower_limit" type="double" value="0.0" />
+  <param name="z_upper_limit" type="double" value="3.0" />
+  <param name="x_lower_limit" type="double" value="-0.5" />
+  <param name="x_upper_limit" type="double" value="0.5" />
+  <param name="y_lower_limit" type="double" value="-0.5" />
+  <param name="y_upper_limit" type="double" value="0.5" />
+</node>
+\endverbatim
+

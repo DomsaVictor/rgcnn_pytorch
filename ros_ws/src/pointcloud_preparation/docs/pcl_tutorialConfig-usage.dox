@@ -1,0 +1,7 @@
+\subsubsection usage Usage
+\verbatim
+<node name="voxel_filter_node" pkg="pointcloud_preparation" type="voxel_filter_node">
+  <param name="leafsize" type="double" value="0.01" />
+</node>
+\endverbatim
+

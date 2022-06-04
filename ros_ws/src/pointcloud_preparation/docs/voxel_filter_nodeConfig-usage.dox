@@ -1,0 +1,7 @@
+\subsubsection usage Usage
+\verbatim
+<node name="pointcloud_preparation" pkg="pointcloud_preparation" type="pointcloud_preparation">
+  <param name="leafsize" type="double" value="0.01" />
+</node>
+\endverbatim
+

@@ -1,0 +1,33 @@
+<launch>
+ <node pkg="pointcloud_preparation" type="voxel_filter_node" name="voxel_filter_node" output="screen" >
+<remap from="point_cloud_in" to="/camera/depth_registered/points" />
+</node>
+
+
+ <node pkg="pointcloud_preparation" type="passthrough_filter_node" name="passthrough_filter_node" output="screen" >
+<remap from="point_cloud_in" to="/vf_out" />
+</node>
+
+ <!-- <node pkg="pointcloud_preparation" type="plane_segmentation_node" name="plane_segmentation_node" output="screen" >
+<remap from="point_cloud_in" to="/pf_out" />
+</node> -->
+ 
+  <!-- <node pkg="pointcloud_preparation" type="trianglemesh_node" name="trianglemesh_node" output="screen" >
+<remap from="pf_out" to="/pcl_meshtriangle" />
+</node> -->
+
+ 
+
+<node pkg="pointcloud_preparation" type="remove_floor_node" name="remove_floor_node" output="screen">
+</node>
+
+ <node pkg="pointcloud_preparation" type="compute_surface_normals_node" name="compute_surface_normals_node" output="screen">
+</node>
+
+
+ <node pkg="rviz" type="rviz" name="rviz" output="screen" args="-d $(find pointcloud_preparation)/cfg/rviz.rviz"/>
+
+ <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure" output="screen" />
+
+
+</launch>

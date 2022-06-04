@@ -1,0 +1,8 @@
+prefix=/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/install
+
+Name: pointcloud_preparation
+Description: Description of pointcloud_preparation
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: 

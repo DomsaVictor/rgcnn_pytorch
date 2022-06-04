@@ -1,0 +1,23 @@
+\subsubsection usage Usage
+\verbatim
+<node name="pointcloud_preparation" pkg="pointcloud_preparation" type="pointcloud_preparation">
+  <param name="selection_camera" type="double" value="1.0" />
+  <param name="nr_points_initial" type="double" value="100.0" />
+  <param name="dividing_number" type="double" value="3.0" />
+  <param name="perpendicular_threshold" type="double" value="0.01" />
+  <param name="parallel_threshold" type="double" value="0.01" />
+  <param name="threshold_x" type="double" value="0.002" />
+  <param name="threshold_y" type="double" value="0.002" />
+  <param name="threshold_z" type="double" value="0.002" />
+  <param name="minimum_nr_points" type="double" value="10.0" />
+  <param name="z_lower_limit" type="double" value="0.0" />
+  <param name="z_upper_limit" type="double" value="3.0" />
+  <param name="x_lower_limit" type="double" value="-0.5" />
+  <param name="x_upper_limit" type="double" value="0.5" />
+  <param name="y_lower_limit" type="double" value="-0.5" />
+  <param name="y_upper_limit" type="double" value="0.5" />
+  <param name="angle_threshold" type="double" value="76.0" />
+  <param name="real_volume" type="double" value="0.01689" />
+</node>
+\endverbatim
+

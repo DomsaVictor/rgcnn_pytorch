@@ -1,0 +1,7 @@
+\subsubsection parameters ROS parameters
+
+Reads and maintains the following parameters on the ROS server
+
+- \b "~lower_limit" : \b [double] Lower limit min: 0.0, default: 0.0, max: 5.0
+- \b "~upper_limit" : \b [double] Upper limit min: 0.0, default: 3.0, max: 5.0
+

@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./model/segmentation",
+        "./utils"
+    ]
+}

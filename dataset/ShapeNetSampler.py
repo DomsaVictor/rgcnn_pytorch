@@ -93,7 +93,7 @@ def sample_pcd(pointcloud, initial_cam, cam_range, save_root, i, angles, num_poi
 
     for j in cam_range:
         cam = rotate(initial_cam, j/10)
-        pcd = rotate_pcd(pcd, angles[j + i * cam_range[1]], 0)
+        # pcd = rotate_pcd(pcd, angles[j + i * cam_range[1]], 0)
         pcd_filtered, _, indexes = get_view(pcd, cam)
         filtered_labels = np.asarray(labels[indexes])
         pcd_filtered = select_by_index(pcd, indexes)
@@ -176,7 +176,7 @@ def continue_to_sample(a):
 
     exit()
 
-def restart_with_new_cam(a):
+def restart_with_new_cam(a, b):
     '''
         Function that is called when pressing the 'Visualize' button
     '''
@@ -186,7 +186,12 @@ def restart_with_new_cam(a):
         initial_cam = [0, 0.25, 0.9]
     else:
         initial_cam = [float(val) for val in initial_cam]
-    visual_check(dataset[0], initial_cam, cam_range)
+    
+    pcd_to_view = 0
+    if b != '':
+        pcd_to_view = int(b)
+        
+    visual_check(dataset[pcd_to_view], initial_cam, cam_range)
 
     return
 
@@ -196,11 +201,13 @@ if __name__ == "__main__":
     answer = ""
     r = Tk()
     a = StringVar()
+    b = StringVar()
     txt = "Visualize the sampleing or create dataset. \n Enter a new camera initial position as \n 'x y' and press 'Visualize'\n to see the result or \n press create database to continue."
     Label(r, text=txt).pack()
     Entry(r, textvariable=a).pack()
+    Entry(r, textvariable=b).pack()
     Button(r, text="Create Database", command=lambda:continue_to_sample(a.get())).pack()
-    Button(r, text="Visualiation", command=lambda:restart_with_new_cam(a.get())).pack()
+    Button(r, text="Visualiation", command=lambda:restart_with_new_cam(a.get(), b.get())).pack()
     #####################################################################
 
     #####################################################################
@@ -209,6 +216,7 @@ if __name__ == "__main__":
     pcd_num = 1000
     initial_cam  = [25, 15]
     cam_range = [0, 60]
+    pcd_to_visualize = 0
 
     transforms = Compose([Center(), RandomScale(scales=[0.5, 0.5])])
     shapenet_root = (curr_dir / "ShapeNet").resolve()

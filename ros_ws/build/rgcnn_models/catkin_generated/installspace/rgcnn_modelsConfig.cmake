@@ -68,7 +68,7 @@ set(rgcnn_models_CONFIG_INCLUDED TRUE)
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
   set(rgcnn_models_SOURCE_PREFIX /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/src/rgcnn_models)
-  set(rgcnn_models_DEVEL_PREFIX /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel)
+  set(rgcnn_models_DEVEL_PREFIX /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models)
   set(rgcnn_models_INSTALL_PREFIX "")
   set(rgcnn_models_PREFIX ${rgcnn_models_DEVEL_PREFIX})
 else()
@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(rgcnn_models_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT " " STREQUAL " ")
+if(NOT "include " STREQUAL " ")
   set(rgcnn_models_INCLUDE_DIRS "")
-  set(_include_dirs "")
+  set(_include_dirs "include")
   if(NOT " " STREQUAL " ")
     set(_report "Check the issue tracker '' and consider creating a ticket if the problem has not been reported yet.")
   elseif(NOT " " STREQUAL " ")
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/install/lib;/home/victor/anaconda3/envs/thesis_env/lib)
+    foreach(path /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/install/lib;/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/lib;/opt/ros/melodic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
@@ -177,7 +177,7 @@ foreach(library ${libraries})
   endif()
 endforeach()
 
-set(rgcnn_models_EXPORTED_TARGETS "")
+set(rgcnn_models_EXPORTED_TARGETS "rgcnn_models_gencfg")
 # create dummy targets for exported code generation targets to make life of users easier
 foreach(t ${rgcnn_models_EXPORTED_TARGETS})
   if(NOT TARGET ${t})

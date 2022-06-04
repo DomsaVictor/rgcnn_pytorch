@@ -12,7 +12,6 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
   rospy
   sensor_msgs
-  sensor_msgs
   std_msgs
 )
 
@@ -96,6 +95,16 @@ find_package(catkin REQUIRED COMPONENTS
 #   cfg/DynReconf2.cfg
 # )
 
+
+generate_dynamic_reconfigure_options(
+  cfg/voxel_filter_node.cfg
+  cfg/passthrough_filter_node.cfg
+  cfg/plane_segmentation_node.cfg
+  cfg/compute_volume_node.cfg
+  cfg/compute_surface_normals_node.cfg
+)
+
+
 ###################################
 ## catkin specific configuration ##
 ###################################
@@ -119,10 +128,10 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
   ${catkin_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/include
+  ${PCL_INCLUDE_DIRS}
 )
-
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/rgcnn_models.cpp
@@ -153,6 +162,26 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
+add_executable(voxel_filter_node src/voxel_filter_node.cpp)
+add_executable(passthrough_filter_node src/passthrough_filter_node.cpp)
+add_executable(plane_segmentation_node src/plane_segmentation_node.cpp)
+add_executable(trianglemesh_node src/trianglemesh_node.cpp)
+add_executable(compute_surface_normals_node src/compute_surface_normals_node.cpp)
+add_executable(remove_floor_node src/remove_floor_node.cpp)
+
+
+target_link_libraries(voxel_filter_node ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(passthrough_filter_node ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(plane_segmentation_node ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries(trianglemesh_node ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries(compute_surface_normals_node ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries(remove_floor_node ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_dependencies(voxel_filter_node ${PROJECT_NAME}_gencfg)
+add_dependencies(passthrough_filter_node ${PROJECT_NAME}_gencfg)
+add_dependencies(plane_segmentation_node ${PROJECT_NAME}_gencfg)
+add_dependencies(trianglemesh_node ${PROJECT_NAME}_gencfg)
+add_dependencies(compute_surface_normals_node ${PROJECT_NAME}_gencfg)
 #############
 ## Install ##
 #############

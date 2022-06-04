@@ -1,0 +1,8 @@
+\subsubsection usage Usage
+\verbatim
+<node name="rgcnn_models" pkg="rgcnn_models" type="rgcnn_models">
+  <param name="dist_thresh" type="double" value="0.01" />
+  <param name="max_iterations" type="double" value="50.0" />
+</node>
+\endverbatim
+

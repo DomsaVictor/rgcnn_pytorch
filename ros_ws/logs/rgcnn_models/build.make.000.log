@@ -1,0 +1,52 @@
+[ 17%] [34m[1mGenerating dynamic reconfigure files from cfg/passthrough_filter_node.cfg: /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/include/rgcnn_models/passthrough_filter_nodeConfig.h /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/lib/python2.7/dist-packages/rgcnn_models/cfg/passthrough_filter_nodeConfig.py[0m
+[ 17%] [34m[1mGenerating dynamic reconfigure files from cfg/voxel_filter_node.cfg: /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/include/rgcnn_models/voxel_filter_nodeConfig.h /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/lib/python2.7/dist-packages/rgcnn_models/cfg/voxel_filter_nodeConfig.py[0m
+[ 17%] [34m[1mGenerating dynamic reconfigure files from cfg/compute_surface_normals_node.cfg: /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/include/rgcnn_models/compute_surface_normals_nodeConfig.h /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/lib/python2.7/dist-packages/rgcnn_models/cfg/compute_surface_normals_nodeConfig.py[0m
+[ 23%] [32mBuilding CXX object CMakeFiles/remove_floor_node.dir/src/remove_floor_node.cpp.o[0m
+[ 29%] [34m[1mGenerating dynamic reconfigure files from cfg/plane_segmentation_node.cfg: /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/include/rgcnn_models/plane_segmentation_nodeConfig.h /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/lib/python2.7/dist-packages/rgcnn_models/cfg/plane_segmentation_nodeConfig.py[0m
+[ 35%] [34m[1mGenerating dynamic reconfigure files from cfg/compute_volume_node.cfg: /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/include/rgcnn_models/compute_volume_nodeConfig.h /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/lib/python2.7/dist-packages/rgcnn_models/cfg/compute_volume_nodeConfig.py[0m
+Generating reconfiguration files for passthrough_filter_node in rgcnn_models
+Generating reconfiguration files for plane_segmentation_node in rgcnn_models
+Generating reconfiguration files for compute_surface_normals_node in rgcnn_models
+Wrote header file in /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/include/rgcnn_models/plane_segmentation_nodeConfig.h
+Wrote header file in /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/include/rgcnn_models/passthrough_filter_nodeConfig.h
+Wrote header file in /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/include/rgcnn_models/compute_surface_normals_nodeConfig.h
+Generating reconfiguration files for voxel_filter_node in rgcnn_models
+Wrote header file in /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/include/rgcnn_models/voxel_filter_nodeConfig.h
+Generating reconfiguration files for compute_volume_node in rgcnn_models
+Wrote header file in /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/include/rgcnn_models/compute_volume_nodeConfig.h
+[ 35%] Built target rgcnn_models_gencfg
+[ 41%] [32mBuilding CXX object CMakeFiles/passthrough_filter_node.dir/src/passthrough_filter_node.cpp.o[0m
+[ 47%] [32mBuilding CXX object CMakeFiles/plane_segmentation_node.dir/src/plane_segmentation_node.cpp.o[0m
+[ 52%] [32mBuilding CXX object CMakeFiles/trianglemesh_node.dir/src/trianglemesh_node.cpp.o[0m
+[ 58%] [32mBuilding CXX object CMakeFiles/voxel_filter_node.dir/src/voxel_filter_node.cpp.o[0m
+[ 64%] [32mBuilding CXX object CMakeFiles/compute_surface_normals_node.dir/src/compute_surface_normals_node.cpp.o[0m
+[ 70%] [32m[1mLinking CXX executable /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/lib/rgcnn_models/passthrough_filter_node[0m
+[ 76%] [32m[1mLinking CXX executable /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/lib/rgcnn_models/voxel_filter_node[0m
+In file included from [01m[K/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/src/rgcnn_models/src/plane_segmentation_node.cpp:17:0[m[K:
+[01m[K/usr/include/pcl-1.8/pcl/sample_consensus/model_types.h:[m[K In function ‘[01m[Kvoid __static_initialization_and_destruction_0(int, int)[m[K’:
+[01m[K/usr/include/pcl-1.8/pcl/sample_consensus/model_types.h:99:3:[m[K [01;35m[Kwarning: [m[K‘[01m[Kpcl::SAC_SAMPLE_SIZE[m[K’ is deprecated: This map is deprecated and is kept only to prevent breaking existing user code. Starting from PCL 1.8.0 model sample size is a protected member of the SampleConsensusModel class [[01;35m[K-Wdeprecated-declarations[m[K]
+   [01;35m[KSAC_SAMPLE_SIZE[m[K (sample_size_pairs, sample_size_pairs + sizeof (sample_size_pairs) / sizeof (SampleSizeModel));
+   [01;35m[K^~~~~~~~~~~~~~~[m[K
+[01m[K/usr/include/pcl-1.8/pcl/sample_consensus/model_types.h:99:3:[m[K [01;36m[Knote: [m[Kdeclared here
+In file included from [01m[K/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/src/rgcnn_models/src/remove_floor_node.cpp:23:0[m[K:
+[01m[K/usr/include/pcl-1.8/pcl/sample_consensus/model_types.h:[m[K In function ‘[01m[Kvoid __static_initialization_and_destruction_0(int, int)[m[K’:
+[01m[K/usr/include/pcl-1.8/pcl/sample_consensus/model_types.h:99:3:[m[K [01;35m[Kwarning: [m[K‘[01m[Kpcl::SAC_SAMPLE_SIZE[m[K’ is deprecated: This map is deprecated and is kept only to prevent breaking existing user code. Starting from PCL 1.8.0 model sample size is a protected member of the SampleConsensusModel class [[01;35m[K-Wdeprecated-declarations[m[K]
+   [01;35m[KSAC_SAMPLE_SIZE[m[K (sample_size_pairs, sample_size_pairs + sizeof (sample_size_pairs) / sizeof (SampleSizeModel));
+   [01;35m[K^~~~~~~~~~~~~~~[m[K
+[01m[K/usr/include/pcl-1.8/pcl/sample_consensus/model_types.h:99:3:[m[K [01;36m[Knote: [m[Kdeclared here
+In file included from [01m[K/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/src/rgcnn_models/src/compute_surface_normals_node.cpp:9:0[m[K:
+[01m[K/usr/include/pcl-1.8/pcl/sample_consensus/model_types.h:[m[K In function ‘[01m[Kvoid __static_initialization_and_destruction_0(int, int)[m[K’:
+[01m[K/usr/include/pcl-1.8/pcl/sample_consensus/model_types.h:99:3:[m[K [01;35m[Kwarning: [m[K‘[01m[Kpcl::SAC_SAMPLE_SIZE[m[K’ is deprecated: This map is deprecated and is kept only to prevent breaking existing user code. Starting from PCL 1.8.0 model sample size is a protected member of the SampleConsensusModel class [[01;35m[K-Wdeprecated-declarations[m[K]
+   [01;35m[KSAC_SAMPLE_SIZE[m[K (sample_size_pairs, sample_size_pairs + sizeof (sample_size_pairs) / sizeof (SampleSizeModel));
+   [01;35m[K^~~~~~~~~~~~~~~[m[K
+[01m[K/usr/include/pcl-1.8/pcl/sample_consensus/model_types.h:99:3:[m[K [01;36m[Knote: [m[Kdeclared here
+[ 76%] Built target voxel_filter_node
+[ 76%] Built target passthrough_filter_node
+[ 82%] [32m[1mLinking CXX executable /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/lib/rgcnn_models/remove_floor_node[0m
+[ 88%] [32m[1mLinking CXX executable /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/lib/rgcnn_models/plane_segmentation_node[0m
+[ 94%] [32m[1mLinking CXX executable /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/lib/rgcnn_models/compute_surface_normals_node[0m
+[100%] [32m[1mLinking CXX executable /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/lib/rgcnn_models/trianglemesh_node[0m
+[100%] Built target remove_floor_node
+[100%] Built target plane_segmentation_node
+[100%] Built target compute_surface_normals_node
+[100%] Built target trianglemesh_node

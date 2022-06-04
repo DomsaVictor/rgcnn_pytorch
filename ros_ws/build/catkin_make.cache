@@ -1,2 +1,0 @@
-rgcnn_models
--DCATKIN_DEVEL_PREFIX=/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel -DCMAKE_INSTALL_PREFIX=/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/install -G Unix Makefiles

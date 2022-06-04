@@ -1,8 +1,0 @@
-prefix=/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel
-
-Name: classification
-Description: Description of classification
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

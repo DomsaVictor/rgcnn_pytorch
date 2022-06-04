@@ -1,0 +1,8 @@
+\subsubsection usage Usage
+\verbatim
+<node name="dynamic_reconfigure_node" pkg="rgcnn_models" type="dynamic_reconfigure_node">
+  <param name="lower_limit" type="double" value="0.0" />
+  <param name="upper_limit" type="double" value="3.0" />
+</node>
+\endverbatim
+

@@ -1,8 +1,0 @@
-\subsubsection usage Usage
-\verbatim
-<node name="dynamic_reconfigure_node" pkg="pointcloud_preparation" type="dynamic_reconfigure_node">
-  <param name="dist_thresh" type="double" value="0.01" />
-  <param name="max_iterations" type="double" value="50.0" />
-</node>
-\endverbatim
-

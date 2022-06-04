@@ -1,0 +1,23 @@
+<launch>
+  <node pkg="rgcnn_models" type="voxel_filter_node" name="voxel_filter_node" output="screen" >
+<remap from="point_cloud_in" to="/cloud_pcd" />
+</node>
+
+ <node pkg="rgcnn_models" type="passthrough_filter_node" name="passthrough_filter_node" output="screen" >
+<remap from="point_cloud_in" to="/vf_out" />
+</node>
+
+ <node pkg="rgcnn_models" type="plane_segmentation_node" name="plane_segmentation_node" output="screen" >
+<remap from="point_cloud_in" to="/pf_out" />
+</node>
+
+ <node pkg="rgcnn_models" type="remove_floor_node" name="remove_floor_node" output="screen"></node>
+
+ <node pkg="rviz" type="rviz" name="rviz" output="screen" args="-d $(find rgcnn_models)/cfg/rviz.rviz"/>
+
+ <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure" output="screen" />
+
+ <node pkg="pcl_ros" type="pcd_to_pointcloud" name="pcd_to_pointcloud" output="screen" args=" $(find rgcnn_models)/data/box_1.pcd 1" />
+
+
+</launch>

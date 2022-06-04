@@ -1,0 +1,8 @@
+prefix=/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/install
+
+Name: rgcnn_models
+Description: Description of rgcnn_models
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

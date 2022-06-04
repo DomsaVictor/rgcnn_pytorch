@@ -1,6 +1,6 @@
 set(_CATKIN_CURRENT_PACKAGE "segmentation")
 set(segmentation_VERSION "0.0.0")
-set(segmentation_MAINTAINER "victor <victor@todo.todo>")
+set(segmentation_MAINTAINER "Victor Domsa <dosmavictor@gmail.com>")
 set(segmentation_PACKAGE_FORMAT "2")
 set(segmentation_BUILD_DEPENDS "pcl_conversions" "pcl_ros" "rospy" "sensor_msgs" "std_msgs")
 set(segmentation_BUILD_EXPORT_DEPENDS "pcl_conversions" "pcl_ros" "rospy" "sensor_msgs" "std_msgs")

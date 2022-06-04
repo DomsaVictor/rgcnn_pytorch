@@ -99,7 +99,7 @@ if(NOT " " STREQUAL " ")
   elseif(NOT " " STREQUAL " ")
     set(_report "Check the website '' for information and consider reporting the problem.")
   else()
-    set(_report "Report the problem to the maintainer 'victor <victor@todo.todo>' and request to fix the problem.")
+    set(_report "Report the problem to the maintainer 'Victor Domsa <dosmavictor@gmail.com>' and request to fix the problem.")
   endif()
   foreach(idir ${_include_dirs})
     if(IS_ABSOLUTE ${idir} AND IS_DIRECTORY ${idir})
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/lib;/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/lib;/opt/ros/melodic/lib)
+    foreach(path /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/lib;/home/victor/anaconda3/envs/thesis_env/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

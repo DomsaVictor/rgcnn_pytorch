@@ -5,6 +5,4 @@
 # This file includes the relevant testing commands required for 
 # testing this directory and lists subdirectories to be tested as well.
 subdirs("gtest")
-subdirs("classification")
-subdirs("pointcloud_preparation")
-subdirs("segmentation")
+subdirs("rgcnn_models")

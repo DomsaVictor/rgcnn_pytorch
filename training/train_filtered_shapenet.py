@@ -131,8 +131,7 @@ def start_training(model, train_loader, test_loader, optimizer, criterion, epoch
         test_stop_time = time.time()
 
         for key, value in cat_iou.items():
-            print(
-                key + ': {:.4f}, total: {:d}'.format(np.mean(value), len(value)))
+            print(key + ': {:.4f}, total: {:d}'.format(np.mean(value), len(value)))
             writer.add_scalar(key + '/test', np.mean(value), epoch)
 
         writer.add_scalar("IoU/test", np.mean(tot_iou) * 100, epoch)
@@ -178,23 +177,15 @@ if __name__ == '__main__':
     M = [512, 128, 4]
 
     
-    # root = Path("/home/domsa/workspace/data/Airplane")
-
-    # print(root)
-
     transforms = Compose([FixedPoints(num_points), GaussianNoiseTransform(
         mu=0, sigma=0, recompute_normals=False), RandomScale([0.8, 1.2]), RandomRotate(45, 0), RandomRotate(45, 1), RandomRotate(30, 2)])
 
     dataset_path = (dataset_path / "Airplane").resolve()
     print(str(dataset_path))
     
-    dataset_train = FilteredShapeNet(root_dir=str(dataset_path), folder="train", transform=transforms)
-    dataset_test = FilteredShapeNet(root_dir=str(dataset_path), folder="test", transform=transforms)
-
-    # dataset_train = reduce_dataset(dataset_train, 0.6)
-    # dataset_test = reduce_dataset(dataset_test, 0.6)
-
-    # weights = get_weights(dataset_train, num_points)
+    # root_dir MUST BE A Path(...) 
+    dataset_train = FilteredShapeNet(root_dir=dataset_path, folder="train", transform=transforms)
+    dataset_test = FilteredShapeNet(root_dir=dataset_path, folder="test", transform=transforms)
 
     # Define loss criterion.
     criterion = torch.nn.CrossEntropyLoss()

@@ -8,6 +8,7 @@ import utils as conv
 
 import torch
 from torch import nn
+from torch.nn import BatchNorm1d
 from torch.nn.functional import one_hot, relu
 
 class seg_model(nn.Module):
@@ -30,6 +31,7 @@ class seg_model(nn.Module):
             self.bias_relus = nn.ParameterList([
                 torch.nn.parameter.Parameter(torch.zeros((1, vertice, i))) for i in self.relus
             ])
+
         else:
             self.bias_relus = nn.ParameterList([
                 torch.nn.parameter.Parameter(torch.zeros((1, 1, i))) for i in self.relus
@@ -39,13 +41,22 @@ class seg_model(nn.Module):
             conv.DenseChebConvV2(input_dim, self.F[i], self.K[i]) if i == 0 else conv.DenseChebConvV2(self.F[i-1], self.F[i], self.K[i]) for i in range(len(K))
         ])
 
+        self.batch_norm_list_conv = nn.ModuleList([BatchNorm1d(input_dim)])
+
+        for i in range(len(F)):
+            self.batch_norm_list_conv.append(nn.BatchNorm1d(F[i])) 
+
+        self.batch_norm_list_fc = nn.ModuleList([
+            BatchNorm1d(M[i]) for i in range(len(M))
+        ])
+
         self.fc = nn.ModuleList([])
         for i in range(len(M)):
             if i == 0:
                 self.fc.append(nn.Linear(self.F[-1], self.M[i], fc_bias))
             elif i == 1:
                 self.fc.append(
-                    nn.Linear(self.M[i-1]+self.M[i-1], self.M[i], fc_bias))
+                    nn.Linear(self.M[i-1] + self.M[i-1], self.M[i], fc_bias))
             else:
                 self.fc.append(nn.Linear(self.M[i-1], self.M[i], fc_bias))
 
@@ -77,7 +88,8 @@ class seg_model(nn.Module):
         self.reset_regularization_terms()
 
         x1 = 0  # cache for layer 1
-
+        x = self.batch_norm_list_conv[0](x.transpose(1, 2))
+        x = x.transpose(2, 1)
         L = self.get_laplacian(x)
 
         if cat is not None:
@@ -94,6 +106,8 @@ class seg_model(nn.Module):
                 L = self.get_laplacian(out)
             out = self.dropout(out)
             out = self.brelu(out, self.bias_relus[i])
+            out = self.batch_norm_list_conv[i+1](out.transpose(1, 2))
+            out = out.transpose(1, 2)
             if i == 1:
                 x1 = out
 
@@ -104,5 +118,8 @@ class seg_model(nn.Module):
             self.append_regularization_terms(out, L)
             out = self.dropout(out)
             out = self.b1relu(out, self.bias_relus[i + len(self.K)])
+            out = self.batch_norm_list_fc[i](out.transpose(1, 2))
+            out = out.transpose(1, 2)
+
 
         return out, self.x, self.L

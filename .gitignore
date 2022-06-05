@@ -3,4 +3,6 @@ data/
 .ipynb_checkpoints
 dataset/ShapeNet/
 dataset/Airplane/
+dataset/__pycache__/FilteredShapenetDataset.cpython-38.pyc
+model/segmentation/__pycache__/RGCNNSegmentation.cpython-38.pyc
 dataset/test_pcd

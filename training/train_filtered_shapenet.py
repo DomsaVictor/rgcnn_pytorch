@@ -65,7 +65,7 @@ def train(model, optimizer, loader, regularization, criterion):
 @torch.no_grad()
 def test(model, loader):
     model.eval()
-    size = len(dataset_test)
+    size = len(loader.dataset)
     predictions = np.empty((size, num_points))
     labels = np.empty((size, num_points))
     total_correct = 0
@@ -83,8 +83,9 @@ def test(model, loader):
         start = i * batch_size
         stop = start + batch_size
         predictions[start:stop] = pred
-        lab = data.y
-        labels[start:stop] = lab.reshape([-1, num_points])
+        # lab = y
+        # labels[start:stop] = lab.reshape([-1, num_points])
+        labels[start:stop] = y
 
     tot_iou = []
     cat_iou = defaultdict(list)
@@ -163,10 +164,10 @@ if __name__ == '__main__':
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-    num_points = 1024
+    num_points = 512
     batch_size = 8
     num_epochs = 200
-    learning_rate =  1e-3 # 0.003111998
+    learning_rate =  1e-4 # 0.003111998
     decay_rate = 0.8
     weight_decay = 1e-9  # 1e-9
     dropout = 0.2 # 0.09170225
@@ -177,8 +178,10 @@ if __name__ == '__main__':
     M = [512, 128, 4]
 
     
-    transforms = Compose([FixedPoints(num_points), GaussianNoiseTransform(
-        mu=0, sigma=0, recompute_normals=False), RandomScale([0.8, 1.2]), RandomRotate(45, 0), RandomRotate(45, 1), RandomRotate(30, 2)])
+    # transforms = Compose([FixedPoints(num_points), GaussianNoiseTransform(
+    #     mu=0, sigma=0, recompute_normals=False), RandomScale([0.8, 1.2]), RandomRotate(15, 0), RandomRotate(15, 1), RandomRotate(15, 2)])
+
+    transforms = Compose([FixedPoints(num_points)])
 
     dataset_path = (dataset_path / "Airplane").resolve()
     print(str(dataset_path))

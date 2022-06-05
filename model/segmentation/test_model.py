@@ -1,5 +1,4 @@
 from matplotlib import transforms
-from regex import R
 import torch
 import open3d as o3d
 import numpy as np
@@ -26,10 +25,10 @@ root_dir = (dataset_path / "Airplane").resolve()
 
 from FilteredShapenetDataset import FilteredShapeNet
 
-from utils_pcd import pcd_registration
+# from utils_pcd import pcd_registration
 
 model_path = (curr_dir / '../../ros_ws/src/rgcnn_models/src/segmentation').resolve()
-model_name = "512p_model_v2_10.pt"
+model_name = "512p_model_v2_30.pt"
 
 def rotate_pcd(pcd, angle, axis):
     c = np.cos(angle)

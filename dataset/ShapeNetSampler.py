@@ -83,7 +83,9 @@ class ShapeNetSampler(Frame):
 
         for i in tqdm(range(self.num_pcds)):
             self.sample_pcd_camera_rot(i, cam_coord)
-    
+        exit(0)
+
+        
     def visualize_pcd_pcd_rot(self, cam_coord, pcd_num):
         cam_coord = cam_coord.split(" ")
         if cam_coord == ['']:
@@ -121,6 +123,7 @@ class ShapeNetSampler(Frame):
 
         for i in tqdm(range(self.num_pcds)):
             self.sample_pcd_camera_rot(i, cam_coord)
+        exit(0)
             
     def to_pcd(self, i):
         pcd_data = self.dataset[i]
@@ -298,7 +301,6 @@ class ShapeNetSampler(Frame):
             self.show_pcds([pcd, pcd_filtered, camera_point])
             
         self.vis.destroy_window()
-
 
 
 if __name__ == "__main__":

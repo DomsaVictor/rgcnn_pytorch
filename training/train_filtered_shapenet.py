@@ -178,7 +178,7 @@ if __name__ == '__main__':
 
     
     transforms = Compose([FixedPoints(num_points), GaussianNoiseTransform(
-        mu=0, sigma=0, recompute_normals=False), RandomScale([0.8, 1.2]), RandomRotate(45, 0), RandomRotate(45, 1), RandomRotate(30, 2)])
+        mu=0, sigma=0, recompute_normals=False), RandomScale([0.8, 1.2]), RandomRotate(15, 0), RandomRotate(15, 1), RandomRotate(15, 2)])
 
     dataset_path = (dataset_path / "Airplane").resolve()
     print(str(dataset_path))

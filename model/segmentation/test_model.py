@@ -38,6 +38,7 @@ def rotate_pcd(pcd, angle, axis):
 
 def resize_pointcloud(pcd, num_points):
     data_length = torch.tensor(pcd.points).size(0)
+    index_fps = None
     if data_length < num_points:
         alpha = 0.03
         rec_mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(pcd, alpha)
@@ -49,12 +50,14 @@ def resize_pointcloud(pcd, num_points):
         points = np.asarray(pcd_sampled.points)
         normals = np.asarray(pcd_sampled.normals)
     else:
-        index_fps = fps(points, ratio=float(num_points)/data_length, random_start=True)
+        points = torch.tensor(pcd.points)
+        index_fps = fps(points, ratio=float(num_points) / data_length, random_start=True)
 
         points = np.asarray(pcd.points)[index_fps]
         normals = np.asarray(pcd.normals)[index_fps]
         
-    return torch.tensor(points), torch.tensor(normals)
+    return torch.tensor(points), torch.tensor(normals), index_fps
+
 device = 'cuda'
 
 F = [128, 512, 1024]  # Outputs size of convolutional filter.
@@ -76,16 +79,17 @@ colors = rand(50, 3)
 pcd_path = (curr_dir / "../../dataset/test_pcd/airplanes").resolve()
 
 pcd_list = []
-label_list =[]
+label_list = []
 segmented_pcds = []
+output_list= []
 for file in sorted(os.listdir(pcd_path), reverse=True):
     if file.endswith('pcd'):
         with open(pcd_path/file) as f:
             pcd_list.append(o3d.io.read_point_cloud(f.name))
+            output_list.append(f.name)
     if file.endswith('npy'):
         with open(pcd_path/file) as f:
             label_list.append(np.load(f.name))
-
 
 registrator = pcd_registration()
 first = True
@@ -106,23 +110,28 @@ for i, pcd in enumerate(pcd_list):
         pcd.estimate_normals(fast_normal_computation=False)
         pcd.orient_normals_consistent_tangent_plane(30)
     
-    points, normals = resize_pointcloud(pcd, 1024)
-        
+    points, normals, indexes = resize_pointcloud(pcd, 1024)
+    pcd.points = o3d.utility.Vector3dVector(points)
+    pcd.normals = o3d.utility.Vector3dVector(normals)
+
     x = torch.cat([points, normals], 1).unsqueeze(0)
     pred, _, _ = model(x.to(torch.float32).to(device), None)
     
     labels = pred.argmax(dim=2)
     labels = labels.squeeze(0)
     labels = labels.to('cpu')
-
     aux_label = np.zeros([num_points, 3])
     for j in range(num_points):
         aux_label[j] = color[int(labels[j])]
 
-    pcd.colors = o3d.utility.Vector3dVector(colors[label_list[i]])
+    # pcd.colors = o3d.utility.Vector3dVector(colors[label_list[i]])
     pcd.colors = o3d.utility.Vector3dVector(colors[labels])
     # pcd.paint_uniform_color([1,0,0])
+    o3d.io.write_point_cloud(output_list[i][:-4]+"out.pcd", pcd)
+    np.save(output_list[i][:-4] + "out.npy", labels)
+    if i < len(label_list):
+        np.save(output_list[i][:-4] + "sampled.npy", label_list[i][indexes])
     segmented_pcds.append(pcd)
-    o3d.visualization.draw_geometries([pcd])
+    # o3d.visualization.draw_geometries([pcd])
     
-o3d.visualization.draw_geometries(segmented_pcds)
+# o3d.visualization.draw_geometries(segmented_pcds)

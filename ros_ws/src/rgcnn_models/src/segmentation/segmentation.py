@@ -22,7 +22,7 @@ sys.path.append(str(model_path))
 
 from RGCNNSegmentation import seg_model
 
-weight_name = "1024p_model_v2_5.pt"
+weight_name = "512p_model_v2_10.pt"
 
 weight_path = f"{str(curr_path)}/{weight_name}"
 
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     K = [6, 5, 3]         # Polynomial orders.
     M = [512, 128, 4]
 
-    num_points = 1024
+    num_points = 512
     header = msg.Header()
     header.frame_id = 'camera_depth_optical_frame'
     fields = [PointField('x', 0,  PointField.FLOAT32, 1),

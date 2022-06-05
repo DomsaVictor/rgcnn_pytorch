@@ -167,7 +167,7 @@ if __name__ == '__main__':
     num_points = 512
     batch_size = 8
     num_epochs = 200
-    learning_rate =  1e-3 # 0.003111998
+    learning_rate =  1e-4 # 0.003111998
     decay_rate = 0.8
     weight_decay = 1e-9  # 1e-9
     dropout = 0.2 # 0.09170225

@@ -82,7 +82,7 @@ class ShapeNetSampler(Frame):
             
 
         for i in tqdm(range(self.num_pcds)):
-            self.sample_pcd_camera_rot(i, cam_coord)
+            self.sample_pcd_pcd_rot(i, cam_coord)
         exit(0)
 
         
@@ -307,7 +307,7 @@ if __name__ == "__main__":
     master = Tk()
     transforms = Compose([Center(), RandomScale(scales=[0.5, 0.5])])
     num_points = 512
-    num_pcds = 1000
+    num_pcds = 300
     
     sampler = ShapeNetSampler(master, transforms, num_points, num_pcds)
     

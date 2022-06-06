@@ -25,7 +25,7 @@ def default_transforms():
 class FilteredShapeNet(Dataset):
     def __init__(self, root_dir, folder="train", transform=default_transforms(), with_normals=True, save_path=None):
         self.root_dir = root_dir
-        folders = [dir for dir in sorted(os.listdir(root_dir)) if os.path.isdir(root_dir/dir)]
+        # folders = [dir for dir in sorted(os.listdir(root_dir)) if os.path.isdir(root_dir/dir)]
         self.transforms = transform
         self.files = []
         self.labels= []

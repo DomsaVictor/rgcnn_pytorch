@@ -16,13 +16,15 @@ from pathlib import Path
 cwd = Path.cwd()
 curr_path  = Path(__file__).parent
 model_path = (curr_path / "../../../../../model/segmentation").resolve()
-
+utils_path = (curr_path / "../../../../../utils").resolve()
 import sys
 sys.path.append(str(model_path))
+sys.path.append(str(utils_path))
 
 from RGCNNSegmentation import seg_model
+from utils_pcd import pcd_registration
 
-weight_name = "512p_model_v2_10.pt"
+weight_name = "512p_model_v2_130.pt"
 
 weight_path = f"{str(curr_path)}/{weight_name}"
 
@@ -46,12 +48,16 @@ def rotate_pcd(pcd, angle, axis):
 
     return pcd.rotate(R)
 
-def callback(data, model):
+def callback(data, args):
     '''
         Reads a point cloud from the topic. The pointclouds also includes normals in the rgb fields.
         The data from the pointcloud is stored into a open3d.geometry.PointCloud data type in 
         order to process it further: center the pointcloud and rotate it ??? - TBD
     '''
+    
+    model = args[0]
+    registrator = args[1]
+    
     gen = pcl2.read_points(data, field_names = ("x", "y", "z", "r", "g", "b"), skip_nans=True)
     init_data = list(gen)
     xyz = np.empty(shape=(len(init_data), 6))
@@ -62,12 +68,21 @@ def callback(data, model):
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(xyz[:, 0:3])
     pcd.normals = o3d.utility.Vector3dVector(xyz[:, 3:])
-
+    # pcd.normalize_normals()
     center = pcd.get_center()
     pcd = pcd.translate(-center, relative=True)
-    pcd = rotate_pcd(pcd, 81, 0)
+    # pcd = rotate_pcd(pcd, 26, 0)
+    registrator.set_source(pcd)
+    pcd = registrator.register_pcds()
+    pcd = rotate_pcd(pcd, 90, 1)
     points = t.tensor(np.asarray(pcd.points))
-    normals = t.tensor(np.asarray(pcd.points))
+    normals = t.tensor(np.asarray(pcd.normals))
+    
+    # points = t.tensor(registrator.target.points)
+    # normals = t.tensor(registrator.target.normals)
+    
+    print(f"Points : {points.max()}")
+    print(f"Normals: {normals.max()}")
     
     xyz = t.cat([points, normals], 1)
 
@@ -88,12 +103,17 @@ def callback(data, model):
     message = pcl2.create_cloud(header, fields, points)
     pub.publish(message)
 
-def listener(model):
+def listener(model, registrator):
     rospy.init_node('listener', anonymous=True)
-    rospy.Subscriber("/Segmented_Point_Cloud", PointCloud2, callback=callback, callback_args=model)
+    rospy.Subscriber("/Segmented_Point_Cloud", PointCloud2, callback=callback, callback_args=[model, registrator])
     rospy.spin()
 
 if __name__ == "__main__":
+    
+    registrator = pcd_registration()
+    target_pcd = o3d.io.read_point_cloud(str((curr_path / "plane_0_1.pcd").resolve()))
+    registrator.set_target(target_pcd)
+    
     F = [128, 512, 1024]  # Outputs size of convolutional filter.
     K = [6, 5, 3]         # Polynomial orders.
     M = [512, 128, 4]
@@ -118,4 +138,5 @@ if __name__ == "__main__":
     model.load_state_dict(t.load(weight_path))
     model.to(device)
     model.eval()
-    listener(model)
+    print("OK")
+    listener(model, registrator)

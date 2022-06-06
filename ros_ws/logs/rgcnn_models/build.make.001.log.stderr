@@ -1,0 +1,20 @@
+[01m[K/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/src/rgcnn_models/src/plane_segmentation_node.cpp:10:10:[m[K [01;31m[Kfatal error: [m[Kvisualization_msgs/Marker.h: No such file or directory
+ #include [01;31m[K<visualization_msgs/Marker.h>[m[K
+          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+compilation terminated.
+make[2]: *** [CMakeFiles/plane_segmentation_node.dir/src/plane_segmentation_node.cpp.o] Error 1
+make[1]: *** [CMakeFiles/plane_segmentation_node.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+[01m[K/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/src/rgcnn_models/src/trianglemesh_node.cpp:36:10:[m[K [01;31m[Kfatal error: [m[Kshape_msgs/Mesh.h: No such file or directory
+ #include [01;31m[K<shape_msgs/Mesh.h>[m[K
+          [01;31m[K^~~~~~~~~~~~~~~~~~~[m[K
+compilation terminated.
+[01m[K/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/src/rgcnn_models/src/compute_surface_normals_node.cpp:20:10:[m[K [01;31m[Kfatal error: [m[Kvisualization_msgs/Marker.h: No such file or directory
+ #include [01;31m[K<visualization_msgs/Marker.h>[m[K
+          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+compilation terminated.
+make[2]: *** [CMakeFiles/trianglemesh_node.dir/src/trianglemesh_node.cpp.o] Error 1
+make[1]: *** [CMakeFiles/trianglemesh_node.dir/all] Error 2
+make[2]: *** [CMakeFiles/compute_surface_normals_node.dir/src/compute_surface_normals_node.cpp.o] Error 1
+make[1]: *** [CMakeFiles/compute_surface_normals_node.dir/all] Error 2
+make: *** [all] Error 2

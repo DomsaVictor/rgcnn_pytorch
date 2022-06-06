@@ -167,7 +167,7 @@ class ShapeNetSampler(Frame):
             cam_range = range(self.init_cam_range[0])
             
         for j in cam_range:
-            pcd_rot = self.rotate_pcd(cam_coord, j/10)
+            pcd_rot = self.rotate_pcd(pcd, 1, j/10)
             pcd_filtered, _, indexes = self.get_view(pcd_rot, cam_coord)
             filtered_labels = np.asarray(labels[indexes])
             
@@ -223,6 +223,7 @@ class ShapeNetSampler(Frame):
                 lable_name = save_path + f"plane_lbl_{i}_{j}.npy"
                 np.save(lable_name, filtered_labels)
                 o3d.io.write_point_cloud(file_name, pcd_filtered)
+                
                 
     def rotate(self, point, angle):
         ox, oy = 0, 0

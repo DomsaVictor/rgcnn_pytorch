@@ -1,3 +1,4 @@
+from xml.etree.ElementInclude import include
 from matplotlib import transforms
 import torch
 import open3d as o3d
@@ -11,6 +12,9 @@ from torch_geometric.nn import fps
 from numpy.random import rand
 from torch_geometric.transforms import *
 from torch_geometric.loader import DenseDataLoader
+from torch_geometric.datasets import ShapeNet
+
+
 
 curr_dir = Path(__file__).parent
 
@@ -26,9 +30,6 @@ root_dir = (dataset_path / "Airplane").resolve()
 from FilteredShapenetDataset import FilteredShapeNet
 
 # from utils_pcd import pcd_registration
-
-model_path = (curr_dir / '../../ros_ws/src/rgcnn_models/src/segmentation').resolve()
-model_name = "512p_model_v2_30.pt"
 
 def rotate_pcd(pcd, angle, axis):
     c = np.cos(angle)
@@ -70,14 +71,6 @@ def resize_pointcloud(pcd, num_points):
 
 device = 'cuda'
 
-F = [128, 512, 1024]  # Outputs size of convolutional filter.
-K = [6, 5, 3]         # Polynomial orders.
-M = [512, 128, 4]
-num_points = 512
-model = seg_model(num_points, F, K, M, input_dim=6)
-model.load_state_dict(torch.load(f'{str(model_path)}/{model_name}'))
-model.eval()
-model.to(device)
 
 color = []
 rng = default_rng()
@@ -165,19 +158,108 @@ curr_labels = 0
 # # o3d.visualization.draw_geometries(segmented_pcds)
 
 
-transforms = Compose([FixedPoints(num_points)])
-dataset = FilteredShapeNet(root_dir=root_dir, folder='test', transform=transforms)
-loader = DenseDataLoader(dataset, batch_size=8, num_workers=6)
+def test_shapenet_model(model_name=None, num_points=2048):
 
-total_correct = 0
-for data in loader:
-    x = torch.cat([data.pos.type(torch.float32), data.x.type(torch.float32)], dim=2)
-    y = data.y
-    logits, _, _ = model(x.to(device), None)
-    logits = logits.cpu()
-    pred = logits.argmax(dim=2)
+    model_path = (curr_dir / '../../ros_ws/src/rgcnn_models/src/segmentation').resolve()
+    model_name = "2048p_model_v2_190.pt" if model_name is None else model_name
 
-    total_correct += int((pred == y).sum()) 
+    F = [128, 512, 1024]  # Outputs size of convolutional filter.
+    K = [6, 5, 3]         # Polynomial orders.
+    M = [512, 128, 4]
+
+    model = seg_model(num_points, F, K, M, input_dim=6)
+    model.load_state_dict(torch.load(f'{str(model_path)}/{model_name}'))
+    model.eval()
+    model.to(device)
+
+
+    transforms = Compose([FixedPoints(num_points)])
+    root = str((dataset_path / "ShapeNet").resolve())
+    dataset = ShapeNet(root=root, categories="Airplane", include_normals=True, split="test", transform=transforms)
+    loader = DenseDataLoader(dataset, batch_size=1, num_workers=6)
+    total_correct = 0
+    for data in loader:
+        x = torch.cat([data.pos.type(torch.float32), data.x.type(torch.float32)], dim=2)
+        y = data.y
+        logits, _, _ = model(x.to(device), None)
+        logits = logits.cpu()
+        pred = logits.argmax(dim=2)
+
+        total_correct += int((pred == y).sum()) 
+        
+    acc = total_correct * 100 / (num_points * len(dataset))
+    print(acc)
+
+def test_sampled_data(model_name, num_points):
     
-acc = total_correct * 100 / (num_points * len(dataset))
-print(acc)
+    model_path = (curr_dir / '../../ros_ws/src/rgcnn_models/src/segmentation').resolve()
+    model_name = "2048p_model_v2_190.pt" if model_name is None else model_name
+
+    F = [128, 512, 1024]  # Outputs size of convolutional filter.
+    K = [6, 5, 3]         # Polynomial orders.
+    M = [512, 128, 4]
+
+    model = seg_model(num_points, F, K, M, input_dim=6)
+    model.load_state_dict(torch.load(f'{str(model_path)}/{model_name}'))
+    model.eval()
+    model.to(device)
+    print(model_name)
+    print(model)
+    root = (dataset_path / "Airplane").resolve()
+    transforms = Compose([FixedPoints(num_points)])
+    dataset = FilteredShapeNet(root_dir=root, folder='test', transform=transforms)
+
+    loader = DenseDataLoader(dataset, batch_size=1, num_workers=6)
+    total_correct = 0
+    for data in loader:
+        x = torch.cat([data.pos.type(torch.float32), data.x.type(torch.float32)], dim=2)
+        y = data.y
+        logits, _, _ = model(x.to(device), None)
+        logits = logits.cpu()
+        pred = logits.argmax(dim=2)
+
+        total_correct += int((pred == y).sum()) 
+        
+    acc = total_correct * 100 / (num_points * len(dataset))
+    print(acc)
+    
+def test_dataset(dataset):
+    data = dataset[0]
+    pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
+    pcd.normals = o3d.utility.Vector3dVector(data.x)
+    
+    o3d.visualization.draw_geometries([pcd], point_show_normal=True)
+    
+    print(dataset)
+    
+    print(len(dataset[0].pos))
+    print(dataset[0].pos.max())
+    print(dataset[0].x.max())
+    return pcd
+    
+if __name__ == "__main__":
+    num_points = 2014
+    # transforms = Compose([FixedPoints(num_points), NormalizeScale()])
+    # root = str((dataset_path / "ShapeNet").resolve())
+    # dataset  = ShapeNet(root=root, categories="Airplane", include_normals=True, split="test", transform=transforms) 
+    # dataset2 = ShapeNet(root=root, categories="Airplane", include_normals=True, split="test", transform=FixedPoints(2048))
+     
+    # pcd1 = test_dataset(dataset)
+    # pcd2 = test_dataset(dataset2)
+    # pcd1.paint_uniform_color([1,0,0])
+    # pcd2.paint_uniform_color([0,0,1])
+    # o3d.visualization.draw_geometries([pcd1, pcd2])    
+    
+    # num_points = 512
+    # root = (dataset_path / "Airplane").resolve()
+    # # transforms = Compose([FixedPoints(num_points)])
+    # dataset = FilteredShapeNet(root_dir=root, folder='test', transform=None)
+    # transforms = Compose([FixedPoints(num_points), NormalizeScale()])
+    # dataset2 = FilteredShapeNet(root_dir=root, folder='test', transform=transforms)
+    
+    # pcd1 = test_dataset(dataset)
+    # pcd2 = test_dataset(dataset2)
+    # o3d.visualization.draw_geometries([pcd1, pcd2])
+    
+    model_name = "512p_model_v2_130.pt"
+    test_sampled_data(model_name, 512)

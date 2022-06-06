@@ -58,7 +58,7 @@ def listener(num_points):
 
 
 if __name__ == "__main__":
-    num_points = 1024
+    num_points = 512
     header = msg.Header()
     header.frame_id = 'camera_depth_optical_frame'
 

@@ -164,13 +164,13 @@ if __name__ == '__main__':
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-    num_points = 2048
-    batch_size = 8
+    num_points = 512
+    batch_size = 4
     num_epochs = 200
     learning_rate =  1e-3 # 0.003111998
-    decay_rate = 0.9
+    decay_rate = 0.8
     weight_decay = 1e-9  # 1e-9
-    dropout = 0.05 # 0.09170225
+    dropout = 0.2 # 0.09170225
     regularization = 1e-9 # 5.295088673159155e-9
 
     F = [128, 512, 1024]  # Outputs size of convolutional filter.
@@ -183,16 +183,16 @@ if __name__ == '__main__':
 
     transforms = Compose([FixedPoints(num_points)])
 
-    # dataset_path = (dataset_path / "Airplane").resolve()
-    dataset_path = (dataset_path / "ShapeNet").resolve()
-    dataset_train = ShapeNet(root=str(dataset_path), categories="Airplane", include_normals=True, split="train", transform=transforms)
-    dataset_test = ShapeNet(root=str(dataset_path), categories="Airplane", include_normals=True, split="test", transform=transforms)
+    dataset_path = (dataset_path / "Airplane").resolve()
+    # dataset_path = (dataset_path / "ShapeNet").resolve()
+    # dataset_train = ShapeNet(root=str(dataset_path), categories="Airplane", include_normals=True, split="train", transform=transforms)
+    # dataset_test = ShapeNet(root=str(dataset_path), categories="Airplane", include_normals=True, split="test", transform=transforms)
 
     print(str(dataset_path))
     
     # root_dir MUST BE A Path(...) 
-    # dataset_train = FilteredShapeNet(root_dir=dataset_path, folder="train", transform=transforms)
-    # dataset_test = FilteredShapeNet(root_dir=dataset_path, folder="test", transform=transforms)
+    dataset_train = FilteredShapeNet(root_dir=dataset_path, folder="train", transform=transforms)
+    dataset_test = FilteredShapeNet(root_dir=dataset_path, folder="test", transform=transforms)
 
     # Define loss criterion.
     criterion = torch.nn.CrossEntropyLoss()
@@ -205,7 +205,7 @@ if __name__ == '__main__':
 
     train_loader = DenseDataLoader(
         dataset_train, batch_size=batch_size,
-        shuffle=True, pin_memory=False, num_workers=4)
+        shuffle=True, pin_memory=True, num_workers=4)
 
     test_loader = DenseDataLoader(
         dataset_test, batch_size=batch_size,
@@ -215,7 +215,7 @@ if __name__ == '__main__':
                       dropout=dropout,
                       one_layer=False,
                       reg_prior=True,
-                      recompute_L=True,
+                      recompute_L=False,
                       b2relu=True)
 
     model = model.to(device)

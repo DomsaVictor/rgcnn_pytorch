@@ -8,3 +8,7 @@ dataset/__pycache__/FilteredShapenetDataset.cpython-38.pyc
 model/segmentation/__pycache__/RGCNNSegmentation.cpython-38.pyc
 dataset/test_pcd
 dataset/Airplane_norris
+training/models
+dataset/Airplane.zip
+training/tensorboard/
+training/tensorboard/events.out.tfevents.1654447912.norris-SYS-2029GP-TR.1863408.0_reg

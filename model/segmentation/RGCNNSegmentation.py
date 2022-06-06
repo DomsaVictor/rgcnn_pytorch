@@ -9,7 +9,7 @@ import utils as conv
 import torch
 from torch import nn
 from torch.nn import BatchNorm1d
-from torch.nn.functional import one_hot, relu
+from torch.nn.functional import one_hot, relu, leaky_relu
 
 class seg_model(nn.Module):
     def __init__(self, vertice, F, K, M, input_dim=22, one_layer=False, dropout=1, reg_prior: bool = True, b2relu=True, recompute_L=False, fc_bias=True):
@@ -25,13 +25,13 @@ class seg_model(nn.Module):
         self.dropout = dropout
         self.recompute_L = recompute_L
         self.dropout = torch.nn.Dropout(p=self.dropout)
+        # self.dropout = torch.nn.Dropout2d(p=self.dropout)
         self.relus = self.F + self.M
 
         if b2relu:
             self.bias_relus = nn.ParameterList([
                 torch.nn.parameter.Parameter(torch.zeros((1, vertice, i))) for i in self.relus
             ])
-
         else:
             self.bias_relus = nn.ParameterList([
                 torch.nn.parameter.Parameter(torch.zeros((1, 1, i))) for i in self.relus
@@ -67,7 +67,7 @@ class seg_model(nn.Module):
         return relu(x + bias)
 
     def brelu(self, x, bias):
-        return relu(x + bias)
+        return leaky_relu(x + bias)
 
     def get_laplacian(self, x):
         with torch.no_grad():

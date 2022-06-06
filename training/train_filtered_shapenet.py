@@ -165,9 +165,9 @@ if __name__ == '__main__':
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     num_points = 512
-    batch_size = 8
+    batch_size = 4
     num_epochs = 200
-    learning_rate =  1e-4 # 0.003111998
+    learning_rate =  1e-3 # 0.003111998
     decay_rate = 0.8
     weight_decay = 1e-9  # 1e-9
     dropout = 0.2 # 0.09170225
@@ -184,6 +184,10 @@ if __name__ == '__main__':
     transforms = Compose([FixedPoints(num_points)])
 
     dataset_path = (dataset_path / "Airplane").resolve()
+    # dataset_path = (dataset_path / "ShapeNet").resolve()
+    # dataset_train = ShapeNet(root=str(dataset_path), categories="Airplane", include_normals=True, split="train", transform=transforms)
+    # dataset_test = ShapeNet(root=str(dataset_path), categories="Airplane", include_normals=True, split="test", transform=transforms)
+
     print(str(dataset_path))
     
     # root_dir MUST BE A Path(...) 
@@ -201,7 +205,7 @@ if __name__ == '__main__':
 
     train_loader = DenseDataLoader(
         dataset_train, batch_size=batch_size,
-        shuffle=True, pin_memory=False, num_workers=4)
+        shuffle=True, pin_memory=True, num_workers=4)
 
     test_loader = DenseDataLoader(
         dataset_test, batch_size=batch_size,
@@ -211,14 +215,17 @@ if __name__ == '__main__':
                       dropout=dropout,
                       one_layer=False,
                       reg_prior=True,
-                      recompute_L=True,
+                      recompute_L=False,
                       b2relu=True)
 
     model = model.to(device)
     
+    # optimizer = torch.optim.Adam(
+    #     model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+
     optimizer = torch.optim.Adam(
-        model.parameters(), lr=learning_rate, weight_decay=weight_decay)
-    
+        model.parameters(), lr=learning_rate)
+
     log_dir_path = (curr_path / "tensorboard/").resolve()
     
     writer = SummaryWriter(log_dir=str(log_dir_path) ,comment='seg_'+str(num_points) +

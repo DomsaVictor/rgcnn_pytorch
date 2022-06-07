@@ -277,7 +277,7 @@ class GaussianNoiseTransform(BaseTransform):
                 data.normal = torch.tensor(data.normal, dtype=torch.float32)
             else:
                 data.x = np.asarray(pcd_o3d.normals)
-                data.x = torch.tensor(data.normal, dtype=torch.float32)
+                data.x = torch.tensor(data.x, dtype=torch.float32)
         return data
 
     def __repr__(self) -> str:

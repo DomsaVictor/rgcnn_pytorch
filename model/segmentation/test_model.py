@@ -28,6 +28,7 @@ pcd_path = (dataset_path / "Airplane/test").resolve()
 root_dir = (dataset_path / "Airplane").resolve()
 
 from FilteredShapenetDataset import FilteredShapeNet
+from utils import GaussianNoiseTransform
 
 # from utils_pcd import pcd_registration
 
@@ -228,7 +229,7 @@ def test_dataset(dataset):
     pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
     pcd.normals = o3d.utility.Vector3dVector(data.x)
     
-    o3d.visualization.draw_geometries([pcd], point_show_normal=True)
+    o3d.visualization.draw_geometries([pcd], point_show_normal=False)
     
     print(dataset)
     
@@ -250,16 +251,20 @@ if __name__ == "__main__":
     # pcd2.paint_uniform_color([0,0,1])
     # o3d.visualization.draw_geometries([pcd1, pcd2])    
     
-    # num_points = 512
-    # root = (dataset_path / "Airplane").resolve()
-    # # transforms = Compose([FixedPoints(num_points)])
-    # dataset = FilteredShapeNet(root_dir=root, folder='test', transform=None)
-    # transforms = Compose([FixedPoints(num_points), NormalizeScale()])
+    num_points = 512
+    root = (dataset_path / "Airplane").resolve()
+    transforms = Compose([FixedPoints(num_points), GaussianNoiseTransform(mu=0, sigma=0.005, recompute_normals=False), NormalizeScale()])
+    dataset = FilteredShapeNet(root_dir=root, folder='test', transform=transforms)
+    # transforms = Compose([FixedPoints(num_points), NormalizeScale(), GaussianNoiseTransform(mu=0, sigma=0, recompute_normals=True)])
     # dataset2 = FilteredShapeNet(root_dir=root, folder='test', transform=transforms)
     
     # pcd1 = test_dataset(dataset)
     # pcd2 = test_dataset(dataset2)
+    # # pcd2.translate([2,0,0])
+    # pcd1.paint_uniform_color([0,0.5,0])
+    # pcd2.paint_uniform_color([1,0,0])
     # o3d.visualization.draw_geometries([pcd1, pcd2])
-    
-    model_name = "512p_model_v2_130.pt"
-    test_sampled_data(model_name, 512)
+    test_sampled_data("model_512_pcd_rot1.pt", 512)
+    test_sampled_data("model_512_pcd_rot2.pt", 512)
+    # model_name = "512p_model_v2_130.pt"
+    # test_sampled_data(model_name, 512)

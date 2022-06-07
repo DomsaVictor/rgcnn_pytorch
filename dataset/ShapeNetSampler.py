@@ -26,7 +26,7 @@ initial_cameras_for_models = {
 
 
 class ShapeNetSampler(Frame):
-    def __init__(self, master: Tk, transforms, num_points: int = 512, num_pcds:int = 1000, save_root: Path = None, shapenet_path: Path = None):
+    def __init__(self, master: Tk, transforms, num_points: int = 512, num_pcds:int = 1000, save_root: Path = None, shapenet_path: Path = None, chosen_indexes_file:str=None):
         super().__init__(master)
         if shapenet_path is None:
             self.root = str((Path(__file__).parent / "ShapeNet").resolve())
@@ -35,6 +35,11 @@ class ShapeNetSampler(Frame):
         self.num_points = num_points
         self.num_pcds = num_pcds
         self.master = master
+        self.chosen_indexes = None
+        if chosen_indexes_file is not None:
+            with open(str((curr_dir/chosen_indexes_file).resolve())) as f:
+                chosen_indexes = f.readlines()
+            self.chosen_indexes = [int(index) for index in chosen_indexes]
         self.init_cam_coord = [0, 0.25, 0.9]
         self.init_cam_range = [0, 60]
         self.dataset = ShapeNet(self.root, categories="Airplane", include_normals=True,  split="trainval", transform=transforms)
@@ -81,8 +86,13 @@ class ShapeNetSampler(Frame):
             cam_range = range(self.init_cam_range[0]) 
             
 
-        for i in tqdm(range(self.num_pcds)):
-            self.sample_pcd_pcd_rot(i, cam_coord)
+        if self.chosen_indexes is None:
+            for i in tqdm(range(self.num_pcds)):
+                self.sample_pcd_pcd_rot(i, cam_coord)
+        else:
+            for i in tqdm(range(len(self.chosen_indexes))):
+                self.sample_pcd_pcd_rot(self.chosen_indexes[i]-1, cam_coord)
+                
         exit(0)
 
         
@@ -121,8 +131,12 @@ class ShapeNetSampler(Frame):
         else:
             cam_coord = [float(val) for val in self.initial_cam]
 
-        for i in tqdm(range(self.num_pcds)):
-            self.sample_pcd_camera_rot(i, cam_coord)
+        if self.chosen_indexes is None:
+            for i in tqdm(range(self.num_pcds)):
+                self.sample_pcd_camera_rot(i, cam_coord)
+        else:
+            for i in tqdm(range(len(self.chosen_indexes))):
+                self.sample_pcd_camera_rot(self.chosen_indexes[i]-1, cam_coord)
         exit(0)
             
     def to_pcd(self, i):
@@ -310,7 +324,7 @@ if __name__ == "__main__":
     num_points = 512
     num_pcds = 300
     
-    sampler = ShapeNetSampler(master, transforms, num_points, num_pcds)
+    sampler = ShapeNetSampler(master, transforms, num_points, num_pcds, chosen_indexes_file="ChosenPCDIndexes1.txt")
     
 # colors = rand(50, 3)
 

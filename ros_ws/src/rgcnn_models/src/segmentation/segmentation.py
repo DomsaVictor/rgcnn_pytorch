@@ -10,7 +10,7 @@ from numpy.random import default_rng
 np.random.seed(0)
 import open3d as o3d
 import torch as t
-
+from torch_geometric.transforms import Center
 
 from pathlib import Path
 cwd = Path.cwd()
@@ -24,7 +24,7 @@ sys.path.append(str(utils_path))
 from RGCNNSegmentation import seg_model
 from utils_pcd import pcd_registration
 
-weight_name = "512p_model_v2_130.pt"
+weight_name = "model_512_pcd_rot2.pt"
 
 weight_path = f"{str(curr_path)}/{weight_name}"
 
@@ -74,15 +74,17 @@ def callback(data, args):
     # pcd = rotate_pcd(pcd, 26, 0)
     registrator.set_source(pcd)
     pcd = registrator.register_pcds()
-    pcd = rotate_pcd(pcd, 90, 1)
+    # pcd = rotate_pcd(pcd, 90, 1)
     points = t.tensor(np.asarray(pcd.points))
+    scale = (1 / points.abs().max()) * 0.999999
+    points = points * scale
     normals = t.tensor(np.asarray(pcd.normals))
     
     # points = t.tensor(registrator.target.points)
     # normals = t.tensor(registrator.target.normals)
     
-    print(f"Points : {points.max()}")
-    print(f"Normals: {normals.max()}")
+    print(f"Points : {points.abs().max()}")
+    print(f"Normals: {normals.abs().max()}")
     
     xyz = t.cat([points, normals], 1)
 
@@ -127,13 +129,12 @@ if __name__ == "__main__":
             PointField('r', 12, PointField.FLOAT32, 1),
             PointField('g', 16, PointField.FLOAT32, 1),
             PointField('b', 20, PointField.FLOAT32, 1)]
-   
-    color = []
+
     rng = default_rng()
     pub = rospy.Publisher("/Final_pcd", PointCloud2, queue_size=10)
-    for i in range(50):
-        color.append(rng.choice(254, size=3, replace=False).tolist())
 
+    color = [[1,0,0], [0,1,0], [0,0,1], [0.2, 0.5, 0.]]
+    
     model = seg_model(num_points, F, K, M, input_dim=6)
     model.load_state_dict(t.load(weight_path))
     model.to(device)

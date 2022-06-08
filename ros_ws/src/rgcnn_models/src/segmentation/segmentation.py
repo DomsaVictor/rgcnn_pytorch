@@ -24,7 +24,7 @@ sys.path.append(str(utils_path))
 from RGCNNSegmentation import seg_model
 from utils_pcd import pcd_registration
 
-weight_name = "model_512_pcd_rot2.pt"
+weight_name = "400p_model_v2_200.pt"
 
 weight_path = f"{str(curr_path)}/{weight_name}"
 
@@ -69,11 +69,11 @@ def callback(data, args):
     pcd.points = o3d.utility.Vector3dVector(xyz[:, 0:3])
     pcd.normals = o3d.utility.Vector3dVector(xyz[:, 3:])
     # pcd.normalize_normals()
-    center = pcd.get_center()
-    pcd = pcd.translate(-center, relative=True)
+    # center = pcd.get_center()
+    # pcd = pcd.translate(-center, relative=True)
     # pcd = rotate_pcd(pcd, 26, 0)
-    registrator.set_source(pcd)
-    pcd = registrator.register_pcds()
+    # registrator.set_source(pcd)
+    # pcd = registrator.register_pcds()
     # pcd = rotate_pcd(pcd, 90, 1)
     points = t.tensor(np.asarray(pcd.points))
     scale = (1 / points.abs().max()) * 0.999999
@@ -83,8 +83,8 @@ def callback(data, args):
     # points = t.tensor(registrator.target.points)
     # normals = t.tensor(registrator.target.normals)
     
-    print(f"Points : {points.abs().max()}")
-    print(f"Normals: {normals.abs().max()}")
+    # print(f"Points : {points.abs().max()}")
+    # print(f"Normals: {normals.abs().max()}")
     
     xyz = t.cat([points, normals], 1)
 
@@ -97,17 +97,18 @@ def callback(data, args):
     aux_label = np.zeros([num_points, 3])
     for i in range(num_points):
         aux_label[i] = color[int(labels[i])]
-
-    # print(aux_label) 
+    colors = np.array([[1,0,0], [0,1,0], [0,0,1]])
+    aux_label = colors[labels]
 
     points = np.append(points, aux_label, axis=1)
+    print(points) 
 
     message = pcl2.create_cloud(header, fields, points)
     pub.publish(message)
 
 def listener(model, registrator):
     rospy.init_node('listener', anonymous=True)
-    rospy.Subscriber("/Segmented_Point_Cloud", PointCloud2, callback=callback, callback_args=[model, registrator])
+    rospy.Subscriber("/reshaped_pointcloud", PointCloud2, callback=callback, callback_args=[model, registrator])
     rospy.spin()
 
 if __name__ == "__main__":
@@ -118,9 +119,9 @@ if __name__ == "__main__":
     
     F = [128, 512, 1024]  # Outputs size of convolutional filter.
     K = [6, 5, 3]         # Polynomial orders.
-    M = [512, 128, 4]
+    M = [512, 128, 3]
 
-    num_points = 512
+    num_points = 400
     header = msg.Header()
     header.frame_id = 'camera_depth_optical_frame'
     fields = [PointField('x', 0,  PointField.FLOAT32, 1),
@@ -131,7 +132,7 @@ if __name__ == "__main__":
             PointField('b', 20, PointField.FLOAT32, 1)]
 
     rng = default_rng()
-    pub = rospy.Publisher("/Final_pcd", PointCloud2, queue_size=10)
+    pub = rospy.Publisher("/SegmentedPCD", PointCloud2, queue_size=10)
 
     color = [[1,0,0], [0,1,0], [0,0,1], [0.2, 0.5, 0.]]
     

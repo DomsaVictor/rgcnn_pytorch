@@ -29,7 +29,7 @@ def callback(data, num_points=1024):
     pcd.estimate_normals(fast_normal_computation=False)
     # pcd.normalize_normals()
     pcd.orient_normals_consistent_tangent_plane(100)
-
+    points = t.tensor(np.asarray(pcd.points))
     if data_length < num_points:
         alpha = 0.03
         rec_mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(pcd, alpha)
@@ -58,7 +58,7 @@ def listener(num_points):
 
 
 if __name__ == "__main__":
-    num_points = 512
+    num_points = 400
     header = msg.Header()
     header.frame_id = 'camera_depth_optical_frame'
 
@@ -69,6 +69,6 @@ if __name__ == "__main__":
               PointField('g', 16, PointField.FLOAT32, 1),
               PointField('b', 20, PointField.FLOAT32, 1)]
     
-    pub = rospy.Publisher("/Segmented_Point_Cloud", PointCloud2, queue_size=1)
+    pub = rospy.Publisher("/reshaped_pointcloud", PointCloud2, queue_size=1)
 
     listener(num_points)

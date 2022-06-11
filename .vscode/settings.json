@@ -2,6 +2,8 @@
     "python.analysis.extraPaths": [
         "./model/segmentation",
         "./utils",
-        "./dataset"
-    ]
+        "./dataset",
+        "./model/classification"
+    ],
+    "cmake.configureOnOpen": false
 }

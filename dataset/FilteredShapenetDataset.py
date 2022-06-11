@@ -55,7 +55,7 @@ class FilteredShapeNet(Dataset):
 
     def __preproc__(self, file, lbl, idx):
         pcd = o3d.io.read_point_cloud(file)
-        points = torch.tensor(pcd.points)
+        points = torch.tensor(np.asarray(pcd.points))
         labels = torch.tensor(np.load(lbl))
         colors = np.array([[1,0,0],[0,1,0],[0,0,1],[0.3,0.5,0.7]])
 
@@ -222,7 +222,7 @@ def choose_pcd(dataset):
     return pcd
 
 if __name__ == '__main__':
-    root_f = (Path(__file__).parent / "Airplane").resolve()
+    root_f = (Path(__file__).parent / "Dataset_Rambo").resolve()
     root_s = (Path(__file__).parent / "ShapeNet").resolve()
     # dataset_f = FilteredShapeNet(root_f, folder="train")
     # dataset_s = ShapeNet(str(root_s), categories="Airplane", split="train")
@@ -231,10 +231,7 @@ if __name__ == '__main__':
     # pcd_s.translate(np.array([0.5, 0, 0]))
     # o3d.visualization.draw_geometries([pcd_f, pcd_s])
 
-    
-    
     data_viewer = FilteredShapenetViewer(root_f, "train")
-    
     
     # for data in loader:
     #     print(data)

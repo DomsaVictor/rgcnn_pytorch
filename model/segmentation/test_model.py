@@ -269,31 +269,16 @@ if __name__ == "__main__":
     # model_name = "512p_model_v2_130.pt"
     # test_sampled_data(model_name, 512)
     
-    pcd_name = ""
+    pcd_name = "1651654246540199.pcd"
     pcd_path = str((curr_dir / pcd_name).resolve())
     pcd = o3d.io.read_point_cloud(pcd_path)
     
-    lbl_name = ""
-    lbl_path = str((curr_dir / lbl_name).resolve())
-    labels = np.load(lbl_path)
+    # lbl_name = ""
+    # lbl_path = str((curr_dir / lbl_name).resolve())
+    # labels = np.load(lbl_path)
     
-    colors = np.array([1,0,0],[0,1,0],[0,0,1],[0.7,0.5,0.9])
+    # colors = np.array([1,0,0],[0,1,0],[0,0,1],[0.7,0.5,0.9])
     
-    pcd.colors = o3d.utility.Vector3dVector(colors[labels])
+    # pcd.colors = o3d.utility.Vector3dVector(colors[labels])
     
     o3d.visualization.draw_geometries([pcd])
-    
-    indexes = np.zeors(400)
-    
-    curr_labels = np.zeros(400)
-    
-    indexes_lbl1 = indexes[curr_labels==0]
-    
-    indexes_lbl2 = indexes[curr_labels==1]
-    
-    indexes_lbl3 = indexes[curr_labels==2]
-        
-    labels = np.zeros(400) # nr total de puncte
-    labels[indexes_lbl1] = 0
-    labels[indexes_lbl2] = 1
-    labels[indexes_lbl3] = 2

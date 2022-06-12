@@ -10,10 +10,10 @@ import torch as t
 from sensor_msgs.msg import PointCloud2, PointField
 from torch_geometric.nn import fps
 
+counter = 0 
+
 def callback(data, num_points=1024):
     global counter
-
-    counter = 0
 
     gen = pcl2.read_points(data, skip_nans=True)
 
@@ -29,7 +29,7 @@ def callback(data, num_points=1024):
     pcd.estimate_normals(fast_normal_computation=False)
     # pcd.normalize_normals()
     pcd.orient_normals_consistent_tangent_plane(100)
-
+    points = t.tensor(np.asarray(pcd.points))
     if data_length < num_points:
         alpha = 0.03
         rec_mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(pcd, alpha)
@@ -46,8 +46,13 @@ def callback(data, num_points=1024):
         points = np.asarray(pcd.points)[index_fps]
         normals = np.asarray(pcd.normals)[index_fps]
 
+    aux_pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(points))
+    aux_pcd.normals = o3d.utility.Vector3dVector(normals)
+    o3d.io.write_point_cloud('/home/victor/Desktop/Dataset_from_ROS/plane_' + str(counter) + '.pcd', aux_pcd)
+    # o3d.visualization.draw_geometries([aux_pcd], point_show_normal=True)
     test_pcd = np.concatenate((points, normals), axis=1)
     message = pcl2.create_cloud(header, fields, test_pcd)
+    counter += 1
     pub.publish(message)
 
 
@@ -58,7 +63,7 @@ def listener(num_points):
 
 
 if __name__ == "__main__":
-    num_points = 512
+    num_points = 400
     header = msg.Header()
     header.frame_id = 'camera_depth_optical_frame'
 
@@ -69,6 +74,6 @@ if __name__ == "__main__":
               PointField('g', 16, PointField.FLOAT32, 1),
               PointField('b', 20, PointField.FLOAT32, 1)]
     
-    pub = rospy.Publisher("/Segmented_Point_Cloud", PointCloud2, queue_size=1)
+    pub = rospy.Publisher("/reshaped_pointcloud", PointCloud2, queue_size=1)
 
     listener(num_points)

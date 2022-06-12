@@ -251,20 +251,49 @@ if __name__ == "__main__":
     # pcd2.paint_uniform_color([0,0,1])
     # o3d.visualization.draw_geometries([pcd1, pcd2])    
     
-    num_points = 512
-    root = (dataset_path / "Airplane").resolve()
-    transforms = Compose([FixedPoints(num_points), GaussianNoiseTransform(mu=0, sigma=0.005, recompute_normals=False), NormalizeScale()])
-    dataset = FilteredShapeNet(root_dir=root, folder='test', transform=transforms)
-    # transforms = Compose([FixedPoints(num_points), NormalizeScale(), GaussianNoiseTransform(mu=0, sigma=0, recompute_normals=True)])
-    # dataset2 = FilteredShapeNet(root_dir=root, folder='test', transform=transforms)
+    # num_points = 512
+    # root = (dataset_path / "Airplane").resolve()
+    # transforms = Compose([FixedPoints(num_points), GaussianNoiseTransform(mu=0, sigma=0.005, recompute_normals=False), NormalizeScale()])
+    # dataset = FilteredShapeNet(root_dir=root, folder='test', transform=transforms)
+    # # transforms = Compose([FixedPoints(num_points), NormalizeScale(), GaussianNoiseTransform(mu=0, sigma=0, recompute_normals=True)])
+    # # dataset2 = FilteredShapeNet(root_dir=root, folder='test', transform=transforms)
     
-    # pcd1 = test_dataset(dataset)
-    # pcd2 = test_dataset(dataset2)
-    # # pcd2.translate([2,0,0])
-    # pcd1.paint_uniform_color([0,0.5,0])
-    # pcd2.paint_uniform_color([1,0,0])
-    # o3d.visualization.draw_geometries([pcd1, pcd2])
-    test_sampled_data("model_512_pcd_rot1.pt", 512)
-    test_sampled_data("model_512_pcd_rot2.pt", 512)
+    # # pcd1 = test_dataset(dataset)
+    # # pcd2 = test_dataset(dataset2)
+    # # # pcd2.translate([2,0,0])
+    # # pcd1.paint_uniform_color([0,0.5,0])
+    # # pcd2.paint_uniform_color([1,0,0])
+    # # o3d.visualization.draw_geometries([pcd1, pcd2])
+    # test_sampled_data("model_512_pcd_rot1.pt", 512)
+    # test_sampled_data("model_512_pcd_rot2.pt", 512)
     # model_name = "512p_model_v2_130.pt"
     # test_sampled_data(model_name, 512)
+    
+    pcd_name = ""
+    pcd_path = str((curr_dir / pcd_name).resolve())
+    pcd = o3d.io.read_point_cloud(pcd_path)
+    
+    lbl_name = ""
+    lbl_path = str((curr_dir / lbl_name).resolve())
+    labels = np.load(lbl_path)
+    
+    colors = np.array([1,0,0],[0,1,0],[0,0,1],[0.7,0.5,0.9])
+    
+    pcd.colors = o3d.utility.Vector3dVector(colors[labels])
+    
+    o3d.visualization.draw_geometries([pcd])
+    
+    indexes = np.zeors(400)
+    
+    curr_labels = np.zeros(400)
+    
+    indexes_lbl1 = indexes[curr_labels==0]
+    
+    indexes_lbl2 = indexes[curr_labels==1]
+    
+    indexes_lbl3 = indexes[curr_labels==2]
+        
+    labels = np.zeros(400) # nr total de puncte
+    labels[indexes_lbl1] = 0
+    labels[indexes_lbl2] = 1
+    labels[indexes_lbl3] = 2

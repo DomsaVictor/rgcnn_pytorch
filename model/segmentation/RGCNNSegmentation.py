@@ -12,7 +12,7 @@ from torch.nn import BatchNorm1d
 from torch.nn.functional import one_hot, relu, leaky_relu
 
 class seg_model(nn.Module):
-    def __init__(self, vertice, F, K, M, input_dim=22, one_layer=False, dropout=1, reg_prior: bool = True, b2relu=True, recompute_L=False, fc_bias=True):
+    def __init__(self, vertice, F, K, M, input_dim=22, one_layer=False, dropout=1, reg_prior: bool = True, b2relu=True, recompute_L=False, fc_bias=True, cheb_bias=True):
         assert len(F) == len(K)
         super(seg_model, self).__init__()
 
@@ -27,7 +27,8 @@ class seg_model(nn.Module):
         self.dropout = torch.nn.Dropout(p=self.dropout)
         # self.dropout = torch.nn.Dropout2d(p=self.dropout)
         self.relus = self.F + self.M
-
+        self.cheb_bias = cheb_bias
+        
         if b2relu:
             self.bias_relus = nn.ParameterList([
                 torch.nn.parameter.Parameter(torch.zeros((1, vertice, i))) for i in self.relus
@@ -38,7 +39,7 @@ class seg_model(nn.Module):
             ])
 
         self.conv = nn.ModuleList([
-            conv.DenseChebConvV2(input_dim, self.F[i], self.K[i]) if i == 0 else conv.DenseChebConvV2(self.F[i-1], self.F[i], self.K[i]) for i in range(len(K))
+            conv.DenseChebConvV2(input_dim, self.F[i], self.K[i], bias=self.cheb_bias) if i == 0 else conv.DenseChebConvV2(self.F[i-1], self.F[i], self.K[i], bias=self.cheb_bias) for i in range(len(K))
         ])
 
         self.batch_norm_list_conv = nn.ModuleList([BatchNorm1d(input_dim)])
@@ -90,8 +91,9 @@ class seg_model(nn.Module):
         x1 = 0  # cache for layer 1
         x = self.batch_norm_list_conv[0](x.transpose(1, 2))
         x = x.transpose(2, 1)
-        L = self.get_laplacian(x)
-
+        # L = self.get_laplacian(x)
+        L = self.get_laplacian(x[:,:,:3])
+        
         if cat is not None:
             cat = one_hot(cat, num_classes=16)
             cat = torch.tile(cat, [1, self.vertice, 1])
@@ -123,3 +125,12 @@ class seg_model(nn.Module):
 
 
         return out, self.x, self.L
+    
+if __name__ == "__main__":
+    F = [128, 512, 1024]  # Outputs size of convolutional filter.
+    K = [6, 5, 3]         # Polynomial orders.
+    M = [512, 128, 3]
+
+    model = seg_model(512,F,K,M, 6, dropout=0.2)
+    
+    print(model)

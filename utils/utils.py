@@ -101,7 +101,7 @@ class DenseChebConvV2(nn.Module):
     def reset_parameters(self):        
         for lin in self.lins:
             lin.weight = t.nn.init.trunc_normal_(lin.weight, mean=0, std=0.2)
-            lin.bias      = t.nn.init.normal_(lin.bias, mean=0, std=0.2)
+            lin.bias   = t.nn.init.normal_(lin.bias, mean=0, std=0.2)
 
 
     def forward(self, x, L):
@@ -123,9 +123,10 @@ class DenseChebConvV2(nn.Module):
 
 
     def __repr__(self) -> str:
-        return (f'{self.__class__.__name__}({self.in_channels}, '
-                f'{self.out_channels}, K={self.K},'
-                f'bias={self.bias})')
+        return (f'{self.__class__.__name__}(in_features={self.in_channels}, '
+                f'out_features={self.out_channels}, K={self.K}, '
+                f'bias={self.bias is not None})'
+                f'')
 
 
 def IoU_accuracy(pred, target, n_classes=16):

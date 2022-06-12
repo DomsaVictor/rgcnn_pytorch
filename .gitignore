@@ -12,3 +12,13 @@ training/models
 dataset/Airplane.zip
 training/tensorboard/
 training/tensorboard/events.out.tfevents.1654447912.norris-SYS-2029GP-TR.1863408.0_reg
+dataset/Dataset_Rambo
+dataset/Modelnet
+dataset/Plane
+*.pyc
+
+*.json
+
+###################################
+ros_ws
+###################################

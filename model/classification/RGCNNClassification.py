@@ -11,10 +11,10 @@ from torch import nn
 from torch.nn import BatchNorm1d
 from torch.nn.functional import one_hot, relu, leaky_relu
 
-class seg_model(nn.Module):
+class cls_model(nn.Module):
     def __init__(self, vertice, F, K, M, input_dim=22, one_layer=False, dropout=1, reg_prior: bool = True, b2relu=True, recompute_L=False, fc_bias=True, cheb_bias=True):
         assert len(F) == len(K)
-        super(seg_model, self).__init__()
+        super(cls_model, self).__init__()
 
         self.F = F
         self.K = K
@@ -55,9 +55,6 @@ class seg_model(nn.Module):
         for i in range(len(M)):
             if i == 0:
                 self.fc.append(nn.Linear(self.F[-1], self.M[i], fc_bias))
-            elif i == 1:
-                self.fc.append(
-                    nn.Linear(self.M[i-1] + self.M[i-1], self.M[i], fc_bias))
             else:
                 self.fc.append(nn.Linear(self.M[i-1], self.M[i], fc_bias))
 
@@ -85,52 +82,47 @@ class seg_model(nn.Module):
         self.L = []
         self.x = []
 
-    def forward(self, x, cat=None):
+    def forward(self, x):
         self.reset_regularization_terms()
 
-        x1 = 0  # cache for layer 1
         x = self.batch_norm_list_conv[0](x.transpose(1, 2))
         x = x.transpose(2, 1)
         # L = self.get_laplacian(x)
         L = self.get_laplacian(x[:,:,:3])
         
-        if cat is not None:
-            cat = one_hot(cat, num_classes=16)
-            cat = torch.tile(cat, [1, self.vertice, 1])
-            out = torch.cat([x, cat], dim=2)  # Pass this to the model
-        else:
-            out = x
-
         for i in range(len(self.K)):
             out = self.conv[i](out, L)
             self.append_regularization_terms(out, L)
             if self.recompute_L:
                 L = self.get_laplacian(out)
             out = self.dropout(out)
-            out = self.brelu(out, self.bias_relus[i])
+            out = self.b1relu(out, self.bias_relus[i])
             out = self.batch_norm_list_conv[i+1](out.transpose(1, 2))
             out = out.transpose(1, 2)
-            if i == 1:
-                x1 = out
 
-        for i in range(len(self.M)):
-            if i == 1:
-                out = torch.concat([out, x1], dim=2)
+        out, _ = torch.max(out, 1)
+        
+        for i in range(len(self.M) -1):
             out = self.fc[i](out)
             self.append_regularization_terms(out, L)
             out = self.dropout(out)
-            out = self.b1relu(out, self.bias_relus[i + len(self.K)])
+            out = self.brelu(out, self.bias_relus[i + len(self.K)])
             out = self.batch_norm_list_fc[i](out.transpose(1, 2))
             out = out.transpose(1, 2)
 
+        out = self.fc[-1](out)
+        self.append_regularization_terms(out, L)
 
         return out, self.x, self.L
     
 if __name__ == "__main__":
+    
+    modelnet_num = 40
+    
     F = [128, 512, 1024]  # Outputs size of convolutional filter.
     K = [6, 5, 3]         # Polynomial orders.
-    M = [512, 128, 3]
+    M = [512, 128, modelnet_num]
 
-    model = seg_model(512,F,K,M, 6, dropout=0.2)
+    model = cls_model(512, F, K, M, 6, dropout=0.2)
     
     print(model)

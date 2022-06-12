@@ -60,7 +60,7 @@ def train(model, optimizer, loader, regularization, criterion):
         total_loss += loss.item()
         if i % 100 == 0:
             print(f"{i}: curr loss: {loss}")
-    return total_loss * batch_size / len(loader.dataset)
+    return total_loss * batch_size / len(dataset_train)
 
 
 @torch.no_grad()
@@ -161,11 +161,11 @@ def start_training(model, train_loader, test_loader, optimizer, criterion, epoch
 if __name__ == '__main__':
     now = datetime.now()
     directory = now.strftime("%d_%m_%y_%H:%M:%S")
-    model_path = (curr_path / f"models_seg/{directory}/").resolve()
+    model_path = (curr_path / f"models/{directory}/").resolve()
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-    num_points = 400
+    num_points = 512
     batch_size = 4
     num_epochs = 200
     learning_rate =  1e-3 # 0.003111998
@@ -176,21 +176,20 @@ if __name__ == '__main__':
 
     F = [128, 512, 1024]  # Outputs size of convolutional filter.
     K = [6, 5, 3]         # Polynomial orders.
-    M = [512, 128, 3]
+    M = [512, 128, 4]
 
     
     # transforms = Compose([FixedPoints(num_points), GaussianNoiseTransform(
     #     mu=0, sigma=0, recompute_normals=False), RandomScale([0.8, 1.2]), RandomRotate(15, 0), RandomRotate(15, 1), RandomRotate(15, 2)])
 
-    transforms = Compose([FixedPoints(num_points), NormalizeScale()])
-
-    dataset_path = (dataset_path / "Plane").resolve()
+    transforms = Compose([FixedPoints(num_points), GaussianNoiseTransform(mu=0, sigma=0.005, recompute_normals=False), NormalizeScale()])
+    dataset_path = (dataset_path / "Airplane").resolve()
     # dataset_path = (dataset_path / "ShapeNet").resolve()
     # dataset_train = ShapeNet(root=str(dataset_path), categories="Airplane", include_normals=True, split="train", transform=transforms)
     # dataset_test = ShapeNet(root=str(dataset_path), categories="Airplane", include_normals=True, split="test", transform=transforms)
 
     print(str(dataset_path))
-    
+    print(transforms)
     # root_dir MUST BE A Path(...) 
     dataset_train = FilteredShapeNet(root_dir=dataset_path, folder="train", transform=transforms)
     dataset_test = FilteredShapeNet(root_dir=dataset_path, folder="test", transform=transforms)
@@ -224,12 +223,13 @@ if __name__ == '__main__':
     # optimizer = torch.optim.Adam(
     #     model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.Adam(
+        model.parameters(), lr=learning_rate)
 
-    log_dir_path = (curr_path / "tensorboard_seg/").resolve()
+    log_dir_path = (curr_path / "tensorboard/").resolve()
     
-    writer = SummaryWriter(log_dir=str(log_dir_path)+"/", comment='seg_' + str(num_points) +
-                           '_' + str(dropout), filename_suffix='_reg')
+    writer = SummaryWriter(log_dir=str(log_dir_path) ,comment='seg_'+str(num_points) +
+                           '_'+str(dropout), filename_suffix='_reg')
 
     start_training(model, train_loader, test_loader, optimizer,
                    epochs=num_epochs, criterion=criterion, regularization=regularization)

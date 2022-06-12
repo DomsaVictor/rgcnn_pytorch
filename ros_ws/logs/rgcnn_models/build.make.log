@@ -1,15 +1,9 @@
 [ 29%] Built target rgcnn_models_gencfg
-[35m[1mConsolidate compiler generated dependencies of target remove_floor_node[0m
-[35m[1mConsolidate compiler generated dependencies of target plane_segmentation_node[0m
-[35m[1mConsolidate compiler generated dependencies of target compute_surface_normals_node[0m
-[35m[1mConsolidate compiler generated dependencies of target passthrough_filter_node[0m
-[35m[1mConsolidate compiler generated dependencies of target voxel_filter_node[0m
-[35m[1mConsolidate compiler generated dependencies of target trianglemesh_node[0m
-[ 47%] Built target passthrough_filter_node
-[ 52%] Built target voxel_filter_node
-[ 58%] [32mBuilding CXX object CMakeFiles/plane_segmentation_node.dir/src/plane_segmentation_node.cpp.o[0m
-[ 64%] [32mBuilding CXX object CMakeFiles/compute_surface_normals_node.dir/src/compute_surface_normals_node.cpp.o[0m
-[ 76%] Built target remove_floor_node
+[ 35%] [32mBuilding CXX object CMakeFiles/plane_segmentation_node.dir/src/plane_segmentation_node.cpp.o[0m
+[ 58%] Built target passthrough_filter_node
+[ 58%] Built target voxel_filter_node
+[ 70%] Built target remove_floor_node
+[ 76%] [32mBuilding CXX object CMakeFiles/compute_surface_normals_node.dir/src/compute_surface_normals_node.cpp.o[0m
 [ 82%] [32mBuilding CXX object CMakeFiles/trianglemesh_node.dir/src/trianglemesh_node.cpp.o[0m
 [01m[K/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/src/rgcnn_models/src/plane_segmentation_node.cpp:10:10:[m[K [01;31m[Kfatal error: [m[Kvisualization_msgs/Marker.h: No such file or directory
  #include [01;31m[K<visualization_msgs/Marker.h>[m[K
@@ -24,14 +18,14 @@ make[1]: *** Waiting for unfinished jobs....
  #include [01;31m[K<shape_msgs/Mesh.h>[m[K
           [01;31m[K^~~~~~~~~~~~~~~~~~~[m[K
 compilation terminated.
-[01m[K/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/src/rgcnn_models/src/compute_surface_normals_node.cpp:20:10:[m[K [01;31m[Kfatal error: [m[Kvisualization_msgs/Marker.h: No such file or directory
- #include [01;31m[K<visualization_msgs/Marker.h>[m[K
-          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
-compilation terminated.
 CMakeFiles/trianglemesh_node.dir/build.make:75: recipe for target 'CMakeFiles/trianglemesh_node.dir/src/trianglemesh_node.cpp.o' failed
 make[2]: *** [CMakeFiles/trianglemesh_node.dir/src/trianglemesh_node.cpp.o] Error 1
 CMakeFiles/Makefile2:2489: recipe for target 'CMakeFiles/trianglemesh_node.dir/all' failed
 make[1]: *** [CMakeFiles/trianglemesh_node.dir/all] Error 2
+[01m[K/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/src/rgcnn_models/src/compute_surface_normals_node.cpp:20:10:[m[K [01;31m[Kfatal error: [m[Kvisualization_msgs/Marker.h: No such file or directory
+ #include [01;31m[K<visualization_msgs/Marker.h>[m[K
+          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+compilation terminated.
 CMakeFiles/compute_surface_normals_node.dir/build.make:75: recipe for target 'CMakeFiles/compute_surface_normals_node.dir/src/compute_surface_normals_node.cpp.o' failed
 make[2]: *** [CMakeFiles/compute_surface_normals_node.dir/src/compute_surface_normals_node.cpp.o] Error 1
 CMakeFiles/Makefile2:2515: recipe for target 'CMakeFiles/compute_surface_normals_node.dir/all' failed

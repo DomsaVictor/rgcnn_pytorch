@@ -10,10 +10,10 @@ import torch as t
 from sensor_msgs.msg import PointCloud2, PointField
 from torch_geometric.nn import fps
 
+counter = 0 
+
 def callback(data, num_points=1024):
     global counter
-
-    counter = 0
 
     gen = pcl2.read_points(data, skip_nans=True)
 
@@ -46,8 +46,13 @@ def callback(data, num_points=1024):
         points = np.asarray(pcd.points)[index_fps]
         normals = np.asarray(pcd.normals)[index_fps]
 
+    aux_pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(points))
+    aux_pcd.normals = o3d.utility.Vector3dVector(normals)
+    o3d.io.write_point_cloud('/home/victor/Desktop/Dataset_from_ROS/plane_' + str(counter) + '.pcd', aux_pcd)
+    # o3d.visualization.draw_geometries([aux_pcd], point_show_normal=True)
     test_pcd = np.concatenate((points, normals), axis=1)
     message = pcl2.create_cloud(header, fields, test_pcd)
+    counter += 1
     pub.publish(message)
 
 

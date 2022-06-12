@@ -182,15 +182,14 @@ if __name__ == '__main__':
     # transforms = Compose([FixedPoints(num_points), GaussianNoiseTransform(
     #     mu=0, sigma=0, recompute_normals=False), RandomScale([0.8, 1.2]), RandomRotate(15, 0), RandomRotate(15, 1), RandomRotate(15, 2)])
 
-    transforms = Compose([FixedPoints(num_points), NormalizeScale()])
-
+    transforms = Compose([FixedPoints(num_points), GaussianNoiseTransform(mu=0, sigma=0.005, recompute_normals=False), NormalizeScale()])
     dataset_path = (dataset_path / "Airplane").resolve()
     # dataset_path = (dataset_path / "ShapeNet").resolve()
     # dataset_train = ShapeNet(root=str(dataset_path), categories="Airplane", include_normals=True, split="train", transform=transforms)
     # dataset_test = ShapeNet(root=str(dataset_path), categories="Airplane", include_normals=True, split="test", transform=transforms)
 
     print(str(dataset_path))
-    
+    print(transforms)
     # root_dir MUST BE A Path(...) 
     dataset_train = FilteredShapeNet(root_dir=dataset_path, folder="train", transform=transforms)
     dataset_test = FilteredShapeNet(root_dir=dataset_path, folder="test", transform=transforms)

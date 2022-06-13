@@ -35,14 +35,22 @@ from utils import compute_loss_with_weights
 from utils import label_to_cat
 from utils import seg_classes
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def train(model, optimizer, loader, regularization, criterion):
     model.train()
     total_loss = 0
+    
+    add_cat = True
+    if (len(loader.dataset.categories) == 1):
+        add_cat = False
+
 
     for i, data in enumerate(loader):
         optimizer.zero_grad()
-        cat = data.category.to(device)
+        cat = None
+        if add_cat:
+            cat = data.category.to(device)
         y = data.y.type(torch.LongTensor)
         # x = data.pos
         x = torch.cat([data.pos.type(torch.float32),
@@ -63,19 +71,26 @@ def train(model, optimizer, loader, regularization, criterion):
         total_loss += loss.item()
         if i % 100 == 0:
             print(f"{i}: curr loss: {loss}")
-    return total_loss * batch_size / len(loader.dataset)
+    return total_loss * loader.batch_size / len(loader.dataset)
 
 
 @torch.no_grad()
 def test(model, loader):
     model.eval()
     size = len(loader.dataset)
-    predictions = np.empty((size, num_points))
-    labels = np.empty((size, num_points))
+    predictions = np.empty((size, model.vertice))
+    labels = np.empty((size, model.vertice))
     total_correct = 0
+    add_cat = True
+    if (len(loader.dataset.categories) == 1):
+        add_cat = False
 
     for i, data in enumerate(loader):
-        cat = data.category.to(device)
+        
+        cat = None
+        if add_cat:
+            cat = data.category.to(device)
+
         x = torch.cat([data.pos.type(torch.float32),
                   data.x.type(torch.float32)], dim=2)
         y = data.y
@@ -84,8 +99,8 @@ def test(model, loader):
         pred = logits.argmax(dim=2)
 
         total_correct += int((pred == y).sum())
-        start = i * batch_size
-        stop = start + batch_size
+        start = i * loader.batch_size
+        stop = start + loader.batch_size
         predictions[start:stop] = pred
         # lab = y
         # labels[start:stop] = lab.reshape([-1, num_points])
@@ -110,12 +125,12 @@ def test(model, loader):
         tot_iou.append(np.mean(part_ious))
 
     ncorrects = np.sum(predictions == labels)
-    accuracy = ncorrects * 100 / (len(dataset_test) * num_points)
+    accuracy = ncorrects * 100 / (len(loader.dataset) * model.vertice)
 
     return accuracy, cat_iou, tot_iou, ncorrects
 
 
-def start_training(model, train_loader, test_loader, optimizer, criterion, epochs=50, learning_rate=1e-3, regularization=1e-9, decay_rate=0.95):
+def start_training(model, train_loader, test_loader, optimizer, criterion, writer, model_path, category="all", epochs=50, learning_rate=1e-3, regularization=1e-9, decay_rate=0.95):
     print(model.parameters)
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"\nTraining on {device}")
@@ -144,7 +159,7 @@ def start_training(model, train_loader, test_loader, optimizer, criterion, epoch
 
         print(
             f'Epoch: {epoch:02d}, Loss: {loss:.4f}, Test Accuracy: {test_acc:.4f}%, IoU: {np.mean(tot_iou)*100:.4f}%')
-        print(f'ncorrect: {ncorrects} / {len(dataset_test) * num_points}')
+        print(f'ncorrect: {ncorrects} / {len(test_loader.dataset) * model.vertice}')
         print(
             f'Train Time: \t{train_stop_time - train_start_time} \nTest Time: \t{test_stop_time - test_start_time }')
         print("~~~" * 30)
@@ -156,12 +171,89 @@ def start_training(model, train_loader, test_loader, optimizer, criterion, epoch
             if not os.path.isdir(str(model_path)):
                 os.mkdir(str(model_path))
             torch.save(model.state_dict(), str(model_path) + '/' +
-                       str(num_points) + 'p_model_v2_' + str(epoch) + '.pt')
+                       str(model.vertice) + f'p_seg_{category}' + str(epoch) + '.pt')
 
     print(f"Training finished")
 
 
-if __name__ == '__main__':
+def train_each_category(categories=None):
+
+    if categories is None:
+        categories = ["Airplane", "Bag", "Cap", "Car", "Chair", "Earphone", 
+                    "Guitar", "Knife", "Lamp", "Laptop", "Motorbike", "Mug", 
+                    "Pistol", "Rocket", "Skateboard", "Table"]
+
+    dataset_path    = (curr_path / "../dataset/").resolve()
+
+
+    # dataset_path = (dataset_path / "Plane").resolve()
+    dataset_path = (dataset_path / "ShapeNet").resolve()
+
+    now = datetime.now()
+    directory = now.strftime("%d_%m_%y_%H:%M:%S")
+    model_path = (curr_path / f"models_seg/{directory}/").resolve()
+
+
+    num_points = 2048
+    batch_size = 16
+    num_epochs = 200
+    learning_rate =  1e-3 # 0.003111998
+    decay_rate = 0.8
+    dropout = 0.2 # 0.09170225
+    regularization = 1e-9 # 5.295088673159155e-9
+
+    input_dim = 6
+
+    F = [128, 512, 1024]  # Outputs size of convolutional filter.
+    K = [6, 5, 3]         # Polynomial orders.
+    M = [512, 128, 4]
+    
+
+    for category in categories:
+        transforms = Compose([FixedPoints(num_points), NormalizeScale()])
+
+        dataset_train = ShapeNet(root=str(dataset_path), include_normals=True, categories=category, split="train", transform=transforms)
+        dataset_test  = ShapeNet(root=str(dataset_path), include_normals=True, categories=category, split="test",  transform=transforms)
+
+        criterion = torch.nn.CrossEntropyLoss()
+
+        print(f"Training on {device}")
+
+        # Verification...
+        print(f"Train dataset shape: {dataset_train}")
+        print(f"Test dataset shape:  {dataset_test}")
+
+        train_loader = DenseDataLoader(
+            dataset_train, batch_size=batch_size,
+            shuffle=True, pin_memory=True, num_workers=4)
+
+        test_loader = DenseDataLoader(
+            dataset_test, batch_size=batch_size,
+            shuffle=True, num_workers=4)
+
+        model = seg_model(num_points, F, K, M, input_dim=input_dim,
+                        dropout=dropout,
+                        one_layer=False,
+                        reg_prior=True,
+                        recompute_L=False,
+                        b2relu=True)
+
+        model = model.to(device)
+        
+        # optimizer = torch.optim.Adam(
+        #     model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+
+        optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+
+        log_dir_path = (curr_path / "tensorboard_seg/").resolve()
+        
+        writer = SummaryWriter(log_dir=str(log_dir_path) + "/" + category + "/"  + str(directory), comment='seg_' + str(num_points) +
+                            '_' + str(dropout), filename_suffix='_reg')
+
+        start_training(model, train_loader, test_loader, optimizer, writer=writer, category=category, model_path=model_path,
+                    epochs=num_epochs, criterion=criterion, regularization=regularization, decay_rate=decay_rate)
+
+def train_shapenet_full():
     now = datetime.now()
     directory = now.strftime("%d_%m_%y_%H:%M:%S")
     model_path = (curr_path / f"models_seg/{directory}/").resolve()
@@ -177,11 +269,11 @@ if __name__ == '__main__':
     dropout = 0.2 # 0.09170225
     regularization = 1e-9 # 5.295088673159155e-9
 
-    input_dim = 22
+    input_dim = 6
 
     F = [128, 512, 1024]  # Outputs size of convolutional filter.
     K = [6, 5, 3]         # Polynomial orders.
-    M = [512, 128, 50]
+    M = [512, 128, 4]
 
     
     # transforms = Compose([FixedPoints(num_points), GaussianNoiseTransform(
@@ -192,8 +284,8 @@ if __name__ == '__main__':
     # dataset_path = (dataset_path / "Plane").resolve()
     dataset_path = (dataset_path / "ShapeNet").resolve()
 
-    dataset_train = ShapeNet(root=str(dataset_path), include_normals=True, split="train", transform=transforms)
-    dataset_test  = ShapeNet(root=str(dataset_path), include_normals=True, split="test",  transform=transforms)
+    dataset_train = ShapeNet(root=str(dataset_path), include_normals=True, categories="Airplane", split="train", transform=transforms)
+    dataset_test  = ShapeNet(root=str(dataset_path), include_normals=True, categories="Airplane", split="test",  transform=transforms)
 
     print(str(dataset_path))
     
@@ -237,5 +329,15 @@ if __name__ == '__main__':
     writer = SummaryWriter(log_dir=str(log_dir_path)+"/"+str(directory), comment='seg_' + str(num_points) +
                            '_' + str(dropout), filename_suffix='_reg')
 
-    start_training(model, train_loader, test_loader, optimizer,
-                   epochs=num_epochs, criterion=criterion, regularization=regularization)
+    start_training(model, train_loader, test_loader, optimizer, model_path=model_path,
+                   epochs=num_epochs, criterion=criterion, regularization=regularization, decay_rate=decay_rate)
+
+
+if __name__ == '__main__':
+    categories = sorted(["Airplane", "Bag", "Cap", "Car", "Chair", "Earphone", 
+                    "Guitar", "Knife", "Lamp", "Laptop", "Motorbike", "Mug", 
+                    "Pistol", "Rocket", "Skateboard", "Table"])
+
+    # train_num = int(input("Train number: "))
+
+    train_each_category(categories)

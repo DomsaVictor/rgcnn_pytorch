@@ -41,7 +41,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 def train(model, optimizer, loader, regularization, criterion):
     model.train()
     total_loss = 0
-    for i, data in enumerate(loader()):
+    for i, data in enumerate(loader):
         optimizer.zero_grad()
         
         x = torch.cat([data.pos.type(torch.float32), data.normal.type(torch.float32)], dim=2)
@@ -57,21 +57,22 @@ def train(model, optimizer, loader, regularization, criterion):
         total_loss += loss.item()
         if i%100 == 0:
             print(f"{i}: curr loss: {loss}")
-    return total_loss / len(loader.dataset)
+    return total_loss / len(loader)
 
 @torch.no_grad()
 def test(model, loader):
+    model.eval()
     total_correct = 0
     for i, data in enumerate(loader):
             x = torch.cat([data.pos.type(torch.float32), data.normal.type(torch.float32)], dim=2)
-            y = data.y.type(torch.LongTensor)
+            y = data.y.type(torch.LongTensor).squeeze()
             
             logits, _, _ = model(x.to(device))
             logits = logits.to('cpu')
             pred = logits.argmax(dim=-1)
-            total_correct += int((pred == data.y).sum())
+            total_correct += int((pred == y).sum())
     
-    return total_correct / len(loader.dataset)
+    return total_correct / len(loader.dataset), total_correct
 
 def start_training(model, train_loader, test_loader, optimizer, criterion, writer, epochs=50, learning_rate=1e-3, regularization=1e-9, decay_rate=0.95):
     print(model.parameters)
@@ -90,21 +91,14 @@ def start_training(model, train_loader, test_loader, optimizer, criterion, write
         writer.add_scalar('loss/train', loss, epoch)
 
         test_start_time = time.time()
-        test_acc, cat_iou, tot_iou, ncorrects = test(model, test_loader)
+        test_acc, ncorrects = test(model, test_loader)
         test_stop_time = time.time()
 
-        for key, value in cat_iou.items():
-            print(key + ': {:.4f}, total: {:d}'.format(np.mean(value), len(value)))
-            writer.add_scalar(key + '/test', np.mean(value), epoch)
-
-        writer.add_scalar("IoU/test", np.mean(tot_iou) * 100, epoch)
         writer.add_scalar("accuracy/test", test_acc, epoch)
 
-        print(
-            f'Epoch: {epoch:02d}, Loss: {loss:.4f}, Test Accuracy: {test_acc:.4f}%, IoU: {np.mean(tot_iou)*100:.4f}%')
-        print(f'ncorrect: {ncorrects} / {len(test_loader.dataset) * model.vertice}')
-        print(
-            f'Train Time: \t{train_stop_time - train_start_time} \nTest Time: \t{test_stop_time - test_start_time }')
+        print(f'Epoch:    {epoch:02d}, Loss: {loss:.4f}, Test Accuracy: {test_acc*100:.4f}%')
+        print(f'ncorrect: {ncorrects} / {len(test_loader.dataset)}')
+        print(f'Train Time: \t{train_stop_time - train_start_time} \nTest Time: \t{test_stop_time - test_start_time }')
         print("~~~" * 30)
 
         my_lr_scheduler.step()
@@ -125,11 +119,16 @@ if __name__ == '__main__':
     model_path = (curr_path / f"models_cls/{directory}/").resolve()
 
     num_points = 1024
-    batch_size = 2
-    num_epochs = 50
+    batch_size = 8
+    num_epochs = 200
     learning_rate = 1e-3
     modelnet_num = 40
     dropout = 0.2
+    gamma = 0.8
+    one_layer = False
+    reg_prior = False
+    recompute_L = False
+    
     
     F = [128, 512, 1024]  # Outputs size of convolutional filter.
     K = [6, 5, 3]         # Polynomial orders.
@@ -140,7 +139,7 @@ if __name__ == '__main__':
     print(f"Training on {device}")
 
     transforms = Compose([SamplePoints(num_points, include_normals=True), NormalizeScale()])
-
+    print(str((dataset_path/"Modelnet").resolve()))
     dataset_train = ModelNet(root=str((dataset_path/"Modelnet").resolve()), name=str(modelnet_num), train=True, transform=transforms)
     dataset_test = ModelNet(root=str((dataset_path/"Modelnet").resolve()), name=str(modelnet_num), train=False, transform=transforms)
 
@@ -152,20 +151,20 @@ if __name__ == '__main__':
     train_loader = DenseDataLoader(dataset_train, batch_size=batch_size, shuffle=True, pin_memory=True)
     test_loader  = DenseDataLoader(dataset_test, batch_size=batch_size)
     
-    model = cls_model(num_points, F, K, M, modelnet_num, dropout=dropout, one_layer=False, reg_prior=True)
+    model = cls_model(num_points, F, K, M, input_dim=6, dropout=dropout, one_layer=one_layer, reg_prior=reg_prior, recompute_L=recompute_L)
     model = model.to(device)
     
     print(model.parameters)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    my_lr_scheduler = lr_scheduler.ExponentialLR(optimizer=optimizer, gamma=0.95)
+    my_lr_scheduler = lr_scheduler.ExponentialLR(optimizer=optimizer, gamma=gamma)
 
     regularization = 1e-9
     criterion = torch.nn.CrossEntropyLoss()  # Define loss criterion.
     
-    log_dir_path = (curr_path / "tensorboard_cls/").resolve()
+    log_dir_path = (curr_path / "tensorboard_cls").resolve()
 
 
-    writer = SummaryWriter(log_dir=str(log_dir_path)+"/", comment='cls_' + str(num_points) +
+    writer = SummaryWriter(log_dir=str(log_dir_path) + "/", comment='cls_' + str(num_points) +
             '_' + str(dropout), filename_suffix='_reg')
-    start_training(model, train_loader, test_loader, optimizer, criterion, writer)
+    start_training(model, train_loader, test_loader, optimizer, criterion, writer, epochs=num_epochs)

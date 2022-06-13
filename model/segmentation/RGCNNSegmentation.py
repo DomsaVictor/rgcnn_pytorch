@@ -42,7 +42,7 @@ class seg_model(nn.Module):
             conv.DenseChebConvV2(input_dim, self.F[i], self.K[i], bias=self.cheb_bias) if i == 0 else conv.DenseChebConvV2(self.F[i-1], self.F[i], self.K[i], bias=self.cheb_bias) for i in range(len(K))
         ])
 
-        self.batch_norm_list_conv = nn.ModuleList([BatchNorm1d(input_dim)])
+        self.batch_norm_list_conv = nn.ModuleList([BatchNorm1d(6)])         # this is hardcoded for a reason.
 
         for i in range(len(F)):
             self.batch_norm_list_conv.append(nn.BatchNorm1d(F[i])) 
@@ -72,7 +72,7 @@ class seg_model(nn.Module):
 
     def get_laplacian(self, x):
         with torch.no_grad():
-            return conv.get_laplacian(conv.pairwise_distance(x))
+            return conv.get_laplacian(conv.pairwise_distance(x), normalize=True)
 
     @torch.no_grad()
     def append_regularization_terms(self, x, L):
@@ -106,7 +106,6 @@ class seg_model(nn.Module):
             self.append_regularization_terms(out, L)
             if self.recompute_L:
                 L = self.get_laplacian(out)
-            out = self.dropout(out)
             out = self.brelu(out, self.bias_relus[i])
             out = self.batch_norm_list_conv[i+1](out.transpose(1, 2))
             out = out.transpose(1, 2)

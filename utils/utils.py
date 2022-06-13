@@ -35,7 +35,7 @@ def get_laplacian(adj_matrix, normalize=True):
         L = D - adj_matrix
     return L
 
-def pairwise_distance(point_cloud,normalize=False):
+def pairwise_distance(point_cloud, normalize=False):
     """
     Compute the pairwise distance of a point cloud.
 
@@ -227,14 +227,14 @@ def get_centroid(point_cloud,num_points):
 
 def compute_loss_with_weights(logits, y, x, L, criterion, model, s=1e-9):
     if not logits.device == y.device:
-            y = y.to(logits.device)
+        y = y.to(logits.device)
 
     l_norm = 0
     for name, p in model.named_parameters():
          if 'bias_relus' not in name:
             l_norm += t.norm(p, p=2)
 
-    loss = criterion(logits, y)
+    loss = criterion(logits, y.squeeze())
     
     l=0
     for i in range(len(x)):

@@ -20,5 +20,11 @@ dataset/Plane
 *.json
 
 ###################################
-ros_ws
+ros_ws/
 ###################################
+
+
+
+
+model/segmentation
+dataset/screenshots

@@ -1,1 +1,11 @@
-/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/share/rgcnn_models/docs/passthrough_filter_nodeConfig.dox
+\subsubsection parameters ROS parameters
+
+Reads and maintains the following parameters on the ROS server
+
+- \b "~z_lower_limit" : \b [double] Z Lower limit min: 0.0, default: 0.0, max: 15.0
+- \b "~z_upper_limit" : \b [double] Z Upper limit min: 0.0, default: 3.0, max: 50.0
+- \b "~x_lower_limit" : \b [double] X Lower limit min: -1.5, default: -0.5, max: 0.0
+- \b "~x_upper_limit" : \b [double] X Upper limit min: 0.0, default: 0.5, max: 1.5
+- \b "~y_lower_limit" : \b [double] Y Lower limit min: -1.5, default: -0.5, max: 0.0
+- \b "~y_upper_limit" : \b [double] Y Upper limit min: 0.0, default: 0.5, max: 1.5
+

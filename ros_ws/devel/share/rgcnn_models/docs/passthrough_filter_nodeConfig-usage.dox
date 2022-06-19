@@ -1,1 +1,12 @@
-/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/share/rgcnn_models/docs/passthrough_filter_nodeConfig-usage.dox
+\subsubsection usage Usage
+\verbatim
+<node name="rgcnn_models" pkg="rgcnn_models" type="rgcnn_models">
+  <param name="z_lower_limit" type="double" value="0.0" />
+  <param name="z_upper_limit" type="double" value="3.0" />
+  <param name="x_lower_limit" type="double" value="-0.5" />
+  <param name="x_upper_limit" type="double" value="0.5" />
+  <param name="y_lower_limit" type="double" value="-0.5" />
+  <param name="y_upper_limit" type="double" value="0.5" />
+</node>
+\endverbatim
+

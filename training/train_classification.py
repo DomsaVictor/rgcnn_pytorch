@@ -30,7 +30,7 @@ sys.path.append(str(dataset_path))
 
 
 from utils import GaussianNoiseTransform
-from FilteredShapenetDataset import FilteredShapeNet
+from FilteredShapenetDataset import FilteredShapeNet, PcdDataset
 from RGCNNClassification import cls_model
 from utils import compute_loss_with_weights
 from utils import label_to_cat
@@ -141,8 +141,8 @@ if __name__ == '__main__':
 
     transforms = Compose([SamplePoints(num_points, include_normals=True), NormalizeScale()])
 
-    dataset_train = ModelNet(root=str((dataset_path/"Modelnet").resolve()), name=str(modelnet_num), train=True, transform=transforms)
-    dataset_test = ModelNet(root=str((dataset_path/"Modelnet").resolve()), name=str(modelnet_num), train=False, transform=transforms)
+    dataset_train = PcdDataset(root=str((dataset_path/"Modelnet").resolve()), name=str(modelnet_num), train=True, transform=transforms)
+    dataset_test  = PcdDataset(root=str((dataset_path/"Modelnet").resolve()), name=str(modelnet_num), train=False, transform=transforms)
 
     # Verification...
     print(f"Train dataset shape: {dataset_train}")
@@ -152,7 +152,7 @@ if __name__ == '__main__':
     train_loader = DenseDataLoader(dataset_train, batch_size=batch_size, shuffle=True, pin_memory=True)
     test_loader  = DenseDataLoader(dataset_test, batch_size=batch_size)
     
-    model = cls_model(num_points, F, K, M, modelnet_num, dropout=dropout, one_layer=False, reg_prior=True)
+    model = cls_model(num_points, F, K, M, modelnet_num, dropout=dropout, one_layer=False, reg_prior=False)
     model = model.to(device)
     
     print(model.parameters)

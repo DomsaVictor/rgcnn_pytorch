@@ -1,1 +1,7 @@
-/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/share/rgcnn_models/docs/voxel_filter_nodeConfig-usage.dox
+\subsubsection usage Usage
+\verbatim
+<node name="rgcnn_models" pkg="rgcnn_models" type="rgcnn_models">
+  <param name="leafsize" type="double" value="0.01" />
+</node>
+\endverbatim
+

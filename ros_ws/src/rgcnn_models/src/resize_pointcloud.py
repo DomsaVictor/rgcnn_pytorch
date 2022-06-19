@@ -28,7 +28,7 @@ def callback(data, num_points=1024):
 
     pcd.estimate_normals(fast_normal_computation=False)
     # pcd.normalize_normals()
-    pcd.orient_normals_consistent_tangent_plane(100)
+    # pcd.orient_normals_consistent_tangent_plane(100)
     points = t.tensor(np.asarray(pcd.points))
     if data_length < num_points:
         alpha = 0.03

@@ -1,6 +1,0 @@
-devel_space: /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel
-install: false
-install_space: /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/install
-profile: default
-source_space: /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/src
-workspace: /home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws

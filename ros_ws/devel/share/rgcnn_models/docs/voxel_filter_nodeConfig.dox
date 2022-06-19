@@ -1,1 +1,6 @@
-/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/share/rgcnn_models/docs/voxel_filter_nodeConfig.dox
+\subsubsection parameters ROS parameters
+
+Reads and maintains the following parameters on the ROS server
+
+- \b "~leafsize" : \b [double] Leafsize min: 0.002, default: 0.01, max: 0.3
+

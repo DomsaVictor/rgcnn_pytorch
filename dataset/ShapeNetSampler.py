@@ -26,12 +26,13 @@ initial_cameras_for_models = {
 
 
 class ShapeNetSampler(Frame):
-    def __init__(self, master: Tk, transforms, num_points: int = 512, num_pcds:int = 1000, save_root: Path = None, shapenet_path: Path = None, chosen_indexes_file:str=None):
+    def __init__(self, master: Tk, transforms, category : str = "Airplane", num_points: int = 512, num_pcds:int = 1000, save_root: Path = None, shapenet_path: Path = None, chosen_indexes_file:str=None):
         super().__init__(master)
         if shapenet_path is None:
             self.root = str((Path(__file__).parent / "ShapeNet").resolve())
         else:
             self.root = shapenet_path
+        self.category = category
         self.num_points = num_points
         self.num_pcds = num_pcds
         self.master = master
@@ -42,10 +43,10 @@ class ShapeNetSampler(Frame):
             self.chosen_indexes = [int(index) for index in chosen_indexes]
         self.init_cam_coord = [0, 0.25, 0.9]
         self.init_cam_range = [0, 60]
-        self.dataset = ShapeNet(self.root, categories="Airplane", include_normals=True,  split="trainval", transform=transforms)
+        self.dataset = ShapeNet(self.root, categories=category, include_normals=True, split="trainval", transform=transforms)
         self.folders = ['train', 'test']
         if save_root is None:
-            self.save_root = (Path(__file__).parent / "Airplane").resolve()
+            self.save_root = (Path(__file__).parent / category).resolve()
         else:
             self.save_root = save_root
                 
@@ -84,7 +85,6 @@ class ShapeNetSampler(Frame):
             cam_range = range(self.init_cam_range[0], self.init_cam_range[1])
         elif len(cam_range) == 1:
             cam_range = range(self.init_cam_range[0]) 
-            
 
         if self.chosen_indexes is None:
             for i in tqdm(range(self.num_pcds)):
@@ -120,7 +120,7 @@ class ShapeNetSampler(Frame):
             pcd_filtered.paint_uniform_color([0,0,1])
             pcd_rot.paint_uniform_color([1,0,0])
             self.show_pcds([pcd_rot, pcd_filtered, camera_point])
-            
+            self.vis.capture_screen_image(filename=str(curr_dir/"screenshots"/self.category/(str(j)+".png")))
         self.vis.destroy_window()
 
     def start_sampling_camera_rot(self, cam_coord):
@@ -274,7 +274,7 @@ class ShapeNetSampler(Frame):
         self.vis.update_renderer()
         rng = default_rng()
         # Delay so you have time to adjust the camera.
-        for _ in range(25):
+        for _ in range(150):
             self.vis.poll_events()
             self.vis.update_renderer()
             time.sleep(0.1)
@@ -314,6 +314,7 @@ class ShapeNetSampler(Frame):
             camera_point.paint_uniform_color([0,0,1])
             # pcd_filtered = self.select_by_index(pcd, indexes)
             self.show_pcds([pcd, pcd_filtered, camera_point])
+            self.vis.capture_screen_image(filename=str(curr_dir/"screenshots"/self.category/(str(j)+".png")))
             
         self.vis.destroy_window()
 
@@ -324,7 +325,7 @@ if __name__ == "__main__":
     num_points = 512
     num_pcds = 300
     
-    sampler = ShapeNetSampler(master, transforms, num_points, num_pcds, chosen_indexes_file="ChosenPCDIndexes1.txt")
+    sampler = ShapeNetSampler(master, transforms=transforms, num_points=num_points, num_pcds=num_pcds, category="Chair", chosen_indexes_file="ChosenPCDIndexes.txt")
     
 # colors = rand(50, 3)
 

@@ -30,7 +30,7 @@ sys.path.append(str(dataset_path))
 
 
 from utils import GaussianNoiseTransform
-from FilteredShapenetDataset import FilteredShapeNet
+# from FilteredShapenetDataset import FilteredShapeNet, PcdDatasetNoise
 from RGCNNClassification import cls_model
 from utils import compute_loss_with_weights
 from utils import label_to_cat
@@ -44,13 +44,13 @@ def train(model, optimizer, loader, regularization, criterion):
     for i, data in enumerate(loader):
         optimizer.zero_grad()
         
+        # x = torch.cat([data.pos.type(torch.float32), data.x.type(torch.float32)], dim=2)
         x = torch.cat([data.pos.type(torch.float32), data.normal.type(torch.float32)], dim=2)
+
         y = data.y.type(torch.LongTensor)
         
         logits, out, L = model(x.to(device))
         
-        
-
         loss = compute_loss_with_weights(logits, y, out, L, criterion=criterion, model=model,s=regularization)
         loss.backward()
         optimizer.step()
@@ -64,6 +64,7 @@ def test(model, loader):
     model.eval()
     total_correct = 0
     for i, data in enumerate(loader):
+            # x = torch.cat([data.pos.type(torch.float32), data.x.type(torch.float32)], dim=2)
             x = torch.cat([data.pos.type(torch.float32), data.normal.type(torch.float32)], dim=2)
             y = data.y.type(torch.LongTensor).squeeze()
             
@@ -75,7 +76,7 @@ def test(model, loader):
     return total_correct / len(loader.dataset), total_correct
 
 def start_training(model, train_loader, test_loader, optimizer, criterion, writer, epochs=50, learning_rate=1e-3, regularization=1e-9, decay_rate=0.95):
-    print(model.parameters)
+    print(model)
     print(f"\nTraining on {device}")
 
     model.to(device)
@@ -106,7 +107,7 @@ def start_training(model, train_loader, test_loader, optimizer, criterion, write
         # Save the model every 5 epochs
         if epoch % 5 == 0 or epoch == 1:
             if not os.path.isdir(str(model_path)):
-                os.mkdir(str(model_path))
+                os.makedirs(str(model_path))
             torch.save(model.state_dict(), str(model_path) + '/' +
                        str(model.vertice) + 'p_model_v2_' + str(epoch) + '.pt')
 
@@ -116,22 +117,22 @@ def start_training(model, train_loader, test_loader, optimizer, criterion, write
 if __name__ == '__main__':
     now = datetime.now()
     directory = now.strftime("%d_%m_%y_%H:%M:%S")
-    model_path = (curr_path / f"models_cls/{directory}/").resolve()
+    model_path = (curr_path / f"models_cls/rotated/{directory}/").resolve()
 
     num_points = 1024
-    batch_size = 8
+    batch_size = 16
     num_epochs = 200
     learning_rate = 1e-3
     modelnet_num = 40
     dropout = 0.2
-    gamma = 0.8
+    gamma = 0.9
     one_layer = False
-    reg_prior = False
+    reg_prior = True
     recompute_L = False
-    
-    
+    b2relu = False
+
     F = [128, 512, 1024]  # Outputs size of convolutional filter.
-    K = [6, 5, 3]         # Polynomial orders.
+    K = [6, 5, 3]         # Polynomial orde
     M = [512, 128, modelnet_num]
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -139,9 +140,17 @@ if __name__ == '__main__':
     print(f"Training on {device}")
 
     transforms = Compose([SamplePoints(num_points, include_normals=True), NormalizeScale()])
+    # transforms = Compose([SamplePoints(num_points, include_normals=True)])
     print(str((dataset_path/"Modelnet").resolve()))
+
     dataset_train = ModelNet(root=str((dataset_path/"Modelnet").resolve()), name=str(modelnet_num), train=True, transform=transforms)
-    dataset_test = ModelNet(root=str((dataset_path/"Modelnet").resolve()), name=str(modelnet_num), train=False, transform=transforms)
+    dataset_test  = ModelNet(root=str((dataset_path/"Modelnet").resolve()), name=str(modelnet_num), train=False, transform=transforms)
+   
+    # dataset_train = PcdDataset(root_dir=dataset_path/"Modelnet40_512", folder="train")
+    # dataset_test  = PcdDataset(root_dir=dataset_path/"Modelnet40_512", folder="test")
+
+    # dataset_train = PcdDatasetNoise(root_dir=dataset_path/"Modelnet40_512_r_40", folder="train")
+    # dataset_test  = PcdDatasetNoise(root_dir=dataset_path/"Modelnet40_512_r_40", folder="test")
 
     # Verification...
     print(f"Train dataset shape: {dataset_train}")
@@ -149,20 +158,18 @@ if __name__ == '__main__':
 
 
     train_loader = DenseDataLoader(dataset_train, batch_size=batch_size, shuffle=True, pin_memory=True)
-    test_loader  = DenseDataLoader(dataset_test, batch_size=batch_size)
+    test_loader  = DenseDataLoader(dataset_test,  batch_size=batch_size, shuffle=True, pin_memory=True)
     
-    model = cls_model(num_points, F, K, M, input_dim=6, dropout=dropout, one_layer=one_layer, reg_prior=reg_prior, recompute_L=recompute_L)
+    model = cls_model(num_points, F, K, M, input_dim=6, dropout=dropout, one_layer=one_layer, reg_prior=reg_prior, recompute_L=recompute_L, b2relu=b2relu)
     model = model.to(device)
     
-    print(model.parameters)
-
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     my_lr_scheduler = lr_scheduler.ExponentialLR(optimizer=optimizer, gamma=gamma)
 
     regularization = 1e-9
     criterion = torch.nn.CrossEntropyLoss()  # Define loss criterion.
     
-    log_dir_path = (curr_path / "tensorboard_cls").resolve()
+    log_dir_path = (curr_path / "tensorboard_cls/modelnet_normalized/").resolve()
 
 
     writer = SummaryWriter(log_dir=str(log_dir_path) + "/", comment='cls_' + str(num_points) +

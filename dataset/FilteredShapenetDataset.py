@@ -23,6 +23,153 @@ colors = rand(50, 3)
 def default_transforms():
     return Compose([FixedPoints(512)])
 
+
+class PcdDataset(Dataset):
+    def __init__(self, root_dir, points=512, valid=False, folder="train", transform=default_transforms(), save_path=None):
+        self.root_dir = root_dir
+        folders = [dir for dir in sorted(os.listdir(root_dir)) if os.path.isdir(root_dir/dir)]
+        self.classes = {folder: i for i, folder in enumerate(folders)}
+        self.transforms = transform if not valid else default_transforms()
+        self.valid = valid
+        self.files = []
+        self.save_path = None
+        self.folder = folder
+        self.points = points
+        if save_path is not None:
+            self.save_path = save_path
+            if not os.path.exists(save_path):
+                os.mkdir(save_path)
+                
+            for category in self.classes.keys():
+                save_dir = save_path/Path(category)/folder
+                os.makedirs(save_dir)
+
+        for category in self.classes.keys():
+            new_dir = root_dir/Path(category)/folder
+            for file in os.listdir(new_dir):
+                if file.endswith('.pcd'):
+                    sample = {}
+                    sample['pcd_path'] = new_dir/file
+                    sample['category'] = category
+                    self.files.append(sample)
+
+    def __len__(self):
+        return len(self.files)
+
+    def __preproc__(self, file, idx):
+        pcd = o3d.io.read_point_cloud(file)
+
+        # angles = np.random.uniform(low=-np.pi, high=np.pi, size=(3,))
+        # pcd=rotate_pcd(pcd,angles[0],0)
+        # pcd=rotate_pcd(pcd,angles[1],0)
+        # pcd=rotate_pcd(pcd,angles[2],0)
+
+        # pcd=rotate_pcd(pcd,np.pi/2,0)
+        # pcd=rotate_pcd(pcd,np.pi/2,1)
+        # pcd=rotate_pcd(pcd,np.pi/2,2)
+
+        #print(file)
+
+
+        #####Centering and rotation
+        #print(file)
+
+        # aabb_2 = pcd.get_oriented_bounding_box()
+        # aabb_2.color = (0, 0, 1)
+        # centroid_2= o3d.geometry.PointCloud.get_center(pcd)
+        # pcd.translate(-centroid_2)
+        
+        # pcd=pcd.rotate(aabb_2.R.T)
+
+        
+
+        points = np.asarray(pcd.points)
+        points = torch.tensor(points)
+
+        normals = []
+
+
+            
+           
+
+            #print(len(points))
+        if self.save_path is not None:
+
+            pcd.estimate_normals(fast_normal_computation=False)
+            pcd.normalize_normals()
+            #pcd.orient_normals_consistent_tangent_plane(100)
+
+            normals=np.asarray(pcd.normals)
+
+
+
+            if len(points) < self.points:
+                alpha = 0.03
+                rec_mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(
+                    pcd, alpha)
+
+
+                #o3d.visualization.draw_geometries([pcd, rec_mesh])
+
+                num_points_sample = self.points
+
+                pcd_sampled = rec_mesh.sample_points_poisson_disk(num_points_sample) 
+
+                points = pcd_sampled.points
+                points = torch.tensor(points)
+                points=points.float()
+                normals = np.asarray(pcd_sampled.normals)
+
+                # print(len(points))
+                # print(len(normals))
+            else:
+
+                nr_points_fps=self.points
+                nr_points=points.shape[0]
+
+                index_fps = fps(points, ratio=float(nr_points_fps/nr_points) , random_start=True)
+
+                index_fps=index_fps[0:nr_points_fps]
+
+                fps_points=points[index_fps]
+                fps_normals=normals[index_fps]
+
+                points=fps_points
+                normals = fps_normals
+        else:
+            normals=np.asarray(pcd.normals)
+
+        normals = torch.Tensor(normals)
+        normals=normals.float()
+
+        pointcloud = torch_geometric.data.Data(normal=normals, pos=points, y=self.classes[self.files[idx]['category']])
+
+        if self.transforms:
+            pointcloud = self.transforms(pointcloud)
+
+
+        return pointcloud
+
+    def __getitem__(self, idx):
+        pcd_path = self.files[idx]['pcd_path']
+        with open(pcd_path, 'r') as f:
+            pointcloud = self.__preproc__(f.name.strip(), idx)
+            if self.save_path is not None:
+                # name = str(time.time())
+                # name = name.replace('.', '')
+                # name = str(name) + ".pcd"
+                splits = f.name.strip().split("/")
+                cat = splits[len(splits) - 3]
+
+                name = splits[len(splits) - 1]
+
+                total_path = self.save_path/cat/self.folder/name
+                pcd_save = o3d.geometry.PointCloud()
+                pcd_save.points = o3d.utility.Vector3dVector(pointcloud.pos)
+                pcd_save.normals =  o3d.utility.Vector3dVector(pointcloud.normal)
+                o3d.io.write_point_cloud(str(total_path), pcd_save, write_ascii=True)
+        return pointcloud
+
 class FilteredShapeNet(Dataset):
     def __init__(self, root_dir, folder="train", transform=FixedPoints(512), with_normals=True, save_path=None):
         self.root_dir = root_dir

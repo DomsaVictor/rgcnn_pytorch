@@ -66,6 +66,7 @@ class seg_model(nn.Module):
 
     def b1relu(self, x, bias):
         return relu(x + bias)
+        # return relu(x)
 
     def brelu(self, x, bias):
         return leaky_relu(x + bias)
@@ -116,7 +117,7 @@ class seg_model(nn.Module):
             if i == 1:
                 out = torch.concat([out, x1], dim=2)
             out = self.fc[i](out)
-            self.append_regularization_terms(out, L)
+            # self.append_regularization_terms(out, L)
             out = self.dropout(out)
             out = self.b1relu(out, self.bias_relus[i + len(self.K)])
             out = self.batch_norm_list_fc[i](out.transpose(1, 2))

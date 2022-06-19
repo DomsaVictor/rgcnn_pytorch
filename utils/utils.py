@@ -31,7 +31,7 @@ def get_laplacian(adj_matrix, normalize=True):
         L = eye - t.matmul(t.matmul(D, adj_matrix), D)
     else:
         D = t.sum(adj_matrix, dim=1)
-        D = t.diag(D)
+        D = t.diag_embed(D)
         L = D - adj_matrix
     return L
 
@@ -230,17 +230,19 @@ def compute_loss_with_weights(logits, y, x, L, criterion, model, s=1e-9):
         y = y.to(logits.device)
 
     l_norm = 0
-    for name, p in model.named_parameters():
-         if 'bias_relus' not in name:
-            l_norm += t.norm(p, p=2)
+    # for name, p in model.named_parameters():
+    #      if 'bias_relus' not in name:
+    #         l_norm += t.norm(p, p=2)
 
     loss = criterion(logits, y.squeeze())
     
-    l=0
-    for i in range(len(x)):
-        l += (1/2) * t.linalg.norm(t.matmul(t.matmul(t.permute(x[i], (0, 2, 1)), L[i]), x[i]))**2
-    l = (l_norm + l) * s
-    loss += l
+    l = torch.tensor(0).to(torch.double).to(loss.device)
+    if len(x) > 0:
+        for i in range(len(x)):
+            # l += (1/2) * t.linalg.norm(t.matmul(t.matmul(t.permute(x[i], (0, 2, 1)), L[i]), x[i]))**2
+            l += (t.matmul(t.matmul(t.permute(x[i].to(torch.double), (0, 2, 1)), L[i].to(torch.double)), x[i].to(torch.double))).sum() / 2 
+        l = (l_norm + l) * s
+        loss += l
     return loss
 
 def compute_loss(logits, y, x, L, criterion, s=1e-9):

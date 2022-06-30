@@ -32,7 +32,7 @@ from utils import Sphere_Occlusion_Transform
 from torch_geometric.transforms import RandomRotate
 
 import probreg_functions as probreg_f
-import Passthrough_function as pf_f
+import BoxSelector as pf_f
 
 def default_transforms():
     return transforms.Compose([

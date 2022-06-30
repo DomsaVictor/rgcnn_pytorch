@@ -5,12 +5,17 @@ dataset/ShapeNet/
 dataset/Airplane/
 dataset/Airplane_norris/
 dataset/__pycache__/FilteredShapenetDataset.cpython-38.pyc
+dataset/Test_rotation_invariant
 model/segmentation/__pycache__/RGCNNSegmentation.cpython-38.pyc
 dataset/test_pcd
 dataset/Airplane_norris
 training/models
+training/models_cls
+training/models_seg
 dataset/Airplane.zip
 training/tensorboard/
+training/tensorboard_cls
+training/tensorboard_seg
 training/tensorboard/events.out.tfevents.1654447912.norris-SYS-2029GP-TR.1863408.0_reg
 dataset/Dataset_Rambo
 dataset/Modelnet
@@ -28,3 +33,7 @@ ros_ws/
 
 model/segmentation
 dataset/screenshots
+ros_ws
+###################################
+dataset/Test_rotation_invariant.zip
+model/classification/512p_model_v2_200.pt

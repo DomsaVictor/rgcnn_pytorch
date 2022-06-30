@@ -8,10 +8,10 @@ import open3d as o3d
 import time
 import math
 from numpy.random import rand
-from tqdm import tqdm 
+from tqdm import tqdm
 from pathlib import Path
 from torch_geometric.data.dataset import Dataset
-import os 
+import os
 from torch_geometric.loader import DenseDataLoader
 from torch_geometric.loader import DataLoader
 from tkinter import *
@@ -23,10 +23,9 @@ colors = rand(50, 3)
 def default_transforms():
     return Compose([FixedPoints(512)])
 
-
-
 class PcdDataset(Dataset):
-    def __init__(self, root_dir, points=512, valid=False, folder="train", transform=default_transforms(), with_normals=True, save_path=None):
+    def __init__(self, root_dir, points=512, valid=False, folder="train", 
+                 transform=default_transforms(), with_normals=True, save_path=None):
         self.root_dir = root_dir
         folders = [dir for dir in sorted(os.listdir(root_dir)) if os.path.isdir(root_dir/dir)]
         self.classes = {folder: i for i, folder in enumerate(folders)}
@@ -45,7 +44,7 @@ class PcdDataset(Dataset):
                 for category in self.classes.keys():
                     save_dir = save_path/Path(category)/folder
                     os.makedirs(save_dir)
-
+                    
         for category in self.classes.keys():
             new_dir = root_dir/Path(category)/folder
             for file in os.listdir(new_dir):
@@ -70,15 +69,11 @@ class PcdDataset(Dataset):
             pcd.normalize_normals()
             pcd.orient_normals_consistent_tangent_plane(100)
 
-            # o3d.visualization.draw_geometries([pcd])
-
-            # print(len(points))
             if self.save_path is not None:
                 if len(points) < self.points:
                     alpha = 0.03
                     rec_mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(
                         pcd, alpha)
-                    # o3d.visualization.draw_geometries([pcd, rec_mesh])
 
                     num_points_sample = self.points
 
@@ -94,6 +89,49 @@ class PcdDataset(Dataset):
             normals = torch.Tensor(normals)
 
         pointcloud = torch_geometric.data.Data(x=normals, pos=points, y=self.files[idx]['category'])
+
+        if self.save_path is not None:
+
+            pcd.estimate_normals(fast_normal_computation=False)
+            pcd.normalize_normals()
+
+            normals=np.asarray(pcd.normals)
+
+            if len(points) < self.points:
+                alpha = 0.03
+                rec_mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(
+                    pcd, alpha)
+
+                num_points_sample = self.points
+
+                pcd_sampled = rec_mesh.sample_points_poisson_disk(num_points_sample) 
+
+                points = pcd_sampled.points
+                points = torch.tensor(points)
+                points=points.float()
+                normals = np.asarray(pcd_sampled.normals)
+            else:
+                nr_points_fps=self.points
+                nr_points=points.shape[0]
+                index_fps = fps(points, ratio=float(nr_points_fps/nr_points), 
+                                random_start=True)
+
+                index_fps=index_fps[0:nr_points_fps]
+
+                fps_points=points[index_fps]
+                fps_normals=normals[index_fps]
+
+                points=fps_points
+                normals = fps_normals
+        else:
+            normals=np.asarray(pcd.normals)
+
+        normals = torch.Tensor(normals)
+        normals=normals.float()
+
+        pointcloud = torch_geometric.data.Data(normal=normals, 
+                                               pos=points, 
+                                               y=self.classes[self.files[idx]['category']])
 
         if self.transforms:
             pointcloud = self.transforms(pointcloud)
@@ -115,8 +153,22 @@ class PcdDataset(Dataset):
                 pcd_save.points = o3d.utility.Vector3dVector(pointcloud.pos)
                 pcd_save.normals =  o3d.utility.Vector3dVector(pointcloud.x)
                 o3d.io.write_point_cloud(str(total_path), pcd_save, write_ascii=True)
-        return pointcloud
 
+
+                # name = str(time.time())
+                # name = name.replace('.', '')
+                # name = str(name) + ".pcd"
+                splits = f.name.strip().split("/")
+                cat = splits[len(splits) - 3]
+
+                name = splits[len(splits) - 1]
+
+                total_path = self.save_path/cat/self.folder/name
+                pcd_save = o3d.geometry.PointCloud()
+                pcd_save.points = o3d.utility.Vector3dVector(pointcloud.pos)
+                pcd_save.normals =  o3d.utility.Vector3dVector(pointcloud.normal)
+                o3d.io.write_point_cloud(str(total_path), pcd_save, write_ascii=True)
+        return pointcloud
 
 class FilteredShapeNet(Dataset):
     def __init__(self, root_dir, folder="train", transform=FixedPoints(512), with_normals=True, save_path=None):
@@ -214,7 +266,6 @@ class FilteredShapeNet(Dataset):
 
         return pointcloud
 
-
 class FilteredShapenetViewer():
     def __init__(self, root_dir, folder="train", transform=default_transforms(), with_normals=True):
         self.root_dir = root_dir
@@ -309,7 +360,6 @@ def process_dataset(root, save_path, transform=None, num_points=512):
 
 colors = np.array([[1,0,0],[0,1,0],[0,0,1],[0.3,0.5,0.7]])
 
-
 def choose_pcd(dataset):
     pointcloud = dataset[0]
     pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(pointcloud.pos))
@@ -325,8 +375,9 @@ if __name__ == '__main__':
     # pcd_s = choose_pcd(dataset_s)
     # pcd_s.translate(np.array([0.5, 0, 0]))
     # o3d.visualization.draw_geometries([pcd_f, pcd_s])
-
-    data_viewer = FilteredShapenetViewer(root_f, "train")
+    
+    root_f = Path(str(Path(__file__).parent/"Airplane")).resolve()
+    data_viewer = FilteredShapenetViewer(root_f, "test")
     
     # for data in loader:
     #     print(data)

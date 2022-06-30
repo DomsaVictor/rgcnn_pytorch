@@ -9,7 +9,7 @@ import torch_geometric as tg
 from torch_geometric.transforms import BaseTransform
 from torch_geometric.data import Data, HeteroData
 import open3d as o3d
-
+import copy
 
 def get_laplacian(adj_matrix, normalize=True):
     """ 
@@ -31,11 +31,11 @@ def get_laplacian(adj_matrix, normalize=True):
         L = eye - t.matmul(t.matmul(D, adj_matrix), D)
     else:
         D = t.sum(adj_matrix, dim=1)
-        D = t.diag(D)
+        D = t.diag_embed(D)
         L = D - adj_matrix
     return L
 
-def pairwise_distance(point_cloud,normalize=False):
+def pairwise_distance(point_cloud, normalize=False):
     """
     Compute the pairwise distance of a point cloud.
 
@@ -227,20 +227,22 @@ def get_centroid(point_cloud,num_points):
 
 def compute_loss_with_weights(logits, y, x, L, criterion, model, s=1e-9):
     if not logits.device == y.device:
-            y = y.to(logits.device)
+        y = y.to(logits.device)
 
     l_norm = 0
-    for name, p in model.named_parameters():
-         if 'bias_relus' not in name:
-            l_norm += t.norm(p, p=2)
+    # for name, p in model.named_parameters():
+    #      if 'bias_relus' not in name:
+    #         l_norm += t.norm(p, p=2)
 
-    loss = criterion(logits, y)
+    loss = criterion(logits, y.squeeze())
     
-    l=0
-    for i in range(len(x)):
-        l += (1/2) * t.linalg.norm(t.matmul(t.matmul(t.permute(x[i], (0, 2, 1)), L[i]), x[i]))**2
-    l = (l_norm + l) * s
-    loss += l
+    l = torch.tensor(0).to(torch.double).to(loss.device)
+    if len(x) > 0:
+        for i in range(len(x)):
+            # l += (1/2) * t.linalg.norm(t.matmul(t.matmul(t.permute(x[i], (0, 2, 1)), L[i]), x[i]))**2
+            l += (t.matmul(t.matmul(t.permute(x[i].to(torch.double), (0, 2, 1)), L[i].to(torch.double)), x[i].to(torch.double))).sum() / 2 
+        l = (l_norm + l) * s
+        loss += l
     return loss
 
 def compute_loss(logits, y, x, L, criterion, s=1e-9):
@@ -270,8 +272,10 @@ class GaussianNoiseTransform(BaseTransform):
         data.pos = data.pos.float()
         if self.recompute_normals:
             pcd_o3d = o3d.geometry.PointCloud()
-            pcd_o3d.points = o3d.utility.Vector3dVector(data.pos)
-            pcd_o3d.estimate_normals(fast_normal_computation=False)
+            p = data.pos.cpu().detach().numpy()
+            pos = copy.deepcopy(p)
+            pcd_o3d.points = o3d.utility.Vector3dVector(pos)
+            pcd_o3d.estimate_normals(fast_normal_computation=True)
             pcd_o3d.normalize_normals()
             if hasattr(data, 'normal'):
                 data.normal = np.asarray(pcd_o3d.normals)

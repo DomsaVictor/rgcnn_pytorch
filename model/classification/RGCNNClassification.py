@@ -31,12 +31,15 @@ class cls_model(nn.Module):
         
         if b2relu:
             self.bias_relus = nn.ParameterList([
-                torch.nn.parameter.Parameter(torch.zeros((1, vertice, i))) for i in self.relus
+                torch.nn.parameter.Parameter(torch.zeros((1, vertice, i))) for i in self.F
             ])
         else:
             self.bias_relus = nn.ParameterList([
-                torch.nn.parameter.Parameter(torch.zeros((1, 1, i))) for i in self.relus
+                torch.nn.parameter.Parameter(torch.zeros((1, 1, i))) for i in self.F
             ])
+
+        for i in self.M:
+            self.bias_relus.append(torch.nn.parameter.Parameter(torch.zeros((1, i))))
 
         self.conv = nn.ModuleList([
             conv.DenseChebConvV2(input_dim, self.F[i], self.K[i], bias=self.cheb_bias) if i == 0 else conv.DenseChebConvV2(self.F[i-1], self.F[i], self.K[i], bias=self.cheb_bias) for i in range(len(K))
@@ -84,34 +87,36 @@ class cls_model(nn.Module):
 
     def forward(self, x):
         self.reset_regularization_terms()
-
-        x = self.batch_norm_list_conv[0](x.transpose(1, 2))
-        x = x.transpose(2, 1)
+        out = x
+        # out = self.batch_norm_list_conv[0](out.transpose(1, 2))
+        # out = out.transpose(2, 1)
         # L = self.get_laplacian(x)
-        L = self.get_laplacian(x[:,:,:3])
+        L = self.get_laplacian(out[:,:,:3])
         
         for i in range(len(self.K)):
             out = self.conv[i](out, L)
             self.append_regularization_terms(out, L)
             if self.recompute_L:
                 L = self.get_laplacian(out)
-            out = self.dropout(out)
-            out = self.b1relu(out, self.bias_relus[i])
-            out = self.batch_norm_list_conv[i+1](out.transpose(1, 2))
-            out = out.transpose(1, 2)
+            # out = self.dropout(out)
+            # out = self.b1relu(out, self.bias_relus[i])
+            out = relu(out)
+
+            # out = self.batch_norm_list_conv[i+1](out.transpose(1, 2))
+            # out = out.transpose(1, 2)
 
         out, _ = torch.max(out, 1)
         
         for i in range(len(self.M) -1):
             out = self.fc[i](out)
-            self.append_regularization_terms(out, L)
+            # self.append_regularization_terms(out, L)
             out = self.dropout(out)
-            out = self.brelu(out, self.bias_relus[i + len(self.K)])
-            out = self.batch_norm_list_fc[i](out.transpose(1, 2))
-            out = out.transpose(1, 2)
+            # out = self.brelu(out, self.bias_relus[i + len(self.K)])
+            out = relu(out)
+            # out = self.batch_norm_list_fc[i](out)
+            # out = out.transpose(0, 1)
 
         out = self.fc[-1](out)
-        self.append_regularization_terms(out, L)
 
         return out, self.x, self.L
     

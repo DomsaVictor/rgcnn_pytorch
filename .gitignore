@@ -37,3 +37,7 @@ ros_ws
 ###################################
 dataset/Test_rotation_invariant.zip
 model/classification/512p_model_v2_200.pt
+
+
+
+dataset/Journal/

@@ -341,8 +341,8 @@ def train_shapenet_full():
 
 
 if __name__ == '__main__':
-    categories = sorted(["Airplane", "Bag", "Cap", "Car", "Chair", "Earphone", 
-                    "Guitar", "Knife", "Lamp", "Laptop", "Motorbike", "Mug", 
+    categories = sorted(["Airplane", "Bag", "Cap", "Car", "Chair", "Earphone",
+                    "Guitar", "Knife", "Lamp", "Laptop", "Motorbike", "Mug",
                     "Pistol", "Rocket", "Skateboard", "Table"])
 
     # train_num = int(input("Train number: "))

@@ -1,3 +1,4 @@
+from cv2 import compare
 from matplotlib.pyplot import axes
 import utils 
 import open3d as o3d
@@ -14,6 +15,7 @@ import networkx as nx
 import matplotlib
 import matplotlib.cm as cm
 from pathlib import Path
+import copy
 
 model_path = (Path(__file__).parent / '../ros_ws/src/rgcnn_models/src/segmentation/').resolve()
 
@@ -89,7 +91,39 @@ def visualize_laplacian(pcd, pts_to_sample):
     vis.add_geometry(pcd_sampled_desc)
     
     vis.run()
-
+    
+def rotate_pcd(pcd, axis, angle): 
+        c = np.cos(angle)
+        s = np.sin(angle)
+        
+        if axis == 0:
+            """rot on x"""
+            R = np.array([[1 ,0 ,0],[0 ,c ,-s],[0 ,s ,c]])
+        elif axis == 1:
+            """rot on y"""
+            R = np.array([[c, 0, s],[0, 1, 0],[-s, 0, c]])
+        elif axis == 2:
+            """rot on z"""
+            R = np.array([[c, -s, 0],[s, c, 0],[0, 0, 1]])
+        else:
+            return pcd
+        pcd_aux = o3d.geometry.PointCloud(copy.deepcopy(pcd))
+        return pcd_aux.rotate(R)
+    
+def compare_laplacians(pcd):
+    pcd_rot = rotate_pcd(pcd, 2, -49)
+    L_o = get_laplacian(pairwise_distance(torch.tensor(np.asarray(pcd.points)).unsqueeze(0)))
+    L_r = get_laplacian(pairwise_distance(torch.tensor(np.asarray(pcd_rot.points)).unsqueeze(0)))
+    
+    # print(L_o == L_r)
+    # print(L_o.T == L_r)
+    print((L_o - L_r).mean())
+    
+    colors = np.array([[1,0,0],[0,1,0]])
+    pcd.paint_uniform_color(colors[0])
+    pcd_rot.paint_uniform_color(colors[1])
+    o3d.visualization.draw_geometries([pcd, pcd_rot])
+    
 if __name__ == "__main__":
     # dataset = ShapeNet(root="/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/dataset/ShapeNet", categories="Airplane")
     # data = dataset[0]
@@ -116,6 +150,8 @@ if __name__ == "__main__":
     # pcd = o3d.io.read_point_cloud("/home/victor/Desktop/Dataset_pcd.pcd")
     pcd = o3d.io.read_point_cloud("/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/dataset/Plane/test/1651654248041929.pcd")
 
+    compare_laplacians(pcd)
+    
     # visualize_laplacian(pcd, 100)
     # model_name = '400p_model_v2_180.pt'
 

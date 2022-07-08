@@ -1,1 +1,22 @@
-/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/share/rgcnn_models/docs/compute_volume_nodeConfig.dox
+\subsubsection parameters ROS parameters
+
+Reads and maintains the following parameters on the ROS server
+
+- \b "~selection_camera" : \b [double] Select camera min: 1.0, default: 1.0, max: 2.0
+- \b "~nr_points_initial" : \b [double] Nr_points_input_pointcloud min: 0.0, default: 100.0, max: 20000.0
+- \b "~dividing_number" : \b [double] Nr_points_input_pointcloud min: 1.0, default: 3.0, max: 100.0
+- \b "~perpendicular_threshold" : \b [double] Perpendicular threshold min: 0.001, default: 0.01, max: 1.0
+- \b "~parallel_threshold" : \b [double] Parallel threshold min: 0.001, default: 0.01, max: 1.0
+- \b "~threshold_x" : \b [double] Threshold X min: 0.001, default: 0.002, max: 0.1
+- \b "~threshold_y" : \b [double] Threshold Y min: 0.001, default: 0.002, max: 0.1
+- \b "~threshold_z" : \b [double] Threshold Z min: 0.001, default: 0.002, max: 0.1
+- \b "~minimum_nr_points" : \b [double] minimum_nr_points min: 0.0, default: 10.0, max: 100.0
+- \b "~z_lower_limit" : \b [double] Z Lower limit min: 0.0, default: 0.0, max: 15.0
+- \b "~z_upper_limit" : \b [double] Z Upper limit min: 0.0, default: 3.0, max: 50.0
+- \b "~x_lower_limit" : \b [double] X Lower limit min: -1.5, default: -0.5, max: 0.0
+- \b "~x_upper_limit" : \b [double] X Upper limit min: 0.0, default: 0.5, max: 1.5
+- \b "~y_lower_limit" : \b [double] Y Lower limit min: -1.5, default: -0.5, max: 0.0
+- \b "~y_upper_limit" : \b [double] Y Upper limit min: 0.0, default: 0.5, max: 1.5
+- \b "~angle_threshold" : \b [double] Wrong_angle_threshold min: 35.0, default: 76.0, max: 90.0
+- \b "~real_volume" : \b [double] Ground truth volume min: 0.01, default: 0.01689, max: 0.4
+

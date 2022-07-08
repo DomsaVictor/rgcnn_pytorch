@@ -13,7 +13,7 @@ from numpy.random import rand
 from torch_geometric.transforms import *
 from torch_geometric.loader import DenseDataLoader
 from torch_geometric.datasets import ShapeNet
-
+import time
 
 
 curr_dir = Path(__file__).parent
@@ -168,7 +168,7 @@ def test_shapenet_model(model_name=None, num_points=2048):
     K = [6, 5, 3]         # Polynomial orders.
     M = [512, 128, 4]
 
-    model = seg_model(num_points, F, K, M, input_dim=6)
+    model = seg_model(num_points, F, K, M, input_dim=6, cheb_bias=False, fc_bias=True, reg_prior=False, b2relu=True)
     model.load_state_dict(torch.load(f'{str(model_path)}/{model_name}'))
     model.eval()
     model.to(device)
@@ -182,25 +182,32 @@ def test_shapenet_model(model_name=None, num_points=2048):
     for data in loader:
         x = torch.cat([data.pos.type(torch.float32), data.x.type(torch.float32)], dim=2)
         y = data.y
+        init_time = time.time()
         logits, _, _ = model(x.to(device), None)
+        final_time = time.time()
+        elapsed_time = final_time - init_time
+        print(f"Elapsed time: {elapsed_time}")
+
         logits = logits.cpu()
         pred = logits.argmax(dim=2)
 
         total_correct += int((pred == y).sum()) 
         
     acc = total_correct * 100 / (num_points * len(dataset))
+    print(num_points)
     print(acc)
 
 def test_sampled_data(model_name, num_points):
     
     model_path = (curr_dir / '../../ros_ws/src/rgcnn_models/src/segmentation').resolve()
-    model_name = "2048p_model_v2_190.pt" if model_name is None else model_name
+    model_path = (curr_dir / '../../training/models_seg/13_06_22_23:31:02')
+    model_name = "2048p_seg_Airplane1.pt" if model_name is None else model_name
 
     F = [128, 512, 1024]  # Outputs size of convolutional filter.
     K = [6, 5, 3]         # Polynomial orders.
     M = [512, 128, 4]
 
-    model = seg_model(num_points, F, K, M, input_dim=6)
+    model = seg_model(num_points, F, K, M, input_dim=6, cheb_bias=False, fc_bias=False, reg_prior=False, b2relu=False)
     model.load_state_dict(torch.load(f'{str(model_path)}/{model_name}'))
     model.eval()
     model.to(device)
@@ -215,7 +222,13 @@ def test_sampled_data(model_name, num_points):
     for data in loader:
         x = torch.cat([data.pos.type(torch.float32), data.x.type(torch.float32)], dim=2)
         y = data.y
+        
+        init_time = time.time()
         logits, _, _ = model(x.to(device), None)
+        final_time = time.time()
+        elapsed_time = final_time - init_time
+        print(f"Elapsed time: {elapsed_time}")
+        
         logits = logits.cpu()
         pred = logits.argmax(dim=2)
 
@@ -239,7 +252,7 @@ def test_dataset(dataset):
     return pcd
     
 if __name__ == "__main__":
-    num_points = 2014
+    num_points = 2048
     # transforms = Compose([FixedPoints(num_points), NormalizeScale()])
     # root = str((dataset_path / "ShapeNet").resolve())
     # dataset  = ShapeNet(root=root, categories="Airplane", include_normals=True, split="test", transform=transforms) 
@@ -269,9 +282,9 @@ if __name__ == "__main__":
     # model_name = "512p_model_v2_130.pt"
     # test_sampled_data(model_name, 512)
     
-    pcd_name = "1651654246540199.pcd"
-    pcd_path = str((curr_dir / pcd_name).resolve())
-    pcd = o3d.io.read_point_cloud(pcd_path)
+    # pcd_name = "1651654246540199.pcd"
+    # pcd_path = str((curr_dir / pcd_name).resolve())
+    # pcd = o3d.io.read_point_cloud(pcd_path)
     
     # lbl_name = ""
     # lbl_path = str((curr_dir / lbl_name).resolve())
@@ -281,4 +294,6 @@ if __name__ == "__main__":
     
     # pcd.colors = o3d.utility.Vector3dVector(colors[labels])
     
-    o3d.visualization.draw_geometries([pcd])
+    # o3d.visualization.draw_geometries([pcd])
+    
+    test_shapenet_model()

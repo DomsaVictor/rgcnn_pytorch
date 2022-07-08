@@ -30,7 +30,7 @@ sys.path.append(str(dataset_path))
 
 
 from utils import GaussianNoiseTransform
-# from FilteredShapenetDataset import FilteredShapeNet, PcdDatasetNoise
+from FilteredShapenetDataset import FilteredShapeNet, PcdDataset
 from RGCNNClassification import cls_model
 from utils import compute_loss_with_weights
 from utils import label_to_cat
@@ -143,14 +143,8 @@ if __name__ == '__main__':
     # transforms = Compose([SamplePoints(num_points, include_normals=True)])
     print(str((dataset_path/"Modelnet").resolve()))
 
-    dataset_train = ModelNet(root=str((dataset_path/"Modelnet").resolve()), name=str(modelnet_num), train=True, transform=transforms)
-    dataset_test  = ModelNet(root=str((dataset_path/"Modelnet").resolve()), name=str(modelnet_num), train=False, transform=transforms)
-   
-    # dataset_train = PcdDataset(root_dir=dataset_path/"Modelnet40_512", folder="train")
-    # dataset_test  = PcdDataset(root_dir=dataset_path/"Modelnet40_512", folder="test")
-
-    # dataset_train = PcdDatasetNoise(root_dir=dataset_path/"Modelnet40_512_r_40", folder="train")
-    # dataset_test  = PcdDatasetNoise(root_dir=dataset_path/"Modelnet40_512_r_40", folder="test")
+    dataset_train = PcdDataset(root=str((dataset_path/"Modelnet").resolve()), name=str(modelnet_num), train=True, transform=transforms)
+    dataset_test  = PcdDataset(root=str((dataset_path/"Modelnet").resolve()), name=str(modelnet_num), train=False, transform=transforms)
 
     # Verification...
     print(f"Train dataset shape: {dataset_train}")
@@ -160,7 +154,7 @@ if __name__ == '__main__':
     train_loader = DenseDataLoader(dataset_train, batch_size=batch_size, shuffle=True, pin_memory=True)
     test_loader  = DenseDataLoader(dataset_test,  batch_size=batch_size, shuffle=True, pin_memory=True)
     
-    model = cls_model(num_points, F, K, M, input_dim=6, dropout=dropout, one_layer=one_layer, reg_prior=reg_prior, recompute_L=recompute_L, b2relu=b2relu)
+    model = cls_model(num_points, F, K, M, modelnet_num, dropout=dropout, one_layer=False, reg_prior=False)
     model = model.to(device)
     
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)

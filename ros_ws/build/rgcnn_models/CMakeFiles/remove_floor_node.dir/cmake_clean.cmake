@@ -1,8 +1,7 @@
 file(REMOVE_RECURSE
-  "/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/lib/rgcnn_models/remove_floor_node"
-  "/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/lib/rgcnn_models/remove_floor_node.pdb"
   "CMakeFiles/remove_floor_node.dir/src/remove_floor_node.cpp.o"
-  "CMakeFiles/remove_floor_node.dir/src/remove_floor_node.cpp.o.d"
+  "/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/lib/rgcnn_models/remove_floor_node.pdb"
+  "/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/lib/rgcnn_models/remove_floor_node"
 )
 
 # Per-language clean rules from dependency scanning.

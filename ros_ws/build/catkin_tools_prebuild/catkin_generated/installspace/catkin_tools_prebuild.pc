@@ -1,8 +1,0 @@
-prefix=/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/install
-
-Name: catkin_tools_prebuild
-Description: Description of catkin_tools_prebuild
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

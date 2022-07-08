@@ -1,1 +1,8 @@
-/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/.private/rgcnn_models/lib/pkgconfig/rgcnn_models.pc
+prefix=/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel
+
+Name: rgcnn_models
+Description: Description of rgcnn_models
+Version: 0.0.0
+Cflags: -I/home/victor/workspace/thesis_ws/github/rgcnn_pytorch/ros_ws/devel/include
+Libs: -L${prefix}/lib 
+Requires: 

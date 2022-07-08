@@ -1,6 +1,0 @@
-\subsubsection parameters ROS parameters
-
-Reads and maintains the following parameters on the ROS server
-
-- \b "~radius_norm" : \b [double] Radius normal compute min: 0.002, default: 0.01, max: 0.3
-

@@ -1,7 +1,0 @@
-\subsubsection usage Usage
-\verbatim
-<node name="rgcnn_models" pkg="rgcnn_models" type="rgcnn_models">
-  <param name="leafsize" type="double" value="0.01" />
-</node>
-\endverbatim
-

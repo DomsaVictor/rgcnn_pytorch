@@ -12,7 +12,9 @@ from torch.nn import BatchNorm1d
 from torch.nn.functional import one_hot, relu, leaky_relu
 
 class seg_model(nn.Module):
-    def __init__(self, vertice, F, K, M, input_dim=22, one_layer=False, dropout=1, reg_prior: bool = True, b2relu=True, recompute_L=False, fc_bias=True, cheb_bias=True):
+    def __init__(self, vertice, F, K, M, input_dim=22, one_layer=False,
+                 dropout=1,reg_prior: bool = True, b2relu=True, 
+                 recompute_L=False, fc_bias=True, cheb_bias=True):
         assert len(F) == len(K)
         super(seg_model, self).__init__()
 
@@ -31,18 +33,24 @@ class seg_model(nn.Module):
         
         if b2relu:
             self.bias_relus = nn.ParameterList([
-                torch.nn.parameter.Parameter(torch.zeros((1, vertice, i))) for i in self.relus
+                torch.nn.parameter.Parameter(torch.zeros((1, vertice, i))) 
+                    for i in self.relus
             ])
         else:
             self.bias_relus = nn.ParameterList([
-                torch.nn.parameter.Parameter(torch.zeros((1, 1, i))) for i in self.relus
+                torch.nn.parameter.Parameter(torch.zeros((1, 1, i))) 
+                    for i in self.relus
             ])
 
         self.conv = nn.ModuleList([
-            conv.DenseChebConvV2(input_dim, self.F[i], self.K[i], bias=self.cheb_bias) if i == 0 else conv.DenseChebConvV2(self.F[i-1], self.F[i], self.K[i], bias=self.cheb_bias) for i in range(len(K))
+            conv.DenseChebConvV2(input_dim, self.F[i], self.K[i], 
+                                 bias=self.cheb_bias)
+                if i == 0 else conv.DenseChebConvV2(self.F[i-1], self.F[i], 
+                                                    self.K[i], bias=self.cheb_bias) 
+                for i in range(len(K))
         ])
 
-        self.batch_norm_list_conv = nn.ModuleList([BatchNorm1d(6)])         # this is hardcoded for a reason.
+        self.batch_norm_list_conv = nn.ModuleList([BatchNorm1d(6)])  
 
         for i in range(len(F)):
             self.batch_norm_list_conv.append(nn.BatchNorm1d(F[i])) 
@@ -122,8 +130,6 @@ class seg_model(nn.Module):
             out = self.b1relu(out, self.bias_relus[i + len(self.K)])
             out = self.batch_norm_list_fc[i](out.transpose(1, 2))
             out = out.transpose(1, 2)
-
-
         return out, self.x, self.L
     
 if __name__ == "__main__":

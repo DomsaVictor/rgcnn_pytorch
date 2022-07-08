@@ -2,7 +2,7 @@
 from torch_geometric.transforms import RandomScale
 from torch_geometric.transforms import RandomRotate
 from torch_geometric.transforms import FixedPoints
-from torch_geometric.transforms import NormalizeScale
+from torch_geometric.transforms import NormalizeScale, NormalizeRotation
 from torch_geometric.loader import DenseDataLoader
 from torch_geometric.datasets import ShapeNet
 import torch
@@ -166,7 +166,7 @@ if __name__ == '__main__':
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     num_points = 400
-    batch_size = 4
+    batch_size = 8
     num_epochs = 200
     learning_rate =  1e-3 # 0.003111998
     decay_rate = 0.8
@@ -182,7 +182,7 @@ if __name__ == '__main__':
     # transforms = Compose([FixedPoints(num_points), GaussianNoiseTransform(
     #     mu=0, sigma=0, recompute_normals=False), RandomScale([0.8, 1.2]), RandomRotate(15, 0), RandomRotate(15, 1), RandomRotate(15, 2)])
 
-    transforms = Compose([FixedPoints(num_points), NormalizeScale()])
+    transforms = Compose([FixedPoints(num_points), NormalizeScale(), NormalizeRotation()])
 
     dataset_path = (dataset_path / "Plane").resolve()
     # dataset_path = (dataset_path / "ShapeNet").resolve()

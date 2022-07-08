@@ -367,7 +367,7 @@ def choose_pcd(dataset):
     return pcd
 
 if __name__ == '__main__':
-    root_f = (Path(__file__).parent / "Dataset_Rambo").resolve()
+    root_f = (Path(__file__).parent / "Plane").resolve()
     root_s = (Path(__file__).parent / "ShapeNet").resolve()
     # dataset_f = FilteredShapeNet(root_f, folder="train")
     # dataset_s = ShapeNet(str(root_s), categories="Airplane", split="train")
@@ -376,7 +376,7 @@ if __name__ == '__main__':
     # pcd_s.translate(np.array([0.5, 0, 0]))
     # o3d.visualization.draw_geometries([pcd_f, pcd_s])
     
-    root_f = Path(str(Path(__file__).parent/"Airplane")).resolve()
+    # root_f = Path(str(Path(__file__).parent/"Airplane")).resolve()
     data_viewer = FilteredShapenetViewer(root_f, "test")
     
     # for data in loader:

@@ -119,7 +119,8 @@ class ShapeNetSampler(Frame):
             pcd_filtered, camera_point, _ = self.get_view(pcd_rot, cam_coord)
             pcd_filtered.paint_uniform_color([0,0,1])
             pcd_rot.paint_uniform_color([1,0,0])
-            self.show_pcds([pcd_rot, pcd_filtered, camera_point])
+            pcd_aux = pcd_filtered.translate([-1,0,0])
+            self.show_pcds([pcd_rot, pcd_filtered, camera_point, pcd_aux])
             self.vis.capture_screen_image(filename=str(curr_dir/"screenshots"/self.category/(str(j)+".png")))
         self.vis.destroy_window()
 
@@ -325,7 +326,7 @@ if __name__ == "__main__":
     num_points = 512
     num_pcds = 300
     
-    sampler = ShapeNetSampler(master, transforms=transforms, num_points=num_points, num_pcds=num_pcds, category="Chair", chosen_indexes_file="ChosenPCDIndexes.txt")
+    sampler = ShapeNetSampler(master, transforms=transforms, num_points=num_points, num_pcds=num_pcds, category="Airplane", chosen_indexes_file="ChosenPCDIndexes.txt")
     
 # colors = rand(50, 3)
 

@@ -1,13 +1,14 @@
 import os
 from matplotlib import transforms
+from matplotlib.colors import Normalize
 import imports
 from pathlib import Path
 import open3d as o3d
 import utils
 from torch_geometric.datasets import ShapeNet
-from torch_geometric.transforms import Compose, FixedPoints
+from torch_geometric.transforms import Compose, FixedPoints, NormalizeScale
 import copy
-from FilteredShapenetDataset import FilteredShapeNet
+from FilteredShapenetDataset import FilteredShapeNet, ShapeNetCustom
 import numpy as np
 
 def noise_transform(noise_levels):
@@ -38,7 +39,7 @@ def occlusion_transform(occlusion_levels):
     categories = sorted(["Airplane", "Bag", "Cap", "Car", "Chair", "Earphone",
                 "Guitar", "Knife", "Lamp", "Laptop", "Motorbike", "Mug",
                 "Pistol", "Rocket", "Skateboard", "Table"])
-
+        
     for level in occlusion_levels:
         pcds = []
         j=0
@@ -57,16 +58,14 @@ def occlusion_transform(occlusion_levels):
         o3d.visualization.draw_geometries(pcds)
 
 
-def create_dataset(dataset, transfrom, num_points=2048):
-    for _ in dataset:
-        pass
-    
 def save_dataset(root, transform, save_path, categories=None, split="train", include_normals=True):
         dataset = ShapeNet(root=root, categories=categories, split=split, include_normals=include_normals, transform=transform)
         
         all_categories = sorted(["Airplane", "Bag", "Cap", "Car", "Chair", "Earphone",
                 "Guitar", "Knife", "Lamp", "Laptop", "Motorbike", "Mug",
                 "Pistol", "Rocket", "Skateboard", "Table"])
+        
+        
         
         if not os.path.isdir(str((save_path/split).resolve())):
             os.makedirs(str((save_path/split).resolve()))
@@ -92,28 +91,60 @@ if __name__ == '__main__':
     num_points = 2048
     sigma_levels = [0.1, 0.15, 0.2]
     splits = ['trainval', 'test']
-    for sigma in sigma_levels:
-        transform = Compose([utils.Sphere_Occlusion_Transform(sigma, num_points=2048)])
-        for split in splits:
-            save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
-                    save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Occlusion_{num_points}_{sigma}/"), split=split)
+    
+    # transform = Compose([FixedPoints(2048)])
+    # for split in splits:
+    #     save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform,
+    #             save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Original_{num_points}/"), split=split)
+    
+    dataset = ShapeNetCustom(root_dir=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Original_{num_points}/"), transform=None, folder="trainval")
+    data = dataset[0]
+    pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
+    colors = np.array([[1,0,0], [0,1,0], [0,0,1], [0.4, 0.3, 0.6]])
+    pcd.colors = o3d.utility.Vector3dVector(colors[data.y])
+    
+    dataset = ShapeNetCustom(root_dir=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Original_{num_points}/"), transform=NormalizeScale(), folder="trainval")
+    data = dataset[5500]
+    print(data.y)
+    print(f"{min(data.y)} - {max(data.y)}")
+    pcd2 = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
+    colors = np.array([[1,0,0], [0,1,0], [0,0,1], [0.4, 0.3, 0.6]])
+    o3d.visualization.draw_geometries([pcd2])
+    print(data.category)
+    
+    dataset = ShapeNet(root=imports.dataset_path + "/ShapeNet", categories='Car', transform=FixedPoints(2048))
+    data = dataset[0]
+    pcd3 = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
+    colors = np.array([[1,0,0], [0,1,0], [0,0,1], [0.4, 0.3, 0.6]])
+    # print(data.y)
+    # pcd3.colors = o3d.utility.Vector3dVector(colors[data.y])
+    # o3d.visualization.draw_geometries([pcd, pcd2, pcd3])
 
-    sigma_levels = [0.01, 0.02, 0.05]
-    splits = ['trainval', 'test']
-    for sigma in sigma_levels:
-        transform = Compose([FixedPoints(2048), utils.GaussianNoiseTransform(mu=0, sigma=sigma, recompute_normals=True)])
-        for split in splits:
-            save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
-                    save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Gaussian_Recomputed_{num_points}_{sigma}/"), split=split)
+    # print(data.category)
+    
+    
+    # for sigma in sigma_levels:
+    #     transform = Compose([utils.Sphere_Occlusion_Transform(sigma, num_points=2048)])
+    #     for split in splits:
+    #         save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
+    #                 save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Occlusion_{num_points}_{sigma}/"), split=split)
+
+    # sigma_levels = [0.01, 0.02, 0.05]
+    # splits = ['trainval', 'test']
+    # for sigma in sigma_levels:
+    #     transform = Compose([FixedPoints(2048), utils.GaussianNoiseTransform(mu=0, sigma=sigma, recompute_normals=True)])
+    #     for split in splits:
+    #         save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
+    #                 save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Gaussian_Recomputed_{num_points}_{sigma}/"), split=split)
 
 
-    sigma_levels = [0.01, 0.02, 0.05]
-    splits = ['trainval', 'test']
-    for sigma in sigma_levels:
-        transform = Compose([FixedPoints(2048), utils.GaussianNoiseTransform(mu=0, sigma=sigma, recompute_normals=False)])
-        for split in splits:
-            save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
-                    save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Gaussian_Original_{num_points}_{sigma}/"), split=split)
+    # sigma_levels = [0.01, 0.02, 0.05]
+    # splits = ['trainval', 'test']
+    # for sigma in sigma_levels:
+    #     transform = Compose([FixedPoints(2048), utils.GaussianNoiseTransform(mu=0, sigma=sigma, recompute_normals=False)])
+    #     for split in splits:
+    #         save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
+    #                 save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Gaussian_Original_{num_points}_{sigma}/"), split=split)
     # dataset = FilteredShapeNet(Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Gaussian_{num_points}_{sigma}/"), folder="train")
     # colors = np.array([[1,0,0], [0,1,0], [0,0,1], [1,0,1]])
     # data = dataset[0]

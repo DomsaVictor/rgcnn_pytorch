@@ -1,11 +1,13 @@
 # PyTorch, PyG and other imports
+from pickletools import optimize
+import torch
+
 from torch_geometric.transforms import RandomScale
 from torch_geometric.transforms import RandomRotate
 from torch_geometric.transforms import FixedPoints
-from torch_geometric.transforms import NormalizeScale
+from torch_geometric.transforms import NormalizeScale, NormalizeRotation
 from torch_geometric.loader import DenseDataLoader
 from torch_geometric.datasets import ShapeNet
-import torch
 from datetime import datetime
 from collections import defaultdict
 import time
@@ -137,7 +139,8 @@ def start_training(model, train_loader, test_loader, optimizer, criterion, write
     model.to(device)
     my_lr_scheduler = lr_scheduler.ExponentialLR(
         optimizer=optimizer, gamma=decay_rate)
-
+    reduce_lr_scheduler = lr_scheduler.ReduceLROnPlateau(
+        optimizer=optimizer)
     for epoch in range(1, epochs+1):
         train_start_time = time.time()
         loss = train(model, optimizer, train_loader,
@@ -165,7 +168,7 @@ def start_training(model, train_loader, test_loader, optimizer, criterion, write
         print("~~~" * 30)
 
         my_lr_scheduler.step()
-
+        reduce_lr_scheduler.step(loss)
         # Save the model every 5 epochs
         if epoch % 5 == 0 or epoch == 1:
             if not os.path.isdir(str(model_path)):
@@ -197,16 +200,16 @@ def train_each_category(categories=None):
 
 
         num_points = 2048
-        batch_size = 8
+        batch_size = 5
         num_epochs = 200
-        learning_rate =  1e-3 # 0.003111998
+        learning_rate =  1e-2# 0.003111998
         decay_rate = 0.9
-        dropout = 0.3 # 0.09170225
+        dropout = 0.1 # 0.09170225
         regularization = 1e-9 # 5.295088673159155e-9
 
         input_dim = 6
 
-        transforms = Compose([FixedPoints(num_points), NormalizeScale()])
+        transforms = Compose([FixedPoints(num_points), NormalizeScale(), NormalizeRotation()])
 
         dataset_train = ShapeNet(root=str(dataset_path), include_normals=True, categories=category, split="train", transform=transforms)
         dataset_test  = ShapeNet(root=str(dataset_path), include_normals=True, categories=category, split="test",  transform=transforms)
@@ -267,8 +270,8 @@ def train_shapenet_full():
     num_points = 2048
     batch_size = 16
     num_epochs = 200
-    learning_rate =  1e-3 # 0.003111998
-    decay_rate = 0.95
+    learning_rate =  1e-4 # 0.003111998
+    decay_rate = 0.8
     weight_decay = 1e-9  # 1e-9
     dropout = 0.2 # 0.09170225
     regularization = 1e-9 # 5.295088673159155e-9
@@ -283,7 +286,7 @@ def train_shapenet_full():
     # transforms = Compose([FixedPoints(num_points), GaussianNoiseTransform(
     #     mu=0, sigma=0, recompute_normals=False), RandomScale([0.8, 1.2]), RandomRotate(15, 0), RandomRotate(15, 1), RandomRotate(15, 2)])
 
-    transforms = Compose([FixedPoints(num_points), NormalizeScale()])
+    transforms = Compose([FixedPoints(num_points), NormalizeScale(), GaussianNoiseTransform(recompute_normals=True)])
 
 
     dataset_path    = (curr_path / "../dataset/").resolve()
@@ -293,6 +296,7 @@ def train_shapenet_full():
 
     dataset_train = ShapeNet(root=str(dataset_path), include_normals=True, split="train", transform=transforms)
     dataset_test  = ShapeNet(root=str(dataset_path), include_normals=True, split="test",  transform=transforms)
+    
 
     print(str(dataset_path))
     
@@ -352,5 +356,5 @@ if __name__ == '__main__':
                     "Pistol", "Rocket", "Skateboard", "Table"])
 
     # small to do: further optimize cap, car, 
-    # train_each_category(["Bag"])
-    train_shapenet_full()
+    train_each_category(["Lamp"])
+    # train_shapenet_full()

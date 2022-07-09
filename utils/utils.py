@@ -97,13 +97,19 @@ class DenseChebConvV2(nn.Module):
         else:
             self.register_parameter('bias', None)
 
-        self.reset_parameters()
+        self.apply(self._init_weights)
+        # self.reset_parameters()
 
+    def _init_weights(self, module):
+        if isinstance(module, nn.Linear):
+            module.weight.data.normal_(mean=0, std=0.1)
+            if module.bias is not None:
+                module.bias.data.zero_()
 
-    def reset_parameters(self):        
-        for lin in self.lins:
-            lin.weight = t.nn.init.trunc_normal_(lin.weight, mean=0, std=0.2)
-            lin.bias   = t.nn.init.normal_(lin.bias, mean=0, std=0.2)
+    # def reset_parameters(self):        
+    #     for lin in self.lins:
+    #         lin.weight = t.nn.init.trunc_normal_(lin.weight, mean=0, std=0.2)
+    #         lin.bias   = t.nn.init.normal_(lin.bias, mean=0, std=0.2)
 
 
     def forward(self, x, L):

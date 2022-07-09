@@ -4,7 +4,7 @@ import torch
 
 from torch_geometric.datasets import ShapeNet
 from torch_geometric.loader import DenseDataLoader
-from FilteredShapenetDataset import FilteredShapeNet
+from FilteredShapenetDataset import FilteredShapeNet, ShapeNetCustom
 from RGCNNSegmentation import seg_model
 
 import numpy as np
@@ -25,7 +25,7 @@ class ModelTester():
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         if not type(self.path) == Path:
             self.path = Path(self.path)
-        self.dataset = FilteredShapeNet(root_dir=self.path, folder="test", transform=transforms)
+        self.dataset = ShapeNetCustom(root_dir=self.path, folder="train", transform=transforms)
         print(self.dataset)
         self.loader = DenseDataLoader(dataset=self.dataset, batch_size=32, pin_memory=True, num_workers=8)
 
@@ -37,11 +37,12 @@ class ModelTester():
         predictions = np.empty((size, self.model.vertice))
         labels = np.empty((size, self.model.vertice))
         total_correct = 0
-        add_cat = True
-        print(self.dataset[0])
-        if (len(self.dataset.categories) == 1):
-            add_cat = False
+        add_cat = False
+        # if (len(self.dataset.categories) == 1):
+        #     add_cat = False
 
+        print(self.dataset[0])
+        
         for i, data in enumerate(self.loader):
             cat = None
         if add_cat:
@@ -108,8 +109,7 @@ if __name__ == '__main__':
     acc, cat_iou, tot_iou, ncorrect = tester.test_model()
 
     print(f"Accuracy = {acc}")
-    for a, b in sorted(cat_iou):
-        print(f"{a}: \t {b} \n")
-
-    print(f"Tot IoU  = {tot_iou}")
+    for key, value in cat_iou.items():
+            print(key + ': {:.4f}, total: {:d}'.format(np.mean(value), len(value)))
+    print(f"Tot IoU  = {np.mean(tot_iou)*100}")
     print(f"Ncorrect = {ncorrect}")

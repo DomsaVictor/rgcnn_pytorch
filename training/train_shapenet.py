@@ -137,6 +137,9 @@ def start_training(model, train_loader, test_loader, optimizer, criterion, write
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"\nTraining on {device}")
     model.to(device)
+
+    pointnet_scheduler = lr_scheduler.StepLR(optimizer=optimizer, step_size=20, gamma=0.5)
+
     my_lr_scheduler = lr_scheduler.ExponentialLR(
         optimizer=optimizer, gamma=decay_rate)
     reduce_lr_scheduler = lr_scheduler.ReduceLROnPlateau(
@@ -167,8 +170,9 @@ def start_training(model, train_loader, test_loader, optimizer, criterion, write
             f'Train Time: \t{train_stop_time - train_start_time} \nTest Time: \t{test_stop_time - test_start_time }')
         print("~~~" * 30)
 
-        my_lr_scheduler.step()
-        reduce_lr_scheduler.step(loss)
+        pointnet_scheduler.step()
+        # my_lr_scheduler.step()
+        # reduce_lr_scheduler.step(loss)
         # Save the model every 5 epochs
         if epoch % 5 == 0 or epoch == 1:
             if not os.path.isdir(str(model_path)):
@@ -268,12 +272,12 @@ def train_shapenet_full():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     num_points = 2048
-    batch_size = 16
+    batch_size = 32
     num_epochs = 200
-    learning_rate =  1e-4 # 0.003111998
+    learning_rate = 0.001 # 0.003111998
     decay_rate = 0.8
     weight_decay = 1e-9  # 1e-9
-    dropout = 0.2 # 0.09170225
+    dropout = 0.09 # 0.09170225
     regularization = 1e-9 # 5.295088673159155e-9
 
     input_dim = 22
@@ -286,7 +290,7 @@ def train_shapenet_full():
     # transforms = Compose([FixedPoints(num_points), GaussianNoiseTransform(
     #     mu=0, sigma=0, recompute_normals=False), RandomScale([0.8, 1.2]), RandomRotate(15, 0), RandomRotate(15, 1), RandomRotate(15, 2)])
 
-    transforms = Compose([FixedPoints(num_points), NormalizeScale(), GaussianNoiseTransform(recompute_normals=True)])
+    transforms = Compose([FixedPoints(num_points), NormalizeScale()])
 
 
     dataset_path    = (curr_path / "../dataset/").resolve()
@@ -315,11 +319,11 @@ def train_shapenet_full():
 
     train_loader = DenseDataLoader(
         dataset_train, batch_size=batch_size,
-        shuffle=True, pin_memory=True, num_workers=4)
+        shuffle=True, pin_memory=True, num_workers=8)
 
     test_loader = DenseDataLoader(
         dataset_test, batch_size=batch_size,
-        shuffle=True, num_workers=4)
+        shuffle=True, pin_memory=True, num_workers=8)
 
     model = seg_model(num_points, F, K, M, input_dim=input_dim,
                       dropout=dropout,
@@ -333,7 +337,7 @@ def train_shapenet_full():
     # optimizer = torch.optim.Adam(
     #     model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, betas=(0.9, 0.999))
 
     log_dir_path = (curr_path / "tensorboard_seg/").resolve()
     
@@ -356,5 +360,5 @@ if __name__ == '__main__':
                     "Pistol", "Rocket", "Skateboard", "Table"])
 
     # small to do: further optimize cap, car, 
-    train_each_category(["Lamp"])
-    # train_shapenet_full()
+    # train_each_category(["Lamp"])
+    train_shapenet_full()

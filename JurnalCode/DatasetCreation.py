@@ -64,7 +64,7 @@ def create_dataset(dataset, transfrom, num_points=2048):
 def save_dataset(root, transform, save_path, categories=None, split="train", include_normals=True):
         dataset = ShapeNet(root=root, categories=categories, split=split, include_normals=include_normals, transform=transform)
         if not os.path.isdir(str((save_path/split).resolve())):
-            os.makedirs(str((save_path/split)).resolve())
+            os.makedirs(str((save_path/split).resolve()))
         for i, data in enumerate(dataset):
             name = f"{i}"
             lbl_name = f"{name}.npy"
@@ -85,10 +85,22 @@ if __name__ == '__main__':
     category = "Airplane"
     # save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
     #              save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Gaussian_{num_points}_{sigma}/"), categories=category, split="train")
-        
-    dataset = FilteredShapeNet(Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Gaussian_{num_points}_{sigma}/"), folder="train")
+    
+    # sigma_levels = [0.1, 0.15, 0.2]
+    # splits = ['trainval', 'test']
+    # for sigma in sigma_levels:
+    #     transfrom = Compose([utils.Sphere_Occlusion_Transform(sigma, num_points=2048)])
+    #     for split in splits:
+    #         save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
+    #                 save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Occlusion_{num_points}_{sigma}/"), split=split)
+
+
+    dataset = FilteredShapeNet(Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Occlusion_{num_points}_{0.15}/"), folder="trainval", transform=None)
     colors = np.array([[1,0,0], [0,1,0], [0,0,1], [1,0,1]])
     data = dataset[0]
+    print(data)
+    print(data.pos.shape)
+    print(data.y.shape)
     pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
-    pcd.colors = o3d.utility.Vector3dVector(colors[data.y])
+    pcd.colors = o3d.utility.Vector3dVector(colors[data.y - min(data.y)])
     o3d.visualization.draw_geometries([pcd])

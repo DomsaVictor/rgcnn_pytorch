@@ -420,7 +420,7 @@ class Sphere_Occlusion_Transform(BaseTransform):
                 # o3d.visualization.draw_geometries([pcd_o3d_remaining,pcd_o3d])
 
 
-                points = torch.tensor(points)
+                points = torch.tensor(np.array(points))
                 points=points.float()
                 normals = np.asarray(pcd_sampled.normals)
                 normals = torch.tensor(normals)

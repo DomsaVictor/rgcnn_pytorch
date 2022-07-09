@@ -4,6 +4,7 @@ import torch
 
 from torch_geometric.datasets import ShapeNet
 from torch_geometric.loader import DenseDataLoader
+from torch_geometric.transforms import FixedPoints
 from FilteredShapenetDataset import FilteredShapeNet, ShapeNetCustom
 from RGCNNSegmentation import seg_model
 
@@ -18,40 +19,41 @@ from utils import seg_classes
 
 class ModelTester():
     def __init__(self, model, dataset_path, transforms=None):
-        self.model = model
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.model = model.to(self.device)
         self.path = dataset_path
         self.transforms = transforms
 
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         if not type(self.path) == Path:
             self.path = Path(self.path)
-        self.dataset = ShapeNetCustom(root_dir=self.path, folder="train", transform=transforms)
+        self.dataset = ShapeNetCustom(root_dir=self.path, folder="test", transform=transforms)
+        # self.dataset = ShapeNet(root=f"{imports.dataset_path}/ShapeNet",split="test", transform=FixedPoints(2048))
         print(self.dataset)
-        self.loader = DenseDataLoader(dataset=self.dataset, batch_size=32, pin_memory=True, num_workers=8)
-
+        self.loader = DenseDataLoader(dataset=self.dataset, batch_size=16, pin_memory=True, num_workers=8)
+        self.all_categories = sorted(["Airplane", "Bag", "Cap", "Car", "Chair", "Earphone",
+                "Guitar", "Knife", "Lamp", "Laptop", "Motorbike", "Mug",
+                "Pistol", "Rocket", "Skateboard", "Table"])
 
     def test_model(self):
-        min_category = 0
         self.model.eval()
-        size = len(self.dataset)
+        size = len(self.loader.dataset)
         predictions = np.empty((size, self.model.vertice))
         labels = np.empty((size, self.model.vertice))
         total_correct = 0
-        add_cat = False
-        # if (len(self.dataset.categories) == 1):
-        #     add_cat = False
-
-        print(self.dataset[0])
+        add_cat = True
+        if (len(self.dataset.categories) == 1):
+            add_cat = False
         
         for i, data in enumerate(self.loader):
+
             cat = None
-        if add_cat:
-            cat = data.category.to(self.device)
+            if add_cat:
+                cat = data.category.to(self.device)
 
             x = torch.cat([data.pos.type(torch.float32),
                     data.x.type(torch.float32)], dim=2)
-            y = (data.y - min_category).type(torch.LongTensor)
-            logits, _, _ = self.model(x.to(self.device), cat)
+            y = (data.y).type(torch.LongTensor)
+            logits, _, _ = self.model(x.to(self.device), cat.to(self.device))
             logits = logits.to('cpu')
             pred = logits.argmax(dim=2)
 
@@ -96,13 +98,13 @@ if __name__ == '__main__':
 
     input_dim = 22
 
-    model_name = "final_seg_clean_model.pt"
+    model_name = "2048p_seg_all200.pt"
 
-    model = seg_model(num_points, F, K, M, input_dim)
+    model = seg_model(num_points, F, K, M, input_dim, dropout=0.2, reg_prior=False)
     model.load_state_dict(torch.load(f"{imports.curr_path}/{model_name}"))
     model.eval()
 
-    dataset_name = "Gaussian_Original_2048_0.01"
+    dataset_name = "Original2_2048"
 
     tester = ModelTester(model, f"{imports.dataset_path}/Journal/ShapeNetCustom/{dataset_name}")
 

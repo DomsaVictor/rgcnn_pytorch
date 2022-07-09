@@ -277,12 +277,14 @@ class ShapeNetCustom(Dataset):
         self.with_normals = with_normals
         self.save_path = None
         self.folder = folder
+        self.all_categories = sorted(["Airplane", "Bag", "Cap", "Car", "Chair", "Earphone",
+                "Guitar", "Knife", "Lamp", "Laptop", "Motorbike", "Mug",
+                "Pistol", "Rocket", "Skateboard", "Table"])
         if save_path is not None:
             self.save_path = save_path
             if not os.path.exists(save_path):
                 os.mkdir(save_path)
 
-        
         for fld in folders:
             new_dir = root_dir/folder/fld
             for file in sorted(os.listdir(new_dir)):
@@ -296,17 +298,15 @@ class ShapeNetCustom(Dataset):
                     sample={}
                     sample['label_path'] = new_dir/file
                     self.labels.append(sample)
-                    
-                
 
     def __len__(self):
         return len(self.files)
 
-    def __preproc__(self, file, lbl, idx):
+    def __preproc__(self, file, lbl, curr_class):
         pcd = o3d.io.read_point_cloud(file)
         points = torch.tensor(np.asarray(pcd.points))
         labels = torch.tensor(np.load(lbl))
-        colors = np.array([[1,0,0],[0,1,0],[0,0,1],[0.3,0.5,0.7]])
+        # colors = np.array([[1,0,0],[0,1,0],[0,0,1],[0.3,0.5,0.7]])
 
         normals = []
 
@@ -339,7 +339,7 @@ class ShapeNetCustom(Dataset):
             normals = torch.Tensor(np.asarray(pcd.normals)) 
         # pointcloud = torch_geometric.data.Data(x=normals, pos=points, y=labels, num_nodes=labels.size(0))
 
-        pointcloud = torch_geometric.data.Data(x=normals, pos=points, y=labels)
+        pointcloud = torch_geometric.data.Data(x=normals, pos=points, y=labels, category=torch.tensor([self.all_categories.index(curr_class)]))
 
         if self.transforms:
             pointcloud = self.transforms(pointcloud)
@@ -349,11 +349,12 @@ class ShapeNetCustom(Dataset):
     def __getitem__(self, idx):
         pcd_path = self.files[idx]['pcd_path']
         lbl_path = self.labels[idx]['label_path']
+        curr_class = self.categories[idx]
         # print(pcd_path)
         # print(lbl_path)
         with open(pcd_path, 'r') as f:
             with open(lbl_path, 'r') as l:    
-                pointcloud = self.__preproc__(f.name.strip(), l.name.strip(), idx)
+                pointcloud = self.__preproc__(f.name.strip(), l.name.strip(), curr_class)
                 if self.save_path is not None:
                     name = str(time.time())
                     name = name.replace('.', '')

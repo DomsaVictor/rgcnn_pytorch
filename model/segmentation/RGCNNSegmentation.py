@@ -106,6 +106,7 @@ class seg_model(nn.Module):
         if cat is not None:
             cat = one_hot(cat, num_classes=16)
             cat = torch.tile(cat, [1, self.vertice, 1])
+            # cat = torch.reshape(cat, [x.shape[0], self.vertice, -1])
             out = torch.cat([x, cat], dim=2)  # Pass this to the model
         else:
             out = x

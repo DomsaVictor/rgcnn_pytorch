@@ -31,7 +31,7 @@ sys.path.append(str(utils_path))
 sys.path.append(str(dataset_path))
 
 from utils import GaussianNoiseTransform
-from FilteredShapenetDataset import FilteredShapeNet
+from FilteredShapenetDataset import FilteredShapeNet, ShapeNetCustom
 from RGCNNSegmentation import seg_model
 from utils import compute_loss_with_weights
 from utils import label_to_cat
@@ -274,10 +274,10 @@ def train_shapenet_full():
     num_points = 2048
     batch_size = 32
     num_epochs = 200
-    learning_rate = 0.001 # 0.003111998
+    learning_rate = 1e-3 # 0.003111998
     decay_rate = 0.8
     weight_decay = 1e-9  # 1e-9
-    dropout = 0.09 # 0.09170225
+    dropout = 0.2 # 0.09170225
     regularization = 1e-9 # 5.295088673159155e-9
 
     input_dim = 22
@@ -296,12 +296,16 @@ def train_shapenet_full():
     dataset_path    = (curr_path / "../dataset/").resolve()
 
     # dataset_path = (dataset_path / "Plane").resolve()
-    dataset_path = (dataset_path / "ShapeNet").resolve()
-
-    dataset_train = ShapeNet(root=str(dataset_path), include_normals=True, split="train", transform=transforms)
-    dataset_test  = ShapeNet(root=str(dataset_path), include_normals=True, split="test",  transform=transforms)
     
-
+    # dataset_path = (dataset_path / "ShapeNet").resolve()
+    # dataset_train = ShapeNet(root=str(dataset_path), include_normals=True, split="trainval", transform=transforms)
+    # dataset_test  = ShapeNet(root=str(dataset_path), include_normals=True, split="test",  transform=transforms)
+    
+    custom_dataset_path = (dataset_path / "Journal/ShapeNetCustom/Original2_2048").resolve()
+    transforms = Compose([NormalizeScale()])
+    dataset_train = ShapeNetCustom(root_dir=custom_dataset_path, folder="trainval", transform=transforms)
+    dataset_test  = ShapeNetCustom(root_dir=custom_dataset_path, folder="test",  transform=transforms)
+    
     print(str(dataset_path))
     
     # # root_dir MUST BE A Path(...) 

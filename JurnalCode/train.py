@@ -25,7 +25,7 @@ import imports
 from utils import compute_loss_with_weights
 from utils import label_to_cat
 from utils import seg_classes
-from FilteredShapenetDataset import FilteredShapeNet
+from FilteredShapenetDataset import FilteredShapeNet, ShapeNetCustom
 from RGCNNSegmentation import seg_model
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -204,8 +204,12 @@ def train_shapenet_full():
     # dataset_path = (dataset_path / "Plane").resolve()
     dataset_path = (dataset_path / "ShapeNet").resolve()
 
-    dataset_train = ShapeNet(root=str(dataset_path), include_normals=True, split="train", transform=transforms)
-    dataset_test  = ShapeNet(root=str(dataset_path), include_normals=True, split="test",  transform=transforms)
+    # dataset_train = ShapeNet(root=str(dataset_path), include_normals=True, split="train", transform=transforms)
+    # dataset_test  = ShapeNet(root=str(dataset_path), include_normals=True, split="test",  transform=transforms)
+    
+    custom_dataset_path = (dataset_path/"Journal/ShapeNetCustom/Original_2048")
+    dataset_train = ShapeNetCustom(root_dir=str(custom_dataset_path), folder="trainval", transform=None)
+    dataset_test  = ShapeNetCustom(root_dir=str(custom_dataset_path), folder="test",  transform=None)
     
 
     print(str(dataset_path))

@@ -90,31 +90,37 @@ if __name__ == '__main__':
     # noise_transform([0, 0.01, 0.02, 0.05, 0.1])
     # occlusion_transform([0.1,0.15,0.2])
     num_points = 2048
-    sigma_levels = [0.1, 0.15, 0.2]
     splits = ['trainval', 'test']
-    for sigma in sigma_levels:
-        transform = Compose([utils.Sphere_Occlusion_Transform(sigma, num_points=2048)])
-        for split in splits:
-            save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
-                    save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Occlusion_{num_points}_{sigma}/"), split=split)
+    transform = Compose([FixedPoints(2048)])
+    for split in splits:
+        save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform,
+                save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Original2_{num_points}/"), split=split)
 
-    sigma_levels = [0.01, 0.02, 0.05]
-    splits = ['trainval', 'test']
-    for sigma in sigma_levels:
-        transform = Compose([FixedPoints(2048), utils.GaussianNoiseTransform(mu=0, sigma=sigma, recompute_normals=True)])
-        for split in splits:
-            save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
-                    save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Gaussian_Recomputed_{num_points}_{sigma}/"), split=split)
+    # sigma_levels = [0.1, 0.15, 0.2]
+    # splits = ['trainval', 'test']
+    # for sigma in sigma_levels:
+    #     transform = Compose([utils.Sphere_Occlusion_Transform(sigma, num_points=2048)])
+    #     for split in splits:
+    #         save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
+    #                 save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Occlusion_{num_points}_{sigma}/"), split=split)
+
+    # sigma_levels = [0.01, 0.02, 0.05]
+    # splits = ['trainval', 'test']
+    # for sigma in sigma_levels:
+    #     transform = Compose([FixedPoints(2048), utils.GaussianNoiseTransform(mu=0, sigma=sigma, recompute_normals=True)])
+    #     for split in splits:
+    #         save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
+    #                 save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Gaussian_Recomputed_{num_points}_{sigma}/"), split=split)
 
 
-    sigma_levels = [0.01, 0.02, 0.05]
-    splits = ['trainval', 'test']
-    for sigma in sigma_levels:
-        transform = Compose([FixedPoints(2048), utils.GaussianNoiseTransform(mu=0, sigma=sigma, recompute_normals=False)])
-        for split in splits:
-            save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
-                    save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Gaussian_Original_{num_points}_{sigma}/"), split=split)
-    # dataset = FilteredShapeNet(Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Gaussian_{num_points}_{sigma}/"), folder="train")
+    # sigma_levels = [0.01, 0.02, 0.05]
+    # splits = ['trainval', 'test']
+    # for sigma in sigma_levels:
+    #     transform = Compose([FixedPoints(2048), utils.GaussianNoiseTransform(mu=0, sigma=sigma, recompute_normals=False)])
+    #     for split in splits:
+    #         save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
+    #                 save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Gaussian_Original_{num_points}_{sigma}/"), split=split)
+    # # dataset = FilteredShapeNet(Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Gaussian_{num_points}_{sigma}/"), folder="train")
     # colors = np.array([[1,0,0], [0,1,0], [0,0,1], [1,0,1]])
     # data = dataset[0]
     # print(data)

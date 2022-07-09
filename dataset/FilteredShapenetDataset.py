@@ -266,6 +266,7 @@ class FilteredShapeNet(Dataset):
 
         return pointcloud
 
+
 class ShapeNetCustom(Dataset):
     def __init__(self, root_dir, folder="train", transform=FixedPoints(512), with_normals=True, save_path=None):
         self.root_dir = root_dir
@@ -280,6 +281,23 @@ class ShapeNetCustom(Dataset):
         self.all_categories = sorted(["Airplane", "Bag", "Cap", "Car", "Chair", "Earphone",
                 "Guitar", "Knife", "Lamp", "Laptop", "Motorbike", "Mug",
                 "Pistol", "Rocket", "Skateboard", "Table"])
+        self.seg_classes = {
+                'Airplane': [0, 1, 2, 3],
+                'Bag': [4, 5],
+                'Cap': [6, 7],
+                'Car': [8, 9, 10, 11],
+                'Chair': [12, 13, 14, 15],
+                'Earphone': [16, 17, 18],
+                'Guitar': [19, 20, 21],
+                'Knife': [22, 23],
+                'Lamp': [24, 25, 26, 27],
+                'Laptop': [28, 29],
+                'Motorbike': [30, 31, 32, 33, 34, 35],
+                'Mug': [36, 37],
+                'Pistol': [38, 39, 40],
+                'Rocket': [41, 42, 43],
+                'Skateboard': [44, 45, 46],
+                'Table': [47, 48, 49],}
         if save_path is not None:
             self.save_path = save_path
             if not os.path.exists(save_path):
@@ -338,8 +356,9 @@ class ShapeNetCustom(Dataset):
 
             normals = torch.Tensor(np.asarray(pcd.normals)) 
         # pointcloud = torch_geometric.data.Data(x=normals, pos=points, y=labels, num_nodes=labels.size(0))
-
-        pointcloud = torch_geometric.data.Data(x=normals, pos=points, y=labels, category=torch.tensor([self.all_categories.index(curr_class)]))
+        cat = torch.tensor([self.all_categories.index(curr_class)])
+        cat += min(self.seg_classes[curr_class])
+        pointcloud = torch_geometric.data.Data(x=normals, pos=points, y=labels, category=cat)
 
         if self.transforms:
             pointcloud = self.transforms(pointcloud)

@@ -51,8 +51,11 @@ def train(model, optimizer, loader, regularization, criterion, min_category=0):
     for i, data in enumerate(loader):
         optimizer.zero_grad()
         cat = None
+        print(data.category)
         if add_cat:
             cat = data.category.to(device)
+            print(cat)
+            exit(0)
         y = (data.y - min_category).type(torch.LongTensor)
         # x = data.pos
         x = torch.cat([data.pos.type(torch.float32),
@@ -272,7 +275,7 @@ def train_shapenet_full():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     num_points = 2048
-    batch_size = 32
+    batch_size = 4
     num_epochs = 200
     learning_rate = 1e-3 # 0.003111998
     decay_rate = 0.8

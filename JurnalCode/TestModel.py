@@ -38,6 +38,7 @@ class ModelTester():
         labels = np.empty((size, self.model.vertice))
         total_correct = 0
         add_cat = True
+        print(self.dataset[0])
         if (len(self.dataset.categories) == 1):
             add_cat = False
 
@@ -100,7 +101,7 @@ if __name__ == '__main__':
     model.load_state_dict(torch.load(f"{imports.curr_path}/{model_name}"))
     model.eval()
 
-    dataset_name = "Gaussian_2048_0"
+    dataset_name = "Gaussian_Original_2048_0.01"
 
     tester = ModelTester(model, f"{imports.dataset_path}/Journal/ShapeNetCustom/{dataset_name}")
 

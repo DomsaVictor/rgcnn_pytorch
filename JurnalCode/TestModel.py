@@ -102,7 +102,7 @@ if __name__ == '__main__':
     model.load_state_dict(torch.load(f"{imports.curr_path}/{model_name}"))
     model.eval()
 
-    dataset_name = "Gaussian_2048_0.05"
+    dataset_name = "Gaussian_Original_2048_0.01"
 
     tester = ModelTester(model, f"{imports.dataset_path}/Journal/ShapeNetCustom/{dataset_name}")
 

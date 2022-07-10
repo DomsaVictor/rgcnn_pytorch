@@ -331,7 +331,7 @@ for key in seg_classes.keys():
 
 class Sphere_Occlusion_Transform(BaseTransform):
 
-    def __init__(self, radius: Optional[float] = 0.1,percentage:Optional[float] = 0.1, num_points: Optional[int]=1024):
+    def __init__(self, radius: Optional[float] = 0.1, percentage:Optional[float] = 0.1, num_points: Optional[int]=1024):
         torch.manual_seed(0)
         np.random.seed(0)
         
@@ -340,18 +340,18 @@ class Sphere_Occlusion_Transform(BaseTransform):
         self.num_points=num_points
 
     def __call__(self, data: Union[Data, HeteroData]):
-        chosen_center= np.random.randint(0, data.pos.shape[0])
+        chosen_center = np.random.randint(0, data.pos.shape[0])
        
-        pcd_center=data.pos[chosen_center]
+        pcd_center = data.pos[chosen_center]
 
-        nr_coordinates=pcd_center.shape[0]
+        nr_coordinates = pcd_center.shape[0]
 
-        pcd_center=np.tile(pcd_center, data.pos.shape[0])
-        pcd_center=pcd_center.reshape(data.pos.shape[0],nr_coordinates)
+        pcd_center = np.tile(pcd_center, data.pos.shape[0])
+        pcd_center = pcd_center.reshape(data.pos.shape[0], nr_coordinates)
 
-        points=data.pos
-        points=points-pcd_center
-        points=np.linalg.norm(points, axis=1)
+        points = data.pos
+        points = points - pcd_center
+        points = np.linalg.norm(points, axis=1)
 
         # sorted_points=np.sort(points)
 
@@ -361,17 +361,15 @@ class Sphere_Occlusion_Transform(BaseTransform):
 
         # remaining_index= np.squeeze(np.argwhere(points>=radius))
         
-        remaining_index= np.squeeze(np.argwhere(points>=self.radius))
+        remaining_index= np.squeeze(np.argwhere(points >= self.radius))
 
-        
-
-    
         pcd_o3d = o3d.geometry.PointCloud()
         pcd_o3d.points = o3d.utility.Vector3dVector(data.pos)
 
         pcd_o3d_remaining = o3d.geometry.PointCloud()
         pcd_o3d_remaining.points = o3d.utility.Vector3dVector(np.squeeze(data.pos[remaining_index]))
         aux_normals = data.normal[remaining_index] if "normal" in data else data.x[remaining_index]
+        print(aux_normals.shape)
         pcd_o3d_remaining.normals = o3d.utility.Vector3dVector(np.squeeze(aux_normals))
         pcd_o3d.paint_uniform_color([0, 1, 0])
 
@@ -380,15 +378,8 @@ class Sphere_Occlusion_Transform(BaseTransform):
         # pcd_o3d_sphere.normals=o3d.utility.Vector3dVector(np.squeeze(data.normal[index_pcd]))
         # pcd_o3d_sphere.paint_uniform_color([1, 0, 0])
 
-
-
-        
-
         # o3d.visualization.draw_geometries([pcd_o3d_sphere]) 
         
-
-
-
         # o3d.visualization.draw_geometries([pcd_o3d_remaining]) 
         # o3d.visualization.draw_geometries([pcd_o3d])        
 
@@ -402,35 +393,35 @@ class Sphere_Occlusion_Transform(BaseTransform):
         points_remaining=torch.tensor(points_remaining)
 
         if len(pcd_o3d_remaining.points) < self.num_points:
-                alpha = 0.03
-                rec_mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(
-                    pcd_o3d_remaining, alpha)
+            alpha = 0.03
+            rec_mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(
+                pcd_o3d_remaining, alpha)
 
-                num_points_sample = data.pos.shape[0]
+            num_points_sample = data.pos.shape[0]
 
-                pcd_sampled = rec_mesh.sample_points_poisson_disk(num_points_sample) 
+            pcd_sampled = rec_mesh.sample_points_poisson_disk(num_points_sample) 
 
-                points = pcd_sampled.points
+            points = pcd_sampled.points
 
-                pcd_o3d_remaining.points=points
+            pcd_o3d_remaining.points=points
 
-                pcd_o3d_remaining.paint_uniform_color([0.5, 0.3, 0.2])
+            pcd_o3d_remaining.paint_uniform_color([0.5, 0.3, 0.2])
 
-                # o3d.visualization.draw_geometries([pcd_o3d_remaining]) 
-                # o3d.visualization.draw_geometries([pcd_o3d_remaining,pcd_o3d])
+            # o3d.visualization.draw_geometries([pcd_o3d_remaining]) 
+            # o3d.visualization.draw_geometries([pcd_o3d_remaining,pcd_o3d])
 
 
-                points = torch.tensor(np.array(points))
-                points=points.float()
-                normals = np.asarray(pcd_sampled.normals)
-                normals = torch.tensor(normals)
-                normals=normals.float()
+            points = torch.tensor(np.array(points))
+            points=points.float()
+            normals = np.asarray(pcd_sampled.normals)
+            normals = torch.tensor(normals)
+            normals=normals.float()
 
-                data.pos = points
-                if 'normal' in data:                
-                    data.normal = normals
-                else:
-                    data.x = normals
+            data.pos = points
+            if 'normal' in data:                
+                data.normal = normals
+            else:
+                data.x = normals
         else:
             nr_points_fps=self.num_points
             nr_points=remaining_index.shape[0]

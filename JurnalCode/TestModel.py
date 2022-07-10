@@ -4,7 +4,7 @@ import torch
 
 from torch_geometric.datasets import ShapeNet
 from torch_geometric.loader import DenseDataLoader
-from torch_geometric.transforms import FixedPoints
+from torch_geometric.transforms import FixedPoints, Compose, NormalizeScale
 from FilteredShapenetDataset import FilteredShapeNet, ShapeNetCustom
 from RGCNNSegmentation import seg_model
 
@@ -18,7 +18,7 @@ from utils import label_to_cat
 from utils import seg_classes
 
 class ModelTester():
-    def __init__(self, model, dataset_path, transforms=None):
+    def __init__(self, model, dataset_path, transforms=NormalizeScale()):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model = model.to(self.device)
         self.path = dataset_path
@@ -27,9 +27,9 @@ class ModelTester():
         if not type(self.path) == Path:
             self.path = Path(self.path)
         self.dataset = ShapeNetCustom(root_dir=self.path, folder="test", transform=transforms)
-        # self.dataset = ShapeNet(root=f"{imports.dataset_path}/ShapeNet",split="test", transform=FixedPoints(2048))
-        print(self.dataset)
-        self.loader = DenseDataLoader(dataset=self.dataset, batch_size=16, pin_memory=True, num_workers=8)
+        print(self.dataset[0])
+        # self.dataset = ShapeNet(root=f"{imports.dataset_path}/ShapeNet",split="test", transform=Compose([FixedPoints(2048), NormalizeScale()]))
+        self.loader = DenseDataLoader(dataset=self.dataset, batch_size=32, pin_memory=True, num_workers=8, shuffle=True)
         self.all_categories = sorted(["Airplane", "Bag", "Cap", "Car", "Chair", "Earphone",
                 "Guitar", "Knife", "Lamp", "Laptop", "Motorbike", "Mug",
                 "Pistol", "Rocket", "Skateboard", "Table"])
@@ -54,8 +54,15 @@ class ModelTester():
                     data.x.type(torch.float32)], dim=2)
             y = (data.y).type(torch.LongTensor)
             logits, _, _ = self.model(x.to(self.device), cat.to(self.device))
-            logits = logits.to('cpu')
+
+            # print(logits.shape)
+            # print(f"{min(logits)} - {max(logits)}")
+
+            # logits = logits.to('cpu')
+
             pred = logits.argmax(dim=2)
+
+            pred = pred.to('cpu')
 
             total_correct += int((pred == y).sum())
             start = i * self.loader.batch_size
@@ -89,7 +96,35 @@ class ModelTester():
         return accuracy, cat_iou, tot_iou, ncorrects
 
 
-if __name__ == '__main__':
+def test_all_models(dataset_names:list):
+    num_points = 2048
+
+    F = [128, 512, 1024]  # Outputs size of convolutional filter.
+    K = [6, 5, 3]         # Polynomial orders.
+    M = [512, 128, 50]
+
+    input_dim = 22
+
+    model_name = "2048p_seg_all200.pt"
+
+    model = seg_model(num_points, F, K, M, input_dim, dropout=0.2, reg_prior=False)
+    model.load_state_dict(torch.load(f"{imports.curr_path}/{model_name}"))
+    model.eval()
+
+    for name in dataset_names:
+        tester = ModelTester(model, f"{imports.dataset_path}/Journal/ShapeNetCustom/{name}")
+
+        acc, cat_iou, tot_iou, ncorrect = tester.test_model()
+        print(f"\n!!!!!!! {name} !!!!!!!")
+        print(f"Accuracy = {acc}")
+        for key, value in cat_iou.items():
+                print(key + ': {:.4f}, total: {:d}'.format(np.mean(value), len(value)))
+        print(f"Tot IoU  = {np.mean(tot_iou)*100}")
+        print(f"Ncorrect = {ncorrect}")
+        print("**"*20)
+
+
+def test():
     num_points = 2048
 
     F = [128, 512, 1024]  # Outputs size of convolutional filter.
@@ -115,3 +150,11 @@ if __name__ == '__main__':
             print(key + ': {:.4f}, total: {:d}'.format(np.mean(value), len(value)))
     print(f"Tot IoU  = {np.mean(tot_iou)*100}")
     print(f"Ncorrect = {ncorrect}")
+
+if __name__ == '__main__':
+    dataset_names = [
+        "Gaussian_Original_2048_0.01", "Gaussian_Original_2048_0.02",  "Gaussian_Original_2048_0.05",
+        "Gaussian_Recomputed_2048_0.01", "Gaussian_Recomputed_2048_0.02", "Gaussian_Recomputed_2048_0.05",
+        "Occlusion_2048_0.1", "Occlusion_2048_0.2", "Occlusion_2048_0.15"]
+    dataset_names = ["Occlusion_2048_0.1", "Occlusion_2048_0.2", "Occlusion_2048_0.15"]
+    test_all_models(dataset_names=dataset_names)

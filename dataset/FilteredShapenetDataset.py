@@ -357,7 +357,7 @@ class ShapeNetCustom(Dataset):
             normals = torch.Tensor(np.asarray(pcd.normals)) 
         # pointcloud = torch_geometric.data.Data(x=normals, pos=points, y=labels, num_nodes=labels.size(0))
         cat = torch.tensor([self.all_categories.index(curr_class)])
-        cat += min(self.seg_classes[curr_class])
+        # labels += min(self.seg_classes[curr_class])
         pointcloud = torch_geometric.data.Data(x=normals, pos=points, y=labels, category=cat)
 
         if self.transforms:

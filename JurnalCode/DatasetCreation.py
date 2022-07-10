@@ -85,7 +85,9 @@ def save_dataset(root, transform, save_path, categories=None, split="train", inc
             o3d.io.write_point_cloud(str((save_path/split/category_name/pcd_name).resolve()), pcd)
             np.save(str((save_path/split/category_name/lbl_name).resolve()), data.y)
             
-if __name__ == '__main__':
+            
+            
+def test():
     # noise_transform([0, 0.01, 0.02, 0.05, 0.1])
     # occlusion_transform([0.1,0.15,0.2])
     num_points = 2048
@@ -153,3 +155,6 @@ if __name__ == '__main__':
     # pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
     # pcd.colors = o3d.utility.Vector3dVector(colors[data.y - min(data.y)])
     # o3d.visualization.draw_geometries([pcd])
+
+if __name__ == '__main__':
+    occlusion_transform([0.1])

@@ -265,6 +265,35 @@ def compute_loss(logits, y, x, L, criterion, s=1e-9):
     loss += l
     return loss
 
+class BoundingBoxRotate(BaseTransform):
+    def __init__(self):
+        pass
+
+    def __call__(self, data: Union[Data, HeteroData]):
+        points = np.asarray(data.pos)
+        normals = np.asarray(data.normal) if 'normal' in data else np.asarray(data.x)
+        pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(points))
+        pcd.normals = o3d.utility.Vector3dVector(normals)
+
+        bounding_box = pcd.get_oriented_bounding_box()
+        center  = pcd.get_center()
+
+        pcd = pcd.translate(-center)
+        pcd = pcd.rotate(bounding_box.R.T)
+
+        points = torch.tensor(np.asarray(pcd.points))
+        normals = torch.tensor(np.asarray(pcd.normals))
+        
+        if 'normal' in data:
+            return tg.data.Data(normal=normals, pos=points, y=data.y) # for Modelnet
+        else:
+            return tg.data.Data(x=normals, pos=points, y=data.y) # for ShapeNet
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}()'
+
+
+
 class GaussianNoiseTransform(BaseTransform):
 
     def __init__(self, mu: Optional[float] = 0, sigma: Optional[float] = 0.1, recompute_normals : bool = True):

@@ -1,15 +1,18 @@
 import os
+from turtle import Shape
 from matplotlib import transforms
 from matplotlib.colors import Normalize
 import imports
 from pathlib import Path
 import open3d as o3d
 import utils
+from utils import BoundingBoxRotate
 from torch_geometric.datasets import ShapeNet
 from torch_geometric.transforms import Compose, FixedPoints, NormalizeScale
 import copy
 from FilteredShapenetDataset import FilteredShapeNet, ShapeNetCustom
 import numpy as np
+
 
 def noise_transform(noise_levels):
     
@@ -65,8 +68,6 @@ def save_dataset(root, transform, save_path, categories=None, split="train", inc
                 "Guitar", "Knife", "Lamp", "Laptop", "Motorbike", "Mug",
                 "Pistol", "Rocket", "Skateboard", "Table"])
         
-        
-        
         if not os.path.isdir(str((save_path/split).resolve())):
             os.makedirs(str((save_path/split).resolve()))
         if categories is None:
@@ -98,37 +99,38 @@ def test():
     #     save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform,
     #             save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Original_{num_points}/"), split=split)
     
-    dataset = ShapeNetCustom(root_dir=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Original_{num_points}/"), transform=None, folder="trainval")
-    data = dataset[0]
-    pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
-    colors = np.array([[1,0,0], [0,1,0], [0,0,1], [0.4, 0.3, 0.6]])
-    pcd.colors = o3d.utility.Vector3dVector(colors[data.y])
+    # dataset = ShapeNetCustom(root_dir=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Original_{num_points}/"), transform=None, folder="trainval")
+    # data = dataset[0]
+    # pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
+    # colors = np.array([[1,0,0], [0,1,0], [0,0,1], [0.4, 0.3, 0.6]])
+    # pcd.colors = o3d.utility.Vector3dVector(colors[data.y])
     
-    dataset = ShapeNetCustom(root_dir=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Original_{num_points}/"), transform=NormalizeScale(), folder="trainval")
-    data = dataset[5500]
-    print(data.y)
-    print(f"{min(data.y)} - {max(data.y)}")
-    pcd2 = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
-    colors = np.array([[1,0,0], [0,1,0], [0,0,1], [0.4, 0.3, 0.6]])
-    o3d.visualization.draw_geometries([pcd2])
-    print(data.category)
+    # dataset = ShapeNetCustom(root_dir=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Original_{num_points}/"), transform=NormalizeScale(), folder="trainval")
+    # data = dataset[5500]
+    # print(data.y)
+    # print(f"{min(data.y)} - {max(data.y)}")
+    # pcd2 = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
+    # colors = np.array([[1,0,0], [0,1,0], [0,0,1], [0.4, 0.3, 0.6]])
+    # o3d.visualization.draw_geometries([pcd2])
+    # print(data.category)
     
-    dataset = ShapeNet(root=imports.dataset_path + "/ShapeNet", categories='Car', transform=FixedPoints(2048))
-    data = dataset[0]
-    pcd3 = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
-    colors = np.array([[1,0,0], [0,1,0], [0,0,1], [0.4, 0.3, 0.6]])
+    # dataset = ShapeNet(root=imports.dataset_path + "/ShapeNet", categories='Car', transform=FixedPoints(2048))
+    # data = dataset[0]
+    # pcd3 = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
+    # colors = np.array([[1,0,0], [0,1,0], [0,0,1], [0.4, 0.3, 0.6]])
+
     # print(data.y)
     # pcd3.colors = o3d.utility.Vector3dVector(colors[data.y])
     # o3d.visualization.draw_geometries([pcd, pcd2, pcd3])
 
     # print(data.category)
     
-    
-    # for sigma in sigma_levels:
-    #     transform = Compose([utils.Sphere_Occlusion_Transform(sigma, num_points=2048)])
-    #     for split in splits:
-    #         save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
-    #                 save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Occlusion_{num_points}_{sigma}/"), split=split)
+    sigma_levels = [0.1, 0.15, 0.2]
+    for sigma in sigma_levels:
+        transform = Compose([utils.Sphere_Occlusion_Transform(sigma, num_points=2048)])
+        for split in splits:
+            save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
+                    save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Occlusion_{num_points}_{sigma}/"), split=split)
 
     # sigma_levels = [0.01, 0.02, 0.05]
     # splits = ['trainval', 'test']
@@ -156,5 +158,22 @@ def test():
     # pcd.colors = o3d.utility.Vector3dVector(colors[data.y - min(data.y)])
     # o3d.visualization.draw_geometries([pcd])
 
+def test_rotation():
+    root = Path(imports.dataset_path) / "ShapeNet"
+    transforms = Compose([FixedPoints(2048), BoundingBoxRotate()])
+    dataset = ShapeNet(root=root, categories=None, transform=transforms)
+    colors = np.array([[1,0,0], [0,1,0], [0,0,1], [0.4, 0.3, 0.6]])
+
+    data = dataset[0]
+    pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
+    pcd.normals = o3d.utility.Vector3dVector(data.x)
+    pcd.colors = o3d.utility.Vector3dVector(colors[data.y - min(data.y)])
+
+    o3d.visualization.draw_geometries([pcd])
+
+
 if __name__ == '__main__':
-    occlusion_transform([0.1])
+    # occlusion_transform([0.1])
+    # test()
+
+    test_rotation()

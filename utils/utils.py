@@ -369,7 +369,7 @@ class Sphere_Occlusion_Transform(BaseTransform):
         pcd_o3d_remaining = o3d.geometry.PointCloud()
         pcd_o3d_remaining.points = o3d.utility.Vector3dVector(np.squeeze(data.pos[remaining_index]))
         aux_normals = data.normal[remaining_index] if "normal" in data else data.x[remaining_index]
-        print(aux_normals.shape)
+        print(f"Normals shepe: {aux_normals.shape}")
         pcd_o3d_remaining.normals = o3d.utility.Vector3dVector(np.squeeze(aux_normals))
         pcd_o3d.paint_uniform_color([0, 1, 0])
 

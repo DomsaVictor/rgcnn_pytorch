@@ -8,7 +8,7 @@ import open3d as o3d
 import utils
 from utils import BoundingBoxRotate
 from torch_geometric.datasets import ShapeNet
-from torch_geometric.transforms import Compose, FixedPoints, NormalizeScale
+from torch_geometric.transforms import Compose, FixedPoints, NormalizeScale, RandomRotate
 import copy
 from FilteredShapenetDataset import FilteredShapeNet, ShapeNetCustom
 import numpy as np
@@ -159,17 +159,36 @@ def test():
     # o3d.visualization.draw_geometries([pcd])
 
 def test_rotation():
+    
     root = Path(imports.dataset_path) / "ShapeNet"
     transforms = Compose([FixedPoints(2048), BoundingBoxRotate()])
+    transforms_rot = Compose([
+        FixedPoints(2048),
+        RandomRotate(185, axis=0),
+        RandomRotate(185, axis=1),
+        RandomRotate(185, axis=2),
+        BoundingBoxRotate()])
     dataset = ShapeNet(root=root, categories=None, transform=transforms)
+    
+    dataset_normal = ShapeNet(root=root, categories=None, transform=transforms_rot)
     colors = np.array([[1,0,0], [0,1,0], [0,0,1], [0.4, 0.3, 0.6]])
 
-    data = dataset[0]
+    data = dataset_normal[5]
+    pcd2 = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
+    pcd2.normals = o3d.utility.Vector3dVector(data.x)
+    # pcd2.colors = o3d.utility.Vector3dVector(colors[data.y - min(data.y)])
+    pcd2.paint_uniform_color([0.4, 0.3, 0.6])
+    pcd2 = pcd2.translate([1,0,0])
+    
+    colors = np.array([[1,0,0], [0,1,0], [0,0,1], [0.4, 0.3, 0.6]])
+
+    data = dataset[5]
     pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
     pcd.normals = o3d.utility.Vector3dVector(data.x)
     pcd.colors = o3d.utility.Vector3dVector(colors[data.y - min(data.y)])
 
-    o3d.visualization.draw_geometries([pcd])
+    o3d.visualization.draw_geometries([pcd, pcd2])
+    # o3d.visualization.draw_geometries([pcd])
 
 
 if __name__ == '__main__':

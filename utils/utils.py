@@ -369,9 +369,9 @@ class Sphere_Occlusion_Transform(BaseTransform):
         pcd_o3d_remaining = o3d.geometry.PointCloud()
         pcd_o3d_remaining.points = o3d.utility.Vector3dVector(np.squeeze(data.pos[remaining_index]))
         aux_normals = data.normal[remaining_index] if "normal" in data else data.x[remaining_index]
-        print(f"Normals shepe: {aux_normals.shape}")
         pcd_o3d_remaining.normals = o3d.utility.Vector3dVector(np.squeeze(aux_normals))
-        pcd_o3d.paint_uniform_color([0, 1, 0])
+        
+        # pcd_o3d.paint_uniform_color([0, 1, 0])
 
         # pcd_o3d_sphere = o3d.geometry.PointCloud()
         # pcd_o3d_sphere.points=o3d.utility.Vector3dVector(np.squeeze(data.pos[index_pcd]))
@@ -387,10 +387,10 @@ class Sphere_Occlusion_Transform(BaseTransform):
         # pcd_o3d_remaining.normalize_normals()
         # pcd_o3d_remaining.orient_normals_consistent_tangent_plane(100)
 
-        normals=np.asarray(pcd_o3d_remaining.normals)
+        normals = np.asarray(pcd_o3d_remaining.normals)
 
-        points_remaining=np.asarray(pcd_o3d_remaining.points)
-        points_remaining=torch.tensor(points_remaining)
+        points_remaining = np.asarray(pcd_o3d_remaining.points)
+        points_remaining = torch.tensor(points_remaining)
 
         if len(pcd_o3d_remaining.points) < self.num_points:
             alpha = 0.03
@@ -409,8 +409,7 @@ class Sphere_Occlusion_Transform(BaseTransform):
 
             # o3d.visualization.draw_geometries([pcd_o3d_remaining]) 
             # o3d.visualization.draw_geometries([pcd_o3d_remaining,pcd_o3d])
-
-
+            
             points = torch.tensor(np.array(points))
             points=points.float()
             normals = np.asarray(pcd_sampled.normals)
@@ -437,8 +436,10 @@ class Sphere_Occlusion_Transform(BaseTransform):
             normals = fps_normals
 
             data.pos=points
-            data.normal=normals
-
+            if 'normal' in data:                
+                data.normal = normals
+            else:
+                data.x = normals
 
         return data
 

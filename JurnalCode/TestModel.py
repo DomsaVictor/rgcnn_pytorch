@@ -1,20 +1,23 @@
 from ast import Num
+import time
 import imports
 import torch
-
+import os
 from torch_geometric.datasets import ShapeNet
 from torch_geometric.loader import DenseDataLoader
-from torch_geometric.transforms import FixedPoints, Compose, NormalizeScale
+from torch_geometric.transforms import FixedPoints, Compose, NormalizeScale, NormalizeRotation, RandomRotate
 from FilteredShapenetDataset import FilteredShapeNet, ShapeNetCustom
 from RGCNNSegmentation import seg_model
-
+import matplotlib.pyplot as plt
 import numpy as np
+
+import pickle
 
 import copy
 from pathlib import Path
 from collections import defaultdict
 
-from utils import label_to_cat
+from utils import BoundingBoxRotate, label_to_cat
 from utils import seg_classes
 
 class ModelTester():
@@ -27,7 +30,7 @@ class ModelTester():
         if not type(self.path) == Path:
             self.path = Path(self.path)
         self.dataset = ShapeNetCustom(root_dir=self.path, folder="test", transform=transforms)
-        print(self.dataset[0])
+        # print(self.dataset[0])
         # self.dataset = ShapeNet(root=f"{imports.dataset_path}/ShapeNet",split="test", transform=Compose([FixedPoints(2048), NormalizeScale()]))
         self.loader = DenseDataLoader(dataset=self.dataset, batch_size=32, pin_memory=True, num_workers=8, shuffle=True)
         self.all_categories = sorted(["Airplane", "Bag", "Cap", "Car", "Chair", "Earphone",
@@ -96,7 +99,7 @@ class ModelTester():
         return accuracy, cat_iou, tot_iou, ncorrects
 
 
-def test_all_models(dataset_names:list):
+def test_all_models(dataset_names:list, model_name="2048p_seg_all200.pt", transform=NormalizeScale()):
     num_points = 2048
 
     F = [128, 512, 1024]  # Outputs size of convolutional filter.
@@ -105,24 +108,48 @@ def test_all_models(dataset_names:list):
 
     input_dim = 22
 
-    model_name = "2048p_seg_all200.pt"
-
     model = seg_model(num_points, F, K, M, input_dim, dropout=0.2, reg_prior=False)
     model.load_state_dict(torch.load(f"{imports.curr_path}/{model_name}"))
     model.eval()
 
+    
+    if not os.path.isdir(Path(imports.curr_path)/"results/"):
+        os.makedirs(Path(imports.curr_path)/"results/")
+    
+    save_path = str((Path(imports.curr_path) / "results").resolve())
+    all_tot_iou = []
+    all_cat_iou = []
+    all_acc = []
     for name in dataset_names:
-        tester = ModelTester(model, f"{imports.dataset_path}/Journal/ShapeNetCustom/{name}")
+        tester = ModelTester(model, f"{imports.dataset_path}/Journal/ShapeNetCustom/{name}", transforms=transform)
 
         acc, cat_iou, tot_iou, ncorrect = tester.test_model()
         print(f"\n!!!!!!! {name} !!!!!!!")
         print(f"Accuracy = {acc}")
-        for key, value in cat_iou.items():
-                print(key + ': {:.4f}, total: {:d}'.format(np.mean(value), len(value)))
+        # for key, value in cat_iou.items():
+        #         print(key + ': {:.4f}, total: {:d}'.format(np.mean(value), len(value)))
         print(f"Tot IoU  = {np.mean(tot_iou)*100}")
-        print(f"Ncorrect = {ncorrect}")
+        # print(f"Ncorrect = {ncorrect}")
         print("**"*20)
+        if not os.path.isdir(Path(save_path)/model_name/name):
+            os.makedirs(Path(save_path)/model_name/name)
+        np.savetxt(f"{save_path}/{model_name}/{name}/acc.txt", np.expand_dims(acc, axis=0))
+        file = open(f"{save_path}/{model_name}/{name}/cat_iou.txt", "w")
+        file.write(str(cat_iou)) 
+        file.close()
+        # np.savetxt(f"{save_path}/{model_name}/{name}/cat_iou.txt",  cat_iou)
+        np.savetxt(f"{save_path}/{model_name}/{name}/tot_iou.txt", np.expand_dims(np.mean(tot_iou)*100, axis=0))
 
+        all_acc.append(acc)
+        all_tot_iou.append(all_tot_iou)
+        all_cat_iou.append(all_cat_iou)
+
+    return all_acc, all_tot_iou, all_cat_iou
+
+        # np.save(f"{save_path}/{name}/ncorrect.npy", ncorrect)
+    # plt.plot(all_acc)
+    # plt.plot(all_tot_iou)
+    
 
 def test():
     num_points = 2048
@@ -155,6 +182,52 @@ if __name__ == '__main__':
     dataset_names = [
         "Gaussian_Original_2048_0.01", "Gaussian_Original_2048_0.02",  "Gaussian_Original_2048_0.05",
         "Gaussian_Recomputed_2048_0.01", "Gaussian_Recomputed_2048_0.02", "Gaussian_Recomputed_2048_0.05",
-        "Occlusion_2048_0.1", "Occlusion_2048_0.2", "Occlusion_2048_0.15"]
-    dataset_names = ["Occlusion_2048_0.1", "Occlusion_2048_0.2", "Occlusion_2048_0.15"]
-    test_all_models(dataset_names=dataset_names)
+        "Occlusion_2048_0.1", "Occlusion_2048_0.2", "Occlusion_2048_0.15",
+        "RandomRotated_2048_10", "RandomRotated_2048_20", "RandomRotated_2048_30", "RandomRotated_2048_40"]
+    # dataset_names = ["Occlusion_2048_0.1", "Occlusion_2048_0.2", "Occlusion_2048_0.15"]
+    # dataset_names = ["RandomRotated_2048_10", "RandomRotated_2048_20", "RandomRotated_2048_30", "RandomRotated_2048_40"]
+    dataset_names = ["RandomRotated_2048_10"]
+    # transforms = Compose([NormalizeScale(), BoundingBoxRotate()])
+    # , model_name="2048_shapenet_bb.pt"
+    # transforms = Compose([NormalizeScale(), BoundingBoxRotate()])
+    transforms = Compose([NormalizeScale(),
+                        RandomRotate(180, axis=0),
+                        RandomRotate(180, axis=1),
+                        RandomRotate(180, axis=2),
+                        BoundingBoxRotate()])
+    model_names = ["2048_seg_clean.pt", "2048_seg_bb.pt", "2048_seg_rrbb.pt", "2048_seg_eig.pt"]
+    transforms  = [Compose([NormalizeScale()]), 
+                    Compose([NormalizeScale(), BoundingBoxRotate()]), 
+                    Compose([NormalizeScale(), BoundingBoxRotate()]), 
+                    Compose([NormalizeScale(), NormalizeRotation()])]
+
+    for_model_acc = []
+    for_model_tot_iou = []
+    for_model_cat_iou = []
+    for i in range(len(model_names)):
+        model = model_names[i]
+        transform = transforms[i]
+        all_acc, all_tot_iou, all_cat_iou = test_all_models(dataset_names=dataset_names, transform=transform, model_name=model)
+        for_model_acc.append(all_acc)
+        for_model_tot_iou.append(all_tot_iou)
+        for_model_cat_iou.append(all_cat_iou)
+
+    with open("for_model_acc", "wb") as fp:
+        pickle.dump(for_model_acc, fp)
+    with open("for_model_tot_iou", "wb") as fp:
+        pickle.dump(for_model_tot_iou, fp)
+    with open("for_model_cat_iou", "wb") as fp:
+        pickle.dump(for_model_cat_iou, fp)
+
+    # for i, name in enumerate(dataset_names):
+    #     for data in for_model_acc[i]:
+    #         plt.plot(data, label=model_names[i])
+    #     plt.title(name)
+    #     plt.show()
+
+
+    # model_name = "2048_seg_rrbb.pt"
+    # start_time = time.time()
+    # test_all_models(dataset_names=dataset_names, transform=transforms, model_name=model_name)
+    # end_time   = time.time()
+    # print(f"Total Test Time: - {end_time - start_time}")

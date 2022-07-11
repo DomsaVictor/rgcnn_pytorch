@@ -30,7 +30,7 @@ sys.path.append(str(model_path))
 sys.path.append(str(utils_path))
 sys.path.append(str(dataset_path))
 
-from utils import GaussianNoiseTransform
+from utils import BoundingBoxRotate, GaussianNoiseTransform
 from FilteredShapenetDataset import FilteredShapeNet, ShapeNetCustom
 from RGCNNSegmentation import seg_model
 from utils import compute_loss_with_weights
@@ -51,11 +51,8 @@ def train(model, optimizer, loader, regularization, criterion, min_category=0):
     for i, data in enumerate(loader):
         optimizer.zero_grad()
         cat = None
-        print(data.category)
         if add_cat:
             cat = data.category.to(device)
-            print(cat)
-            exit(0)
         y = (data.y - min_category).type(torch.LongTensor)
         # x = data.pos
         x = torch.cat([data.pos.type(torch.float32),
@@ -269,18 +266,18 @@ def train_each_category(categories=None):
 
 def train_shapenet_full():
     now = datetime.now()
-    directory = now.strftime("%d_%m_%y_%H:%M:%S")
+    directory = f'{now.strftime("%d_%m_%y_%H:%M:%S")}_occlusion_recomp_0.15'
     model_path = (curr_path / f"models_seg/{directory}/").resolve()
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     num_points = 2048
-    batch_size = 4
+    batch_size = 32
     num_epochs = 200
-    learning_rate = 1e-3 # 0.003111998
+    learning_rate = 1e-4 # 0.003111998
     decay_rate = 0.8
     weight_decay = 1e-9  # 1e-9
-    dropout = 0.2 # 0.09170225
+    dropout = 0.15 # 0.09170225
     regularization = 1e-9 # 5.295088673159155e-9
 
     input_dim = 22
@@ -293,10 +290,14 @@ def train_shapenet_full():
     # transforms = Compose([FixedPoints(num_points), GaussianNoiseTransform(
     #     mu=0, sigma=0, recompute_normals=False), RandomScale([0.8, 1.2]), RandomRotate(15, 0), RandomRotate(15, 1), RandomRotate(15, 2)])
 
-    transforms = Compose([FixedPoints(num_points), NormalizeScale()])
-
-
-    dataset_path    = (curr_path / "../dataset/").resolve()
+    # transforms = Compose([FixedPoints(num_points), NormalizeScale(), BoundingBoxRotate()])
+    # transforms = Compose([FixedPoints(num_points),
+    #                     NormalizeScale(),
+    #                     RandomRotate(50, 0),
+    #                     RandomRotate(50, 1),
+    #                     RandomRotate(50, 2),
+    #                     BoundingBoxRotate()])
+    dataset_path = (curr_path / "../dataset/").resolve()
 
     # dataset_path = (dataset_path / "Plane").resolve()
     
@@ -304,7 +305,7 @@ def train_shapenet_full():
     # dataset_train = ShapeNet(root=str(dataset_path), include_normals=True, split="trainval", transform=transforms)
     # dataset_test  = ShapeNet(root=str(dataset_path), include_normals=True, split="test",  transform=transforms)
     
-    custom_dataset_path = (dataset_path / "Journal/ShapeNetCustom/Original2_2048").resolve()
+    custom_dataset_path = (dataset_path / "Journal/ShapeNetCustom/Occlusion_2048_0.15").resolve()
     transforms = Compose([NormalizeScale()])
     dataset_train = ShapeNetCustom(root_dir=custom_dataset_path, folder="trainval", transform=transforms)
     dataset_test  = ShapeNetCustom(root_dir=custom_dataset_path, folder="test",  transform=transforms)
@@ -326,11 +327,11 @@ def train_shapenet_full():
 
     train_loader = DenseDataLoader(
         dataset_train, batch_size=batch_size,
-        shuffle=True, pin_memory=True, num_workers=8)
+        shuffle=True, pin_memory=True, num_workers=4)
 
     test_loader = DenseDataLoader(
         dataset_test, batch_size=batch_size,
-        shuffle=True, pin_memory=True, num_workers=8)
+        shuffle=True, pin_memory=True, num_workers=4)
 
     model = seg_model(num_points, F, K, M, input_dim=input_dim,
                       dropout=dropout,

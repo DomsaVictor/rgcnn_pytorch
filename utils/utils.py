@@ -285,9 +285,9 @@ class BoundingBoxRotate(BaseTransform):
         normals = torch.tensor(np.asarray(pcd.normals))
         
         if 'normal' in data:
-            return tg.data.Data(normal=normals, pos=points, y=data.y) # for Modelnet
+            return tg.data.Data(normal=normals, pos=points, y=data.y, category=data.category) # for Modelnet
         else:
-            return tg.data.Data(x=normals, pos=points, y=data.y) # for ShapeNet
+            return tg.data.Data(x=normals, pos=points, y=data.y, category=data.category) # for ShapeNet
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -422,34 +422,43 @@ class Sphere_Occlusion_Transform(BaseTransform):
         points_remaining = torch.tensor(points_remaining)
 
         if len(pcd_o3d_remaining.points) < self.num_points:
-            alpha = 0.03
-            rec_mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(
-                pcd_o3d_remaining, alpha)
-
-            num_points_sample = data.pos.shape[0]
-
-            pcd_sampled = rec_mesh.sample_points_poisson_disk(num_points_sample) 
-
-            points = pcd_sampled.points
-
-            pcd_o3d_remaining.points=points
-
-            pcd_o3d_remaining.paint_uniform_color([0.5, 0.3, 0.2])
-
-            # o3d.visualization.draw_geometries([pcd_o3d_remaining]) 
-            # o3d.visualization.draw_geometries([pcd_o3d_remaining,pcd_o3d])
-            
-            points = torch.tensor(np.array(points))
-            points=points.float()
-            normals = np.asarray(pcd_sampled.normals)
-            normals = torch.tensor(normals)
-            normals=normals.float()
-
-            data.pos = points
-            if 'normal' in data:                
-                data.normal = normals
+            if len(data.y > 1):
+                choice = np.random.choice(len(points), self.num_points, replace=True)
+                data.pos  = data.pos[choice]
+                if 'normal' in data:
+                    data.normal = data.normal[choice]
+                else:
+                    data.x = data.x[choice]
+                data.y = data.y[choice]
             else:
-                data.x = normals
+                alpha = 0.03
+                rec_mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(
+                    pcd_o3d_remaining, alpha)
+
+                num_points_sample = data.pos.shape[0]
+
+                pcd_sampled = rec_mesh.sample_points_poisson_disk(num_points_sample)
+
+                points = pcd_sampled.points
+
+                # pcd_o3d_remaining.points = points
+
+                # pcd_o3d_remaining.paint_uniform_color([0.5, 0.3, 0.2])
+
+                # o3d.visualization.draw_geometries([pcd_o3d_remaining]) 
+                # o3d.visualization.draw_geometries([pcd_o3d_remaining,pcd_o3d])
+                
+                points = torch.tensor(np.array(points))
+                points = points.float()
+                normals = np.asarray(pcd_sampled.normals)
+                normals = torch.tensor(normals)
+                normals = normals.float()
+
+                data.pos = points
+                if 'normal' in data:
+                    data.normal = normals
+                else:
+                    data.x = normals
         else:
             nr_points_fps=self.num_points
             nr_points=remaining_index.shape[0]
@@ -460,6 +469,7 @@ class Sphere_Occlusion_Transform(BaseTransform):
 
             fps_points=points_remaining[index_fps]
             fps_normals=normals[index_fps]
+            data.y = data.y[index_fps]
 
             points=fps_points
             normals = fps_normals

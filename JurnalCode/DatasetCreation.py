@@ -12,7 +12,7 @@ from torch_geometric.transforms import Compose, FixedPoints, NormalizeScale, Ran
 import copy
 from FilteredShapenetDataset import FilteredShapeNet, ShapeNetCustom
 import numpy as np
-
+from tqdm import tqdm
 
 def noise_transform(noise_levels):
     
@@ -75,8 +75,10 @@ def save_dataset(root, transform, save_path, categories=None, split="train", inc
         for category in categories:
             if not os.path.isdir(str((save_path/split/all_categories[category]).resolve())):
                 os.makedirs(str((save_path/split/all_categories[category]).resolve()))
-        for i, data in enumerate(dataset):
+        
+        for i in tqdm(range(len(dataset))):
             name = f"{i}"
+            data = dataset[i]
             lbl_name = f"{name}.npy"
             pcd_name = f"{name}.pcd"
             category_name = all_categories[int(data.category)]
@@ -85,6 +87,17 @@ def save_dataset(root, transform, save_path, categories=None, split="train", inc
             
             o3d.io.write_point_cloud(str((save_path/split/category_name/pcd_name).resolve()), pcd)
             np.save(str((save_path/split/category_name/lbl_name).resolve()), data.y)
+            
+        # for i, data in enumerate(dataset):
+        #     name = f"{i}"
+        #     lbl_name = f"{name}.npy"
+        #     pcd_name = f"{name}.pcd"
+        #     category_name = all_categories[int(data.category)]
+        #     pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
+        #     pcd.normals = o3d.utility.Vector3dVector(data.x)
+            
+        #     o3d.io.write_point_cloud(str((save_path/split/category_name/pcd_name).resolve()), pcd)
+        #     np.save(str((save_path/split/category_name/lbl_name).resolve()), data.y)
             
             
             
@@ -158,6 +171,24 @@ def test():
     # pcd.colors = o3d.utility.Vector3dVector(colors[data.y - min(data.y)])
     # o3d.visualization.draw_geometries([pcd])
 
+def create_rotated_dataset(rotation_levels):
+    num_points = 2048
+    splits = ["trainval", "test"]
+    for sigma in rotation_levels:
+        transform = Compose([
+            FixedPoints(num_points),
+            RandomRotate(sigma, 0),
+            RandomRotate(sigma, 1),
+            RandomRotate(sigma, 2)
+        ])
+
+        for split in splits:
+            print(f"Creating dataset for: {split} - {sigma}")
+            save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
+                    save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/RandomRotated_{num_points}_{sigma}/"), split=split)
+
+
+
 def test_rotation():
     
     root = Path(imports.dataset_path) / "ShapeNet"
@@ -193,6 +224,9 @@ def test_rotation():
 
 if __name__ == '__main__':
     # occlusion_transform([0.1])
-    # test()
+    test()
 
-    test_rotation()
+    # test_rotation()
+
+    # rotation_levels = [10, 20, 30, 40]
+    # create_rotated_dataset(rotation_levels)

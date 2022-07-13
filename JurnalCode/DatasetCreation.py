@@ -49,9 +49,12 @@ def occlusion_transform(occlusion_levels):
         j=0
         k=0
         transforms = Compose([utils.Sphere_Occlusion_Transform(radius=level, num_points=2048)])
+        colors = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1 ,0], [1, 1, 1], [0.1, 0.7, 0.3]])
         for i, category in enumerate(categories):
             dataset = ShapeNet(root=imports.dataset_path + "/ShapeNet", categories=category, transform=transforms)
-            pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(dataset[0].pos))
+            data = dataset[0]
+            pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
+            pcd.colors = o3d.utility.Vector3dVector(colors[data.y- int(min(data.y))])
             k += 1
             if i%4 == 0:
                 j += 1
@@ -137,7 +140,7 @@ def test():
     # noise_transform([0, 0.01, 0.02, 0.05, 0.1])
     # occlusion_transform([0.1,0.15,0.2])
     num_points = 2048
-    splits = ['trainval', 'test']
+    splits = ['train', 'test']
     
     # transform = Compose([FixedPoints(2048)])
     # for split in splits:
@@ -285,4 +288,6 @@ if __name__ == '__main__':
 
     # rotation_levels = [10, 20, 30, 40]
     # create_rotated_dataset(rotation_levels)
-    save_gauss_rr_dataset()
+    # save_gauss_rr_dataset()
+    
+    occlusion_transform([0.2])

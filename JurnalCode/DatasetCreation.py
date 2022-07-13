@@ -2,6 +2,7 @@ import os
 from turtle import Shape
 from matplotlib import transforms
 from matplotlib.colors import Normalize
+from torch import save
 import imports
 from pathlib import Path
 import open3d as o3d
@@ -61,6 +62,37 @@ def occlusion_transform(occlusion_levels):
         o3d.visualization.draw_geometries(pcds)
 
 
+def save_concatenated_dataset(root, transforms, save_path, categories=None, split="train", include_normals=True):
+    datasets = []
+    for i in range(len(transforms)):
+        datasets.append(ShapeNet(root, split=split, categories=categories, transform=transforms[i], include_normals=include_normals))
+
+    all_categories = sorted(["Airplane", "Bag", "Cap", "Car", "Chair", "Earphone",
+                "Guitar", "Knife", "Lamp", "Laptop", "Motorbike", "Mug",
+                "Pistol", "Rocket", "Skateboard", "Table"])
+
+    if not os.path.isdir(str((save_path/split).resolve())):
+            os.makedirs(str((save_path/split).resolve()))
+    if categories is None:
+        categories = range(16)
+    for category in categories:
+        if not os.path.isdir(str((save_path/split/all_categories[category]).resolve())):
+            os.makedirs(str((save_path/split/all_categories[category]).resolve()))
+    
+    for i, dataset in enumerate(datasets):
+        print(f"Part {i+1} / {len(transforms)}")
+        for j in tqdm(range(len(dataset))):
+            name = f"{i}_{j}"
+            data = dataset[j]
+            lbl_name = f"{name}.npy"
+            pcd_name = f"{name}.pcd"
+            category_name = all_categories[int(data.category)]
+            pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(data.pos))
+            pcd.normals = o3d.utility.Vector3dVector(data.x)
+            
+            o3d.io.write_point_cloud(str((save_path/split/category_name/pcd_name).resolve()), pcd)
+            np.save(str((save_path/split/category_name/lbl_name).resolve()), data.y)
+    
 def save_dataset(root, transform, save_path, categories=None, split="train", include_normals=True):
         dataset = ShapeNet(root=root, categories=categories, split=split, include_normals=include_normals, transform=transform)
         
@@ -222,11 +254,35 @@ def test_rotation():
     # o3d.visualization.draw_geometries([pcd])
 
 
-if __name__ == '__main__':
-    # occlusion_transform([0.1])
-    test()
+def save_gauss_rr_dataset():
+    num_points = 2048
+    splits = ['train', 'test']
+    sigma_levels = [0.01, 0.03, 0.05]
 
+    g_t = []
+    for sigma in sigma_levels:
+        g_t.append(utils.GaussianNoiseTransform(mu=0, sigma=sigma, recompute_normals=True))
+
+    # g_t = Compose(g_t)
+
+    rr = Compose([RandomRotate(180, 0),
+                  RandomRotate(180, 1),
+                  RandomRotate(180, 2)])
+
+    all_transfroms = []
+    for i in range(len(sigma_levels)):
+        all_transfroms.append(Compose([FixedPoints(2048), g_t[i], rr]))
+    
+    for split in splits:
+        # save_dataset(root=imports.dataset_path + "/ShapeNet", transform=transform, 
+        #         save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Occlusion_{num_points}_{sigma}/"), split=split)
+        save_concatenated_dataset(root=imports.dataset_path + "/ShapeNet", transforms=all_transfroms, 
+            save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Gaussian_Concatenated_RR_{num_points}/"), split=split)
+
+
+if __name__ == '__main__':
     # test_rotation()
 
     # rotation_levels = [10, 20, 30, 40]
     # create_rotated_dataset(rotation_levels)
+    save_gauss_rr_dataset()

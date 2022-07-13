@@ -423,12 +423,12 @@ class Sphere_Occlusion_Transform(BaseTransform):
 
         if len(pcd_o3d_remaining.points) < self.num_points:
             if len(data.y > 1):
-                choice = np.random.choice(len(points), self.num_points, replace=True)
-                data.pos  = data.pos[choice]
+                choice = np.random.choice(len(points_remaining), self.num_points, replace=True)
+                data.pos  = points_remaining[choice]
                 if 'normal' in data:
-                    data.normal = data.normal[choice]
+                    data.normal = normals[choice]
                 else:
-                    data.x = data.x[choice]
+                    data.x = normals[choice]
                 data.y = data.y[choice]
             else:
                 alpha = 0.03

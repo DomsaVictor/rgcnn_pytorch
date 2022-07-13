@@ -141,8 +141,8 @@ def test_all_models(dataset_names:list, model_name="2048p_seg_all200.pt", transf
         np.savetxt(f"{save_path}/{model_name}/{name}/tot_iou.txt", np.expand_dims(np.mean(tot_iou)*100, axis=0))
 
         all_acc.append(acc)
-        all_tot_iou.append(all_tot_iou)
-        all_cat_iou.append(all_cat_iou)
+        all_tot_iou.append(np.mean(tot_iou)*100)
+        all_cat_iou.append(cat_iou)
 
     return all_acc, all_tot_iou, all_cat_iou
 
@@ -179,27 +179,49 @@ def test():
     print(f"Ncorrect = {ncorrect}")
 
 if __name__ == '__main__':
-    dataset_names = [
-        "Gaussian_Original_2048_0.01", "Gaussian_Original_2048_0.02",  "Gaussian_Original_2048_0.05",
-        "Gaussian_Recomputed_2048_0.01", "Gaussian_Recomputed_2048_0.02", "Gaussian_Recomputed_2048_0.05",
-        "Occlusion_2048_0.1", "Occlusion_2048_0.2", "Occlusion_2048_0.15",
-        "RandomRotated_2048_10", "RandomRotated_2048_20", "RandomRotated_2048_30", "RandomRotated_2048_40"]
-    # dataset_names = ["Occlusion_2048_0.1", "Occlusion_2048_0.2", "Occlusion_2048_0.15"]
-    # dataset_names = ["RandomRotated_2048_10", "RandomRotated_2048_20", "RandomRotated_2048_30", "RandomRotated_2048_40"]
-    dataset_names = ["RandomRotated_2048_10"]
+    # dataset_names = [
+    #     "Gaussian_Original_2048_0.01", "Gaussian_Original_2048_0.02",  "Gaussian_Original_2048_0.05",
+    #     "Gaussian_Recomputed_2048_0.01", "Gaussian_Recomputed_2048_0.02", "Gaussian_Recomputed_2048_0.05",
+    #     "Occlusion_2048_0.1", "Occlusion_2048_0.2", "Occlusion_2048_0.15",
+    #     "RandomRotated_2048_10", "RandomRotated_2048_20", "RandomRotated_2048_30", "RandomRotated_2048_40"]
+   
+    # dataset_names = ["Original_2048", "RandomRotated_2048_10", "RandomRotated_2048_20", "RandomRotated_2048_30", "RandomRotated_2048_40"]
+    # file_name = "for_model"
+
+    # dataset_names = ["Original_2048", "Gaussian_Original_2048_0.01", "Gaussian_Original_2048_0.02",  "Gaussian_Original_2048_0.05"]
+    # file_name = "gaussian_original"
+    
+    dataset_names = ["Original_2048", "Occlusion_2048_0.1", "Occlusion_2048_0.15", "Occlusion_2048_0.2"]
+    file_name = "occlusion"
+   
+    # dataset_names = ["RandomRotated_2048_10"]
     # transforms = Compose([NormalizeScale(), BoundingBoxRotate()])
     # , model_name="2048_shapenet_bb.pt"
     # transforms = Compose([NormalizeScale(), BoundingBoxRotate()])
-    transforms = Compose([NormalizeScale(),
+
+    # dataset_names = ["Original_2048", "Gaussian_Recomputed_2048_0.01", "Gaussian_Recomputed_2048_0.02", "Gaussian_Recomputed_2048_0.05"]
+    # file_name = "gaussian_recomputed"
+
+    # dataset_names = ["Original_2048"]
+    # file_name = "raw"
+
+    big_rotations = Compose([
                         RandomRotate(180, axis=0),
                         RandomRotate(180, axis=1),
-                        RandomRotate(180, axis=2),
-                        BoundingBoxRotate()])
-    model_names = ["2048_seg_clean.pt", "2048_seg_bb.pt", "2048_seg_rrbb.pt", "2048_seg_eig.pt"]
-    transforms  = [Compose([NormalizeScale()]), 
-                    Compose([NormalizeScale(), BoundingBoxRotate()]), 
-                    Compose([NormalizeScale(), BoundingBoxRotate()]), 
-                    Compose([NormalizeScale(), NormalizeRotation()])]
+                        RandomRotate(180, axis=2)])
+    
+    transforms = [Compose([NormalizeScale(), big_rotations]),
+                Compose([NormalizeScale(), big_rotations, BoundingBoxRotate()]),
+                Compose([NormalizeScale(), big_rotations, BoundingBoxRotate()]),
+                Compose([NormalizeScale(), big_rotations, NormalizeRotation()])]
+
+    model_names = ["2048_seg_clean.pt", "2048_seg_bb.pt", "2048_seg_rrbb.pt", "2048_seg_eig.pt", "2048_seg_gauss_rr_bb.pt"]
+
+    transforms = [Compose([NormalizeScale()]),
+                  Compose([NormalizeScale(), BoundingBoxRotate()]),
+                  Compose([NormalizeScale(), BoundingBoxRotate()]),
+                  Compose([NormalizeScale(), NormalizeRotation()]),
+                  Compose([NormalizeScale(), BoundingBoxRotate()])]
 
     for_model_acc = []
     for_model_tot_iou = []
@@ -212,11 +234,11 @@ if __name__ == '__main__':
         for_model_tot_iou.append(all_tot_iou)
         for_model_cat_iou.append(all_cat_iou)
 
-    with open("for_model_acc", "wb") as fp:
+    with open(f"{file_name}_acc", "wb") as fp:
         pickle.dump(for_model_acc, fp)
-    with open("for_model_tot_iou", "wb") as fp:
+    with open(f"{file_name}_tot_iou", "wb") as fp:
         pickle.dump(for_model_tot_iou, fp)
-    with open("for_model_cat_iou", "wb") as fp:
+    with open(f"{file_name}_cat_iou", "wb") as fp:
         pickle.dump(for_model_cat_iou, fp)
 
     # for i, name in enumerate(dataset_names):
@@ -224,7 +246,6 @@ if __name__ == '__main__':
     #         plt.plot(data, label=model_names[i])
     #     plt.title(name)
     #     plt.show()
-
 
     # model_name = "2048_seg_rrbb.pt"
     # start_time = time.time()

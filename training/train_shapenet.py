@@ -266,7 +266,7 @@ def train_each_category(categories=None):
 
 def train_shapenet_full():
     now = datetime.now()
-    directory = f'{now.strftime("%d_%m_%y_%H:%M:%S")}_occlusion_recomp_0.15'
+    directory = f'{now.strftime("%d_%m_%y_%H:%M:%S")}_Gauss_Concat_RR_BB'
     model_path = (curr_path / f"models_seg/{directory}/").resolve()
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -305,12 +305,12 @@ def train_shapenet_full():
     # dataset_train = ShapeNet(root=str(dataset_path), include_normals=True, split="trainval", transform=transforms)
     # dataset_test  = ShapeNet(root=str(dataset_path), include_normals=True, split="test",  transform=transforms)
     
-    custom_dataset_path = (dataset_path / "Journal/ShapeNetCustom/Occlusion_2048_0.15").resolve()
+    custom_dataset_path = (dataset_path / "Journal/ShapeNetCustom/Gaussian_Concatenated_RR_BB_2048").resolve()
     transforms = Compose([NormalizeScale()])
-    dataset_train = ShapeNetCustom(root_dir=custom_dataset_path, folder="trainval", transform=transforms)
+    dataset_train = ShapeNetCustom(root_dir=custom_dataset_path, folder="train", transform=transforms)
     dataset_test  = ShapeNetCustom(root_dir=custom_dataset_path, folder="test",  transform=transforms)
     
-    print(str(dataset_path))
+    print(str(custom_dataset_path))
     
     # # root_dir MUST BE A Path(...) 
     # dataset_train = FilteredShapeNet(root_dir=dataset_path, folder="train", transform=transforms)

@@ -223,8 +223,8 @@ def test_rotation():
 
 
 if __name__ == '__main__':
-    # occlusion_transform([0.1])
-    test()
+    occlusion_transform([0.2])
+    # test()
 
     # test_rotation()
 

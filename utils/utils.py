@@ -460,4 +460,4 @@ class Sphere_Occlusion_Transform(BaseTransform):
         return data
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}()'
+        return f'{self.__class__.__name__}(radius={self.radius}, num_points={self.num_points})'

@@ -29,13 +29,16 @@ class ModelTester():
 
         if not type(self.path) == Path:
             self.path = Path(self.path)
-        self.dataset = ShapeNetCustom(root_dir=self.path, folder="test", transform=transforms)
+        self.dataset = ShapeNetCustom(root_dir=self.path, folder="test",
+                                      transform=transforms)
         # print(self.dataset[0])
         # self.dataset = ShapeNet(root=f"{imports.dataset_path}/ShapeNet",split="test", transform=Compose([FixedPoints(2048), NormalizeScale()]))
-        self.loader = DenseDataLoader(dataset=self.dataset, batch_size=32, pin_memory=True, num_workers=8, shuffle=True)
+        self.loader = DenseDataLoader(dataset=self.dataset, batch_size=32,
+                                      pin_memory=True, num_workers=8,
+                                      shuffle=True)
         self.all_categories = sorted(["Airplane", "Bag", "Cap", "Car", "Chair", "Earphone",
-                "Guitar", "Knife", "Lamp", "Laptop", "Motorbike", "Mug",
-                "Pistol", "Rocket", "Skateboard", "Table"])
+                                      "Guitar", "Knife", "Lamp", "Laptop", "Motorbike", "Mug",
+                                      "Pistol", "Rocket", "Skateboard", "Table"])
 
     def test_model(self):
         self.model.eval()
@@ -54,7 +57,7 @@ class ModelTester():
                 cat = data.category.to(self.device)
 
             x = torch.cat([data.pos.type(torch.float32),
-                    data.x.type(torch.float32)], dim=2)
+                           data.x.type(torch.float32)], dim=2)
             y = (data.y).type(torch.LongTensor)
             logits, _, _ = self.model(x.to(self.device), cat.to(self.device))
 
@@ -99,7 +102,7 @@ class ModelTester():
         return accuracy, cat_iou, tot_iou, ncorrects
 
 
-def test_all_models(dataset_names:list, model_name="2048p_seg_all200.pt", transform=NormalizeScale()):
+def test_all_models(dataset_names: list, model_name="2048p_seg_all200.pt", transform=NormalizeScale()):
     num_points = 2048
 
     F = [128, 512, 1024]  # Outputs size of convolutional filter.
@@ -174,9 +177,10 @@ def test():
 
     print(f"Accuracy = {acc}")
     for key, value in cat_iou.items():
-            print(key + ': {:.4f}, total: {:d}'.format(np.mean(value), len(value)))
+        print(key + ': {:.4f}, total: {:d}'.format(np.mean(value), len(value)))
     print(f"Tot IoU  = {np.mean(tot_iou)*100}")
     print(f"Ncorrect = {ncorrect}")
+
 
 if __name__ == '__main__':
     # dataset_names = [
@@ -191,19 +195,22 @@ if __name__ == '__main__':
     # dataset_names = ["Original_2048", "Gaussian_Original_2048_0.01", "Gaussian_Original_2048_0.02",  "Gaussian_Original_2048_0.05"]
     # file_name = "gaussian_original"
     
-    dataset_names = ["Original_2048", "Occlusion_2048_0.1", "Occlusion_2048_0.15", "Occlusion_2048_0.2"]
-    file_name = "occlusion"
+    # dataset_names = ["Original_2048", "Occlusion_2048_0.1", "Occlusion_2048_0.15", "Occlusion_2048_0.2"]
+    # file_name = "occlusion"
    
     # dataset_names = ["RandomRotated_2048_10"]
     # transforms = Compose([NormalizeScale(), BoundingBoxRotate()])
     # , model_name="2048_shapenet_bb.pt"
     # transforms = Compose([NormalizeScale(), BoundingBoxRotate()])
 
-    # dataset_names = ["Original_2048", "Gaussian_Recomputed_2048_0.01", "Gaussian_Recomputed_2048_0.02", "Gaussian_Recomputed_2048_0.05"]
-    # file_name = "gaussian_recomputed"
-
+    dataset_names = ["Original_2048", "Gaussian_Recomputed_2048_0.01", "Gaussian_Recomputed_2048_0.02", "Gaussian_Recomputed_2048_0.05"]
+    file_name = "gaussian_recomputed"
+    
     # dataset_names = ["Original_2048"]
     # file_name = "raw"
+    
+    # dataset_names = ["Original_2048", "Occlusion_2048_0.1", "Occlusion_2048_0.15", "Occlusion_2048_0.2"]
+    # file_name = "occlusion"
 
     big_rotations = Compose([
                         RandomRotate(180, axis=0),
@@ -211,11 +218,13 @@ if __name__ == '__main__':
                         RandomRotate(180, axis=2)])
     
     transforms = [Compose([NormalizeScale(), big_rotations]),
-                Compose([NormalizeScale(), big_rotations, BoundingBoxRotate()]),
-                Compose([NormalizeScale(), big_rotations, BoundingBoxRotate()]),
-                Compose([NormalizeScale(), big_rotations, NormalizeRotation()])]
+                  Compose([NormalizeScale(), big_rotations, BoundingBoxRotate()]),
+                  Compose([NormalizeScale(), big_rotations, BoundingBoxRotate()]),
+                  Compose([NormalizeScale(), big_rotations, NormalizeRotation()]),
+                  Compose([NormalizeScale(), big_rotations, BoundingBoxRotate()])]
+    file_name = "gaussian_recomputed_rotations"
 
-    model_names = ["2048_seg_clean.pt", "2048_seg_bb.pt", "2048_seg_rrbb.pt", "2048_seg_eig.pt", "2048_seg_gauss_rr_bb.pt"]
+    model_names = ["2048_seg_clean.pt", "2048_seg_bb.pt", "2048_seg_rrbb.pt", "2048_seg_eig.pt", "2048_seg_gauss_rr_bb.pt", "2048_seg_gauss_rr_eig.pt"]
 
     transforms = [Compose([NormalizeScale()]),
                   Compose([NormalizeScale(), BoundingBoxRotate()]),
@@ -226,6 +235,7 @@ if __name__ == '__main__':
     for_model_acc = []
     for_model_tot_iou = []
     for_model_cat_iou = []
+    
     for i in range(len(model_names)):
         model = model_names[i]
         transform = transforms[i]

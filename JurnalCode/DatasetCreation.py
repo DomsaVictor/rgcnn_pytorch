@@ -290,4 +290,6 @@ if __name__ == '__main__':
     # create_rotated_dataset(rotation_levels)
     # save_gauss_rr_dataset()
     
-    occlusion_transform([0.2])
+    # occlusion_transform([0.2])
+
+    test()

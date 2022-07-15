@@ -6,7 +6,8 @@
         "./model/classification"
     ],
     "cmake.configureOnOpen": false,
-    "python.linting.pylintEnabled": true,
-    "python.linting.enabled": true,
-    "python.linting.mypyEnabled": false
+    "python.linting.pylintEnabled": false,
+    "python.linting.enabled": false,
+    "python.linting.mypyEnabled": true,
+    "python.linting.pycodestyleEnabled": false
 }

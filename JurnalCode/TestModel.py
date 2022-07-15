@@ -33,7 +33,7 @@ class ModelTester():
                                       transform=transforms)
         # print(self.dataset[0])
         # self.dataset = ShapeNet(root=f"{imports.dataset_path}/ShapeNet",split="test", transform=Compose([FixedPoints(2048), NormalizeScale()]))
-        self.loader = DenseDataLoader(dataset=self.dataset, batch_size=32,
+        self.loader = DenseDataLoader(dataset=self.dataset, batch_size=1,
                                       pin_memory=True, num_workers=8,
                                       shuffle=True)
         self.all_categories = sorted(["Airplane", "Bag", "Cap", "Car", "Chair", "Earphone",

@@ -36,7 +36,8 @@ class ModelTester():
         self.all_categories = sorted(["Airplane", "Bag", "Cap", "Car", "Chair", "Earphone",
                 "Guitar", "Knife", "Lamp", "Laptop", "Motorbike", "Mug",
                 "Pistol", "Rocket", "Skateboard", "Table"])
-
+        self.all_forward_times = []
+        
     def test_model(self):
         self.model.eval()
         size = len(self.loader.dataset)
@@ -48,7 +49,6 @@ class ModelTester():
             add_cat = False
         
         for i, data in enumerate(self.loader):
-
             cat = None
             if add_cat:
                 cat = data.category.to(self.device)
@@ -56,8 +56,10 @@ class ModelTester():
             x = torch.cat([data.pos.type(torch.float32),
                     data.x.type(torch.float32)], dim=2)
             y = (data.y).type(torch.LongTensor)
+            start_time = time.time()
             logits, _, _ = self.model(x.to(self.device), cat.to(self.device))
-
+            final_time = time.time()
+            self.all_forward_times.append(final_time - start_time)
             # print(logits.shape)
             # print(f"{min(logits)} - {max(logits)}")
 
@@ -124,13 +126,17 @@ def test_all_models(dataset_names:list, model_name="2048p_seg_all200.pt", transf
         tester = ModelTester(model, f"{imports.dataset_path}/Journal/ShapeNetCustom/{name}", transforms=transform)
 
         acc, cat_iou, tot_iou, ncorrect = tester.test_model()
-        print(f"\n!!!!!!! {name} !!!!!!!")
-        print(f"Accuracy = {acc}")
+        all_forward_times = tester.all_forward_times
+        mean_forward_time = np.mean(np.array(all_forward_times))
+        
+        print(f"\n!!!!!!! {name} - {model_name} !!!!!!!")
+        # print(f"Accuracy = {acc}")
         # for key, value in cat_iou.items():
         #         print(key + ': {:.4f}, total: {:d}'.format(np.mean(value), len(value)))
         print(f"Tot IoU  = {np.mean(tot_iou)*100}")
+        print(f"Mean forward time = {mean_forward_time}")
         # print(f"Ncorrect = {ncorrect}")
-        print("**"*20)
+        # print("**"*20)
         if not os.path.isdir(Path(save_path)/model_name/name):
             os.makedirs(Path(save_path)/model_name/name)
         np.savetxt(f"{save_path}/{model_name}/{name}/acc.txt", np.expand_dims(acc, axis=0))
@@ -178,6 +184,9 @@ def test():
     print(f"Tot IoU  = {np.mean(tot_iou)*100}")
     print(f"Ncorrect = {ncorrect}")
 
+def test_forward_time():
+    pass
+
 if __name__ == '__main__':
     # dataset_names = [
     #     "Gaussian_Original_2048_0.01", "Gaussian_Original_2048_0.02",  "Gaussian_Original_2048_0.05",
@@ -191,16 +200,16 @@ if __name__ == '__main__':
     # dataset_names = ["Original_2048", "Gaussian_Original_2048_0.01", "Gaussian_Original_2048_0.02",  "Gaussian_Original_2048_0.05"]
     # file_name = "gaussian_original"
     
-    dataset_names = ["Original_2048", "Occlusion_2048_0.1", "Occlusion_2048_0.15", "Occlusion_2048_0.2"]
-    file_name = "occlusion"
+    # dataset_names = ["Original_2048", "Occlusion_2048_0.1", "Occlusion_2048_0.15", "Occlusion_2048_0.2"]
+    # file_name = "occlusion"
    
     # dataset_names = ["RandomRotated_2048_10"]
     # transforms = Compose([NormalizeScale(), BoundingBoxRotate()])
     # , model_name="2048_shapenet_bb.pt"
     # transforms = Compose([NormalizeScale(), BoundingBoxRotate()])
 
-    # dataset_names = ["Original_2048", "Gaussian_Recomputed_2048_0.01", "Gaussian_Recomputed_2048_0.02", "Gaussian_Recomputed_2048_0.05"]
-    # file_name = "gaussian_recomputed"
+    dataset_names = ["Original_2048", "Gaussian_Recomputed_2048_0.01", "Gaussian_Recomputed_2048_0.02", "Gaussian_Recomputed_2048_0.05"]
+    file_name = "gaussian_recomputed_aux"
 
     # dataset_names = ["Original_2048"]
     # file_name = "raw"

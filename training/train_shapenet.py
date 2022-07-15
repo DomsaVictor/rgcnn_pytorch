@@ -266,7 +266,7 @@ def train_each_category(categories=None):
 
 def train_shapenet_full():
     now = datetime.now()
-    directory = f'{now.strftime("%d_%m_%y_%H:%M:%S")}_Gauss_Concat_RR_BB'
+    directory = f'{now.strftime("%d_%m_%y_%H:%M:%S")}_Gauss_Concat_RR_Eig'
     model_path = (curr_path / f"models_seg/{directory}/").resolve()
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'

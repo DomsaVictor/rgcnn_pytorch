@@ -3,17 +3,18 @@ import imports
 from matplotlib import pyplot as plt
 import numpy as np
 import pickle
+import os
+from pathlib import Path
+import sys
 
 def prepare_data_rot(raw_data):
-    print(len(raw_data))
-    print(len(raw_data[0]))
     to_plot_data = np.empty((len(raw_data), len(raw_data[0])))
     for i in range(len(raw_data)):
         for j, acc in enumerate(raw_data[i]):
             to_plot_data[i, j] = acc
     return to_plot_data
 
-def plot_values(data, model_names, x_values=[0, 10, 20, 30, 40], line_type="-", title="ShapeNet with random rotations", x_label="Rotations in degrees", y_label="Accuracy"):
+def plot_values(data, model_names, x_values=[0, 10, 20, 30, 40], line_type="-", title="ShapeNet with random rotations", x_label="Rotations in degrees", y_label="Accuracy", show=True, folder_name=""):
     plt.figure()
     plt.title(title)
     for i in range(len(model_names)):
@@ -22,7 +23,13 @@ def plot_values(data, model_names, x_values=[0, 10, 20, 30, 40], line_type="-", 
     plt.ylabel(y_label)
     plt.grid()
     plt.legend()
-    plt.show()
+    if show == True:
+        plt.show()
+    else:
+        path = Path(imports.curr_path)/"Plots/"/folder_name
+        if not os.path.isdir(path):
+            os.makedirs(path)
+        plt.savefig(str(path.resolve())+f"/{title}.png")
 # for_model_acc = np.reshape(for_model_acc,(len(dataset_names), len(for_model_acc)))
 # print(for_model_acc[0])
 
@@ -67,6 +74,29 @@ def load_data(noise:str):
         raise Exception("Not Implemented.")
     return acc, cat_iou, tot_iou
 
+def plot_and_save_all():
+    datasets    = ["Rotation", "Gaussian Original", "Gaussian Recomputed", "Occlusion", "Gaussian and Rotations"]
+    model_names = ["RGCNN", "RGCNN Bounding Box", "RGCNN Rotations and Bounding Box", "RGCNN Eig", "RGCNN Gaussian RR BB", "RGCNN Gaussian RR Eig"]
+    model_names = ["RGCNN", "RGCNN Bounding Box", "RGCNN Rotations and Bounding Box", "RGCNN Eig"]
+    model_names = ["RGCNN", "RGCNN Bounding Box", "RGCNN Rotations and Bounding Box", "RGCNN Eig"]
+    
+    x_values    = [[0, 10, 20, 30 ,40], [0, 0.01, 0.02, 0.05], [0, 0.01, 0.02, 0.05],
+                   [0, 0.1, 0.15, 0.2], [0, 0.01, 0.02, 0.05]]
+    titles      = ["Random Rotations", "Gaussian Noise with Original Normals", "Gaussian Noise with Recomputed Normals",
+                   "Occlusion Noise", "Gaussian and Rotations"]
+    y_label     = "mIoU"
+    x_labels    = ["Degrees", "Sigma", "Sigma", "Radius", "Sigma"]
+    folder_name = input("Enter folder name: ")
+
+    for i, dataset in enumerate(datasets):
+        acc, cat_iou, tot_iou = load_data(dataset)
+        x_value = x_values[i]
+        title = titles[i]
+        x_label = x_labels[i]
+        data = prepare_data_rot(tot_iou)
+        plot_values(data, model_names, x_value, title=title, y_label=y_label, x_label=x_label, show=False, folder_name=folder_name)
+        
+
 if __name__ == "__main__":
     model_names = ["RGCNN", "RGCNN Bounding Box", "RGCNN Rotations and Bounding Box", "RGCNN Eig", "RGCNN Gaussian RR BB"]
 
@@ -77,7 +107,11 @@ if __name__ == "__main__":
     print("\t3. Gaussian  Noise (recomputed)")
     print("\t4. Occlusion Noise")
     print("\t5. Gaussian and Rotations")
+    print("\t6. Save all plots")
     noise_type = input("Waiting: ")
+    if noise_type == "6":
+        plot_and_save_all()
+        sys.exit(0)
     print("Choose metric:")
     print("\t1. Accuracy")
     print("\t2. mIoU")

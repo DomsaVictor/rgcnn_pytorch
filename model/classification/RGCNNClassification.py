@@ -31,19 +31,16 @@ class cls_model(nn.Module):
         
         if b2relu:
             self.bias_relus = nn.ParameterList([
-                torch.nn.parameter.Parameter(torch.zeros((1, vertice, i))) for i in self.F
-            ])
+                torch.nn.parameter.Parameter(torch.zeros((1, vertice, i))) for i in self.F])
         else:
             self.bias_relus = nn.ParameterList([
-                torch.nn.parameter.Parameter(torch.zeros((1, 1, i))) for i in self.F
-            ])
+                torch.nn.parameter.Parameter(torch.zeros((1, 1, i))) for i in self.F])
 
         for i in self.M:
             self.bias_relus.append(torch.nn.parameter.Parameter(torch.zeros((1, i))))
 
         self.conv = nn.ModuleList([
-            conv.DenseChebConvV2(input_dim, self.F[i], self.K[i], bias=self.cheb_bias) if i == 0 else conv.DenseChebConvV2(self.F[i-1], self.F[i], self.K[i], bias=self.cheb_bias) for i in range(len(K))
-        ])
+            conv.DenseChebConvV2(input_dim, self.F[i], self.K[i], bias=self.cheb_bias) if i == 0 else conv.DenseChebConvV2(self.F[i-1], self.F[i], self.K[i], bias=self.cheb_bias) for i in range(len(K))])
 
         self.batch_norm_list_conv = nn.ModuleList([BatchNorm1d(input_dim)])
 
@@ -51,8 +48,7 @@ class cls_model(nn.Module):
             self.batch_norm_list_conv.append(nn.BatchNorm1d(F[i])) 
 
         self.batch_norm_list_fc = nn.ModuleList([
-            BatchNorm1d(M[i]) for i in range(len(M))
-        ])
+            BatchNorm1d(M[i]) for i in range(len(M))])
 
         self.fc = nn.ModuleList([])
         for i in range(len(M)):

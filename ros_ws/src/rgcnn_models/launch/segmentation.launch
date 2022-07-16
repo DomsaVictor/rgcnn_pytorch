@@ -11,7 +11,7 @@
 
 <node pkg="rgcnn_models" type="remove_floor_node" name="remove_floor_node" output="screen"/>
 
-<node pkg="rgcnn_models" type="compute_surface_normals_node" name="compute_surface_normals_node" output="screen"/>
+<!-- <node pkg="rgcnn_models" type="compute_surface_normals_node" name="compute_surface_normals_node" output="screen"/> -->
 
 <node pkg="rgcnn_models" name="resize_pointcloud" type="resize_pointcloud.py" output="screen"/>
 

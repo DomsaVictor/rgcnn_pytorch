@@ -1,4 +1,3 @@
-from ast import Num
 import time
 import imports
 import torch
@@ -8,12 +7,10 @@ from torch_geometric.loader import DenseDataLoader
 from torch_geometric.transforms import FixedPoints, Compose, NormalizeScale, NormalizeRotation, RandomRotate
 from FilteredShapenetDataset import FilteredShapeNet, ShapeNetCustom
 from RGCNNSegmentation import seg_model
-import matplotlib.pyplot as plt
 import numpy as np
 
 import pickle
 
-import copy
 from pathlib import Path
 from collections import defaultdict
 
@@ -34,7 +31,7 @@ class ModelTester():
         # print(self.dataset[0])
         # self.dataset = ShapeNet(root=f"{imports.dataset_path}/ShapeNet",split="test", transform=Compose([FixedPoints(2048), NormalizeScale()]))
         self.loader = DenseDataLoader(dataset=self.dataset, batch_size=1,
-                                      pin_memory=True, num_workers=8,
+                                      pin_memory=False, num_workers=4,
                                       shuffle=True)
         self.all_categories = sorted(["Airplane", "Bag", "Cap", "Car", "Chair", "Earphone",
                 "Guitar", "Knife", "Lamp", "Laptop", "Motorbike", "Mug",
@@ -212,6 +209,9 @@ if __name__ == '__main__':
     # transforms = Compose([NormalizeScale(), BoundingBoxRotate()])
 
     dataset_names = ["Original_2048", "Gaussian_Recomputed_2048_0.01", "Gaussian_Recomputed_2048_0.02", "Gaussian_Recomputed_2048_0.05"]
+    file_name = "gaussian_recomputed_aux"
+    
+    dataset_names = ["Original_2048"]
     file_name = "gaussian_recomputed_aux"
 
     # dataset_names = ["Original_2048"]

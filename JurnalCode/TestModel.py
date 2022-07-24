@@ -54,10 +54,10 @@ class ModelTester():
                 cat = data.category.to(self.device)
 
             x = torch.cat([data.pos.type(torch.float32),
-                           data.x.type(torch.float32)], dim=2)
+                           data.x.type(torch.float32)], dim=2).to(self.device)
             y = (data.y).type(torch.LongTensor)
             start_time = time.time()
-            logits, _, _ = self.model(x.to(self.device), cat.to(self.device))
+            logits, _, _ = self.model(x, cat)
             final_time = time.time()
             self.all_forward_times.append(final_time - start_time)
             # print(logits.shape)

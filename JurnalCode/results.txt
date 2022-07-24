@@ -1,0 +1,708 @@
+Random Rotations 
+	RGCNN 
+		[0, 10, 20, 30, 40] [82.81343361 81.18223654 76.38496969 69.71311803 62.9715484 ]
+
+Random Rotations 
+	RGCNN Bounding Box 
+		[0, 10, 20, 30, 40] [80.00118524 79.46905464 77.87273653 74.78496695 70.73707787]
+
+Random Rotations 
+	RGCNN Rotations and Bounding Box 
+		[0, 10, 20, 30, 40] [78.9008972  78.89336502 78.85292256 78.31189454 76.94031013]
+
+Random Rotations 
+	RGCNN Eig 
+		[0, 10, 20, 30, 40] [81.31001588 80.96774765 80.94921476 80.62750487 79.78985066]
+
+Gaussian Noise with Original Normals 
+	RGCNN 
+		[0, 0.01, 0.02, 0.05] [82.81343361 80.65297854 76.01333791 58.05395115]
+
+Gaussian Noise with Original Normals 
+	RGCNN Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00118524 77.88355895 72.43867046 53.16607776]
+
+Gaussian Noise with Original Normals 
+	RGCNN Rotations and Bounding Box 
+		[0, 0.01, 0.02, 0.05] [78.9008972  76.73636882 70.93185712 47.63217594]
+
+Gaussian Noise with Original Normals 
+	RGCNN Eig 
+		[0, 0.01, 0.02, 0.05] [81.31001588 79.35738003 74.63504309 56.45192187]
+
+Gaussian Noise with Recomputed Normals 
+	RGCNN 
+		[0, 0.01, 0.02, 0.05] [82.81343361 73.94806424 69.52225494 54.46719032]
+
+Gaussian Noise with Recomputed Normals 
+	RGCNN Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00118524 68.71927824 62.05097554 42.24924289]
+
+Gaussian Noise with Recomputed Normals 
+	RGCNN Rotations and Bounding Box 
+		[0, 0.01, 0.02, 0.05] [78.9008972  67.14630307 60.99982488 38.47722578]
+
+Gaussian Noise with Recomputed Normals 
+	RGCNN Eig 
+		[0, 0.01, 0.02, 0.05] [81.31001588 59.16576528 53.12478303 39.59764029]
+
+Occlusion Noise 
+	RGCNN 
+		[0, 0.1, 0.15, 0.2] [82.81343361 82.14239961 79.97472488 77.81097987]
+
+Occlusion Noise 
+	RGCNN Bounding Box 
+		[0, 0.1, 0.15, 0.2] [80.00118524 79.17397635 75.22180047 70.71229415]
+
+Occlusion Noise 
+	RGCNN Rotations and Bounding Box 
+		[0, 0.1, 0.15, 0.2] [78.9008972  77.19409649 72.39395708 67.43510071]
+
+Occlusion Noise 
+	RGCNN Eig 
+		[0, 0.1, 0.15, 0.2] [81.31001588 80.83481569 78.5323442  75.96114545]
+
+Gaussian and Rotations 
+	RGCNN 
+		[0, 0.01, 0.02, 0.05] [33.59171082 30.32793826 28.00189557 24.64372125]
+
+Gaussian and Rotations 
+	RGCNN Bounding Box 
+		[0, 0.01, 0.02, 0.05] [53.2453765  45.58323327 44.54408925 32.61315088]
+
+Gaussian and Rotations 
+	RGCNN Rotations and Bounding Box 
+		[0, 0.01, 0.02, 0.05] [75.24728959 63.6305181  57.93806635 36.8696438 ]
+
+Gaussian and Rotations 
+	RGCNN Eig 
+		[0, 0.01, 0.02, 0.05] [76.75816266 51.31806173 45.59473735 33.80453303]
+
+Original Dataset 
+	RGCNN gauss 
+		[0, 10, 20, 30, 40] [74.3085366  72.97685977 67.75815603 61.61366355 54.97468036]
+
+Original Dataset 
+	RGCNN gauss rr bb 
+		[0, 10, 20, 30, 40] [60.12282106 61.70374788 62.32771347 62.48680464 61.4779581 ]
+
+Original Dataset 
+	RGCNN gauss rr eig 
+		[0, 10, 20, 30, 40] [65.87864685 67.09734957 67.86292028 68.12998773 68.12072103]
+
+Random Rotations 
+	RGCNN 
+		[0, 10, 20, 30, 40] [82.81343361 81.18223654 76.38496969 69.71311803 62.9715484 ]
+
+Random Rotations 
+	RGCNN Bounding Box 
+		[0, 10, 20, 30, 40] [80.00118524 79.46905464 77.87273653 74.78496695 70.73707787]
+
+Random Rotations 
+	RGCNN Eig  
+		[0, 10, 20, 30, 40] [78.9008972  78.89336502 78.85292256 78.31189454 76.94031013]
+
+Gaussian Noise with original normals 
+	RGCNN 
+		[0, 0.01, 0.02, 0.05] [82.81343361 80.65297854 76.01333791 58.05395115]
+
+Gaussian Noise with original normals 
+	RGCNN Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00118524 77.88355895 72.43867046 53.16607776]
+
+Gaussian Noise with original normals 
+	RGCNN Eig  
+		[0, 0.01, 0.02, 0.05] [78.9008972  76.73636882 70.93185712 47.63217594]
+
+Gaussian Noise with recomputed normals 
+	RGCNN 
+		[0, 0.01, 0.02, 0.05] [82.81343361 73.94806424 69.52225494 54.46719032]
+
+Gaussian Noise with recomputed normals 
+	RGCNN Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00118524 68.71927824 62.05097554 42.24924289]
+
+Gaussian Noise with recomputed normals 
+	RGCNN Eig  
+		[0, 0.01, 0.02, 0.05] [78.9008972  67.14630307 60.99982488 38.47722578]
+
+Occlusion Noise 
+	RGCNN 
+		[0, 0.1, 0.15, 0.2] [82.81343361 82.14239961 79.97472488 77.81097987]
+
+Occlusion Noise 
+	RGCNN Bounding Box 
+		[0, 0.1, 0.15, 0.2] [80.00118524 79.17397635 75.22180047 70.71229415]
+
+Occlusion Noise 
+	RGCNN Eig  
+		[0, 0.1, 0.15, 0.2] [78.9008972  77.19409649 72.39395708 67.43510071]
+
+Gaussian and Rotations 
+	RGCNN 
+		[0, 0.01, 0.02, 0.05] [33.59171082 30.32793826 28.00189557 24.64372125]
+
+Gaussian and Rotations 
+	RGCNN Bounding Box 
+		[0, 0.01, 0.02, 0.05] [53.2453765  45.58323327 44.54408925 32.61315088]
+
+Gaussian and Rotations 
+	RGCNN Eig  
+		[0, 0.01, 0.02, 0.05] [75.24728959 63.6305181  57.93806635 36.8696438 ]
+
+Random Rotations 
+	RGCNN 
+		[0, 10, 20, 30, 40] [82.81343361 81.18223654 76.38496969 69.71311803 62.9715484 ]
+
+Random Rotations 
+	RGCNN Bounding Box 
+		[0, 10, 20, 30, 40] [80.00118524 79.46905464 77.87273653 74.78496695 70.73707787]
+
+Random Rotations 
+	RGCNN Eig  
+		[0, 10, 20, 30, 40] [78.9008972  78.89336502 78.85292256 78.31189454 76.94031013]
+
+Gaussian Noise with original normals 
+	RGCNN 
+		[0, 0.01, 0.02, 0.05] [82.81343361 80.65297854 76.01333791 58.05395115]
+
+Gaussian Noise with original normals 
+	RGCNN Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00118524 77.88355895 72.43867046 53.16607776]
+
+Gaussian Noise with original normals 
+	RGCNN Eig  
+		[0, 0.01, 0.02, 0.05] [78.9008972  76.73636882 70.93185712 47.63217594]
+
+Gaussian Noise with recomputed normals 
+	RGCNN 
+		[0, 0.01, 0.02, 0.05] [82.81343361 73.94806424 69.52225494 54.46719032]
+
+Gaussian Noise with recomputed normals 
+	RGCNN Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00118524 68.71927824 62.05097554 42.24924289]
+
+Gaussian Noise with recomputed normals 
+	RGCNN Eig  
+		[0, 0.01, 0.02, 0.05] [78.9008972  67.14630307 60.99982488 38.47722578]
+
+Occlusion Noise 
+	RGCNN 
+		[0, 0.1, 0.15, 0.2] [82.81343361 82.14239961 79.97472488 77.81097987]
+
+Occlusion Noise 
+	RGCNN Bounding Box 
+		[0, 0.1, 0.15, 0.2] [80.00118524 79.17397635 75.22180047 70.71229415]
+
+Occlusion Noise 
+	RGCNN Eig  
+		[0, 0.1, 0.15, 0.2] [78.9008972  77.19409649 72.39395708 67.43510071]
+
+Gaussian and Rotations 
+	RGCNN 
+		[0, 0.01, 0.02, 0.05] [33.59171082 30.32793826 28.00189557 24.64372125]
+
+Gaussian and Rotations 
+	RGCNN Bounding Box 
+		[0, 0.01, 0.02, 0.05] [53.2453765  45.58323327 44.54408925 32.61315088]
+
+Gaussian and Rotations 
+	RGCNN Eig  
+		[0, 0.01, 0.02, 0.05] [75.24728959 63.6305181  57.93806635 36.8696438 ]
+
+Random Rotations 
+	RGCNN 
+		[0, 10, 20, 30, 40] [82.81343361 81.18223654 76.38496969 69.71311803 62.9715484 ]
+
+Random Rotations 
+	RGCNN Bounding Box 
+		[0, 10, 20, 30, 40] [80.00118524 79.46905464 77.87273653 74.78496695 70.73707787]
+
+Random Rotations 
+	RGCNN Eig  
+		[0, 10, 20, 30, 40] [78.9008972  78.89336502 78.85292256 78.31189454 76.94031013]
+
+Gaussian Noise with original normals 
+	RGCNN 
+		[0, 0.01, 0.02, 0.05] [82.81343361 80.65297854 76.01333791 58.05395115]
+
+Gaussian Noise with original normals 
+	RGCNN Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00118524 77.88355895 72.43867046 53.16607776]
+
+Gaussian Noise with original normals 
+	RGCNN Eig  
+		[0, 0.01, 0.02, 0.05] [78.9008972  76.73636882 70.93185712 47.63217594]
+
+Gaussian Noise with recomputed normals 
+	RGCNN 
+		[0, 0.01, 0.02, 0.05] [82.81343361 73.94806424 69.52225494 54.46719032]
+
+Gaussian Noise with recomputed normals 
+	RGCNN Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00118524 68.71927824 62.05097554 42.24924289]
+
+Gaussian Noise with recomputed normals 
+	RGCNN Eig  
+		[0, 0.01, 0.02, 0.05] [78.9008972  67.14630307 60.99982488 38.47722578]
+
+Occlusion Noise 
+	RGCNN 
+		[0, 0.1, 0.15, 0.2] [82.81343361 82.14239961 79.97472488 77.81097987]
+
+Occlusion Noise 
+	RGCNN Bounding Box 
+		[0, 0.1, 0.15, 0.2] [80.00118524 79.17397635 75.22180047 70.71229415]
+
+Occlusion Noise 
+	RGCNN Eig  
+		[0, 0.1, 0.15, 0.2] [78.9008972  77.19409649 72.39395708 67.43510071]
+
+Gaussian and Rotations 
+	RGCNN 
+		[0, 0.01, 0.02, 0.05] [33.59171082 30.32793826 28.00189557 24.64372125]
+
+Gaussian and Rotations 
+	RGCNN Bounding Box 
+		[0, 0.01, 0.02, 0.05] [53.2453765  45.58323327 44.54408925 32.61315088]
+
+Gaussian and Rotations 
+	RGCNN Eig  
+		[0, 0.01, 0.02, 0.05] [75.24728959 63.6305181  57.93806635 36.8696438 ]
+
+Random Rotations 
+	RGCNN 
+		[0, 10, 20, 30, 40] [82.81343361 81.18223654 76.38496969 69.71311803 62.9715484 ]
+
+Random Rotations 
+	RGCNN Bounding Box 
+		[0, 10, 20, 30, 40] [80.00118524 79.46905464 77.87273653 74.78496695 70.73707787]
+
+Random Rotations 
+	RGCNN Eig  
+		[0, 10, 20, 30, 40] [78.9008972  78.89336502 78.85292256 78.31189454 76.94031013]
+
+Gaussian Noise with original normals 
+	RGCNN 
+		[0, 0.01, 0.02, 0.05] [82.81343361 80.65297854 76.01333791 58.05395115]
+
+Gaussian Noise with original normals 
+	RGCNN Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00118524 77.88355895 72.43867046 53.16607776]
+
+Gaussian Noise with original normals 
+	RGCNN Eig  
+		[0, 0.01, 0.02, 0.05] [78.9008972  76.73636882 70.93185712 47.63217594]
+
+Gaussian Noise with recomputed normals 
+	RGCNN 
+		[0, 0.01, 0.02, 0.05] [82.81343361 73.94806424 69.52225494 54.46719032]
+
+Gaussian Noise with recomputed normals 
+	RGCNN Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00118524 68.71927824 62.05097554 42.24924289]
+
+Gaussian Noise with recomputed normals 
+	RGCNN Eig  
+		[0, 0.01, 0.02, 0.05] [78.9008972  67.14630307 60.99982488 38.47722578]
+
+Occlusion Noise 
+	RGCNN 
+		[0, 0.1, 0.15, 0.2] [82.81343361 82.14239961 79.97472488 77.81097987]
+
+Occlusion Noise 
+	RGCNN Bounding Box 
+		[0, 0.1, 0.15, 0.2] [80.00118524 79.17397635 75.22180047 70.71229415]
+
+Occlusion Noise 
+	RGCNN Eig  
+		[0, 0.1, 0.15, 0.2] [78.9008972  77.19409649 72.39395708 67.43510071]
+
+Gaussian and Rotations 
+	RGCNN 
+		[0, 0.01, 0.02, 0.05] [33.59171082 30.32793826 28.00189557 24.64372125]
+
+Gaussian and Rotations 
+	RGCNN Bounding Box 
+		[0, 0.01, 0.02, 0.05] [53.2453765  45.58323327 44.54408925 32.61315088]
+
+Gaussian and Rotations 
+	RGCNN Eig  
+		[0, 0.01, 0.02, 0.05] [75.24728959 63.6305181  57.93806635 36.8696438 ]
+
+Random Rotations 
+	Original 
+		[0, 0.01, 0.02, 0.05] [82.81350518 73.9480201  69.52219336 54.46732332]
+
+Random Rotations 
+	Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00129344 68.71908393 62.05106433 42.24909481]
+
+Random Rotations 
+	Eig 
+		[0, 0.01, 0.02, 0.05] [81.30142016 59.16582101 53.12480041 39.59777542]
+
+Random Rotations 
+	Random Rotated and Bounding Box 
+		[0, 0.01, 0.02, 0.05] [78.90081519 67.14623743 60.99989847 38.47710471]
+
+Random Rotations 
+	Gaussian Random Rotated and Bounding Box 
+		[0, 0.01, 0.02, 0.05] [60.12541618 71.63548327 71.00488466 62.11602313]
+
+Random Rotations 
+	Gaussian Random Rotated and Eig 
+		[0, 0.01, 0.02, 0.05] [65.87905816 77.57906897 75.03200915 66.14890271]
+
+Random Rotations 
+	Original 
+		[0, 0.01, 0.02, 0.05] [82.81350518 73.9480201  69.52219336 54.46732332]
+
+Random Rotations 
+	Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00129344 68.71908393 62.05106433 42.24909481]
+
+Random Rotations 
+	Eig 
+		[0, 0.01, 0.02, 0.05] [81.30142016 59.16582101 53.12480041 39.59777542]
+
+Random Rotations 
+	RR and Bounding Box 
+		[0, 0.01, 0.02, 0.05] [78.90081519 67.14623743 60.99989847 38.47710471]
+
+Random Rotations 
+	Gaussian RR and Bounding Box 
+		[0, 0.01, 0.02, 0.05] [60.12541618 71.63548327 71.00488466 62.11602313]
+
+Random Rotations 
+	Gaussian RR and Eig 
+		[0, 0.01, 0.02, 0.05] [65.87905816 77.57906897 75.03200915 66.14890271]
+
+Random Rotations 
+	Original 
+		[0, 0.01, 0.02, 0.05] [82.81350518 73.9480201  69.52219336 54.46732332]
+
+Random Rotations 
+	Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00129344 68.71908393 62.05106433 42.24909481]
+
+Random Rotations 
+	Eig 
+		[0, 0.01, 0.02, 0.05] [81.30142016 59.16582101 53.12480041 39.59777542]
+
+Gaussian Recomputed Normals 
+	Original 
+		[0, 0.01, 0.02, 0.05] [82.81350518 73.9480201  69.52219336 54.46732332]
+
+Gaussian Recomputed Normals 
+	Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00129344 68.71908393 62.05106433 42.24909481]
+
+Gaussian Recomputed Normals 
+	Eig 
+		[0, 0.01, 0.02, 0.05] [81.30142016 59.16582101 53.12480041 39.59777542]
+
+Gaussian Original Normals 
+	Original 
+		[0, 0.01, 0.02, 0.05] [82.81350518 80.65285445 76.00464852 58.05391323]
+
+Gaussian Original Normals 
+	Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00129344 77.88375994 72.43868404 53.16603907]
+
+Gaussian Original Normals 
+	Eig 
+		[0, 0.01, 0.02, 0.05] [81.30142016 79.35740887 74.6349477  56.45191706]
+
+Random Rotated 
+	Original 
+		[0, 10, 20, 30, 40] [82.81350518 81.18214939 76.38498597 69.71317457 62.9715563 ]
+
+Random Rotated 
+	Bounding Box 
+		[0, 10, 20, 30, 40] [80.00129344 79.46910174 77.87271547 74.78496297 70.73705755]
+
+Random Rotated 
+	Eig 
+		[0, 10, 20, 30, 40] [81.30142016 80.96778778 80.94924005 80.62745107 79.79004729]
+
+Occlusion 
+	Original 
+		[0, 0.1, 0.15, 0.2] [82.81350518 82.14230958 79.97481989 77.81081776]
+
+Occlusion 
+	Bounding Box 
+		[0, 0.1, 0.15, 0.2] [80.00129344 79.17387928 75.2217787  70.71218231]
+
+Occlusion 
+	Eig 
+		[0, 0.1, 0.15, 0.2] [81.30142016 80.83477037 78.53252597 75.96105617]
+
+Occlusion 
+	Original 
+		[0, 0.1, 0.15, 0.2] [82.81350518 82.14230958 79.97481989 77.81081776]
+
+Occlusion 
+	Bounding Box 
+		[0, 0.1, 0.15, 0.2] [80.00129344 79.17387928 75.2217787  70.71218231]
+
+Occlusion 
+	Eig 
+		[0, 0.1, 0.15, 0.2] [81.30142016 80.83477037 78.53252597 75.96105617]
+
+Occlusion 
+	RR and Bounding Box 
+		[0, 0.1, 0.15, 0.2] [78.90081519 77.19422124 72.39400826 67.43518928]
+
+Occlusion 
+	Gaussian RR and Bounding Box 
+		[0, 0.1, 0.15, 0.2] [60.12541618 56.8634632  52.24952679 47.74859103]
+
+Occlusion 
+	Gaussian RR and Eig 
+		[0, 0.1, 0.15, 0.2] [65.87905816 64.83350075 61.48766811 58.70313454]
+
+Random Rotated 
+	Original 
+		[0, 10, 20, 30, 40] [82.81350518 81.18214939 76.38498597 69.71317457 62.9715563 ]
+
+Random Rotated 
+	Bounding Box 
+		[0, 10, 20, 30, 40] [80.00129344 79.46910174 77.87271547 74.78496297 70.73705755]
+
+Random Rotated 
+	Eig 
+		[0, 10, 20, 30, 40] [81.30142016 80.96778778 80.94924005 80.62745107 79.79004729]
+
+Random Rotated 
+	RR and Bounding Box 
+		[0, 10, 20, 30, 40] [78.90081519 78.89340104 78.85303103 78.31188267 76.94036014]
+
+Random Rotated 
+	Gaussian RR and Bounding Box 
+		[0, 10, 20, 30, 40] [60.12541618 61.68679817 62.33712663 62.49476797 61.48667932]
+
+Random Rotated 
+	Gaussian RR and Eig 
+		[0, 10, 20, 30, 40] [65.87905816 67.09738316 67.85486602 68.12931367 68.11011987]
+
+Gaussian Original Normals 
+	Original 
+		[0, 0.01, 0.02, 0.05] [82.81350518 80.65285445 76.00464852 58.05391323]
+
+Gaussian Original Normals 
+	Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00129344 77.88375994 72.43868404 53.16603907]
+
+Gaussian Original Normals 
+	Eig 
+		[0, 0.01, 0.02, 0.05] [81.30142016 79.35740887 74.6349477  56.45191706]
+
+Gaussian Original Normals 
+	RR and Bounding Box 
+		[0, 0.01, 0.02, 0.05] [78.90081519 76.73636185 70.93184838 47.63209628]
+
+Gaussian Original Normals 
+	Gaussian RR and Bounding Box 
+		[0, 0.01, 0.02, 0.05] [60.12541618 60.88153507 59.91732155 52.14811237]
+
+Gaussian Original Normals 
+	Gaussian RR and Eig 
+		[0, 0.01, 0.02, 0.05] [65.87905816 66.11451504 65.50329322 60.57965693]
+
+Gaussian Recomputed Normals 
+	Original 
+		[0, 0.01, 0.02, 0.05] [82.81350518 73.9480201  69.52219336 54.46732332]
+
+Gaussian Recomputed Normals 
+	Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00129344 68.71908393 62.05106433 42.24909481]
+
+Gaussian Recomputed Normals 
+	Eig 
+		[0, 0.01, 0.02, 0.05] [81.30142016 59.16582101 53.12480041 39.59777542]
+
+Gaussian Original Normals 
+	Original 
+		[0, 0.01, 0.02, 0.05] [82.81350518 80.65285445 76.00464852 58.05391323]
+
+Gaussian Original Normals 
+	Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00129344 77.88375994 72.43868404 53.16603907]
+
+Gaussian Original Normals 
+	Eig 
+		[0, 0.01, 0.02, 0.05] [81.30142016 79.35740887 74.6349477  56.45191706]
+
+Random Rotated 
+	Original 
+		[0, 10, 20, 30, 40] [82.81350518 81.18214939 76.38498597 69.71317457 62.9715563 ]
+
+Random Rotated 
+	Bounding Box 
+		[0, 10, 20, 30, 40] [80.00129344 79.46910174 77.87271547 74.78496297 70.73705755]
+
+Random Rotated 
+	Eig 
+		[0, 10, 20, 30, 40] [81.30142016 80.96778778 80.94924005 80.62745107 79.79004729]
+
+Occlusion 
+	Original 
+		[0, 0.1, 0.15, 0.2] [82.81350518 82.14230958 79.97481989 77.81081776]
+
+Occlusion 
+	Bounding Box 
+		[0, 0.1, 0.15, 0.2] [80.00129344 79.17387928 75.2217787  70.71218231]
+
+Occlusion 
+	Eig 
+		[0, 0.1, 0.15, 0.2] [81.30142016 80.83477037 78.53252597 75.96105617]
+
+Occlusion 
+	Original 
+		[0, 0.1, 0.15, 0.2] [82.81350518 82.14230958 79.97481989 77.81081776]
+
+Occlusion 
+	Bounding Box 
+		[0, 0.1, 0.15, 0.2] [80.00129344 79.17387928 75.2217787  70.71218231]
+
+Occlusion 
+	Eig 
+		[0, 0.1, 0.15, 0.2] [81.30142016 80.83477037 78.53252597 75.96105617]
+
+Occlusion 
+	Original 
+		[0, 0.1, 0.15, 0.2] [82.81350518 82.14230958 79.97481989 77.81081776]
+
+Occlusion 
+	Bounding Box 
+		[0, 0.1, 0.15, 0.2] [80.00129344 79.17387928 75.2217787  70.71218231]
+
+Occlusion 
+	Eig 
+		[0, 0.1, 0.15, 0.2] [81.30142016 80.83477037 78.53252597 75.96105617]
+
+Random Rotated 
+	Original 
+		[0, 10, 20, 30, 40] [82.81350518 81.18214939 76.38498597 69.71317457 62.9715563 ]
+
+Random Rotated 
+	Bounding Box 
+		[0, 10, 20, 30, 40] [80.00129344 79.46910174 77.87271547 74.78496297 70.73705755]
+
+Random Rotated 
+	Eig 
+		[0, 10, 20, 30, 40] [81.30142016 80.96778778 80.94924005 80.62745107 79.79004729]
+
+Gaussian Original Normals 
+	Original 
+		[0, 0.01, 0.02, 0.05] [82.81350518 80.65285445 76.00464852 58.05391323]
+
+Gaussian Original Normals 
+	Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00129344 77.88375994 72.43868404 53.16603907]
+
+Gaussian Original Normals 
+	Eig 
+		[0, 0.01, 0.02, 0.05] [81.30142016 79.35740887 74.6349477  56.45191706]
+
+Gaussian Recomputed Normals 
+	Original 
+		[0, 0.01, 0.02, 0.05] [82.81350518 73.9480201  69.52219336 54.46732332]
+
+Gaussian Recomputed Normals 
+	Bounding Box 
+		[0, 0.01, 0.02, 0.05] [80.00129344 68.71908393 62.05106433 42.24909481]
+
+Gaussian Recomputed Normals 
+	Eig 
+		[0, 0.01, 0.02, 0.05] [81.30142016 59.16582101 53.12480041 39.59777542]
+
+Gaussian and Rotations 
+	Original 
+		[0, 0.01, 0.02, 0.05] [82.81350518 73.9480201  69.52219336 54.46732332]
+
+Gaussian and Rotations 
+	Bounding Box 
+		[0, 0.01, 0.02, 0.05] [53.19723656 45.94559293 44.09340849 32.28041246]
+
+Gaussian and Rotations 
+	Eig 
+		[0, 0.01, 0.02, 0.05] [76.18047864 51.26718251 45.63367752 33.94237347]
+
+Gaussian and Rotations 
+	RR and Bounding Box 
+		[0, 0.01, 0.02, 0.05] [75.35012776 63.69147494 57.94666401 36.87852994]
+
+Gaussian and Rotations 
+	Gaussian RR and Bounding Box 
+		[0, 0.01, 0.02, 0.05] [60.60813052 71.87534282 71.10123253 62.14010252]
+
+Gaussian and Rotations 
+	Gaussian RR and Eig 
+		[0, 0.01, 0.02, 0.05] [66.53911801 77.52894238 75.1574415  66.17671744]
+
+Gaussian and Rotations 
+	Original 
+		[0, 0.01, 0.02, 0.05] [82.81350518 73.9480201  69.52219336 54.46732332]
+
+Gaussian and Rotations 
+	Bounding Box 
+		[0, 0.01, 0.02, 0.05] [53.19723656 45.94559293 44.09340849 32.28041246]
+
+Gaussian and Rotations 
+	Eig 
+		[0, 0.01, 0.02, 0.05] [76.18047864 51.26718251 45.63367752 33.94237347]
+
+Gaussian and Rotations 
+	Gaussian RR and Bounding Box 
+		[0, 0.01, 0.02, 0.05] [60.60813052 71.87534282 71.10123253 62.14010252]
+
+Gaussian and Rotations 
+	Gaussian RR and Eig 
+		[0, 0.01, 0.02, 0.05] [66.53911801 77.52894238 75.1574415  66.17671744]
+
+Gaussian and Rotations 
+	Original 
+		[0, 0.01, 0.02, 0.05] [82.81350518 73.9480201  69.52219336 54.46732332]
+
+Gaussian and Rotations 
+	Bounding Box 
+		[0, 0.01, 0.02, 0.05] [53.19723656 45.94559293 44.09340849 32.28041246]
+
+Gaussian and Rotations 
+	Eig 
+		[0, 0.01, 0.02, 0.05] [76.18047864 51.26718251 45.63367752 33.94237347]
+
+Gaussian and Rotations 
+	Gaussian RR and BB 
+		[0, 0.01, 0.02, 0.05] [60.60813052 71.87534282 71.10123253 62.14010252]
+
+Gaussian and Rotations 
+	Gaussian RR and Eig 
+		[0, 0.01, 0.02, 0.05] [66.53911801 77.52894238 75.1574415  66.17671744]
+
+Gaussian and Rotations 
+	Original 
+		[0, 0.01, 0.02, 0.05] [82.81350518 73.9480201  69.52219336 54.46732332]
+
+Gaussian and Rotations 
+	Bounding Box 
+		[0, 0.01, 0.02, 0.05] [53.19723656 45.94559293 44.09340849 32.28041246]
+
+Gaussian and Rotations 
+	Eig 
+		[0, 0.01, 0.02, 0.05] [76.18047864 51.26718251 45.63367752 33.94237347]
+
+Gaussian and Rotations 
+	Original 
+		[0, 0.01, 0.02, 0.05] [82.81350518 73.9480201  69.52219336 54.46732332]
+
+Gaussian and Rotations 
+	Gaussian RR and Bounding Box 
+		[0, 0.01, 0.02, 0.05] [60.60813052 71.87534282 71.10123253 62.14010252]
+
+Gaussian and Rotations 
+	Gaussian RR and Eig 
+		[0, 0.01, 0.02, 0.05] [66.53911801 77.52894238 75.1574415  66.17671744]
+

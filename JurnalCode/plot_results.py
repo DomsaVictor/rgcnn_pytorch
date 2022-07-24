@@ -14,11 +14,16 @@ def prepare_data_rot(raw_data):
             to_plot_data[i, j] = acc
     return to_plot_data
 
-def plot_values(data, model_names, x_values=[0, 10, 20, 30, 40], line_type="-", title="ShapeNet with random rotations", x_label="Rotations in degrees", y_label="Accuracy", show=True, folder_name=""):
+def plot_values(data, model_names, x_values=[0, 10, 20, 30, 40], line_types=None, title="ShapeNet with random rotations", x_label="Rotations in degrees", y_label="Accuracy", show=True, folder_name=""):
     plt.figure()
-    plt.title(title)
+    # plt.title(title)
     for i in range(len(model_names)):
-        plt.plot(x_values, data[i], line_type, label=model_names[i])
+        if model_names[i] is not None:
+            plt.plot(x_values, data[i], line_types[i], label=model_names[i], markersize=10)
+            with open(str((imports.curr_path/"results.txt").resolve()), "a") as f:
+                text = f"{title} \n\t{model_names[i]} \n\t\t{str(x_values)} {str(data[i])}\n\n"
+                print(text)
+                f.write(text)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.grid()
@@ -71,22 +76,90 @@ def load_data(noise:str):
         cat_iou = open_file(f"{file_name}_cat_iou")
         tot_iou = open_file(f"{file_name}_tot_iou")
     else:
-        raise Exception("Not Implemented.")
+        file_name = noise
+        acc = open_file(f"{file_name}_acc")
+        cat_iou = open_file(f"{file_name}_cat_iou")
+        tot_iou = open_file(f"{file_name}_tot_iou")
     return acc, cat_iou, tot_iou
 
+def get_gaussian_data():
+    datasets = ["final_all_models_ordered_gaussian"]
+    x_values = [[0, 0.01, 0.02, 0.05]]
+    x_labels = ["Sigma"]
+    titles   = ["Gaussian Recomputed Normals"]
+    return datasets, x_values, x_labels, titles
+
+def get_gaussian_original_data():
+    datasets = ["final_all_models_ordered_gaussian_original"]
+    x_values = [[0, 0.01, 0.02, 0.05]]
+    x_labels = ["Sigma"]
+    titles   = ["Gaussian Original Normals"]
+    return datasets, x_values, x_labels, titles
+
+def get_rotated_data():
+    datasets = ["final_all_models_ordered_random_rotate"]
+    x_values = [[0, 10, 20, 30, 40]]
+    x_labels = ["Sigma"]
+    titles   = ["Random Rotated"]
+    return datasets, x_values, x_labels, titles
+
+def get_occlusion_data():
+    datasets = ["final_all_models_ordered_occlusion"]
+    x_values = [[0, 0.1, 0.15, 0.2]]
+    x_labels = ["Radius"]
+    titles   = ["Occlusion"]
+    return datasets, x_values, x_labels, titles
+
+def get_real_approx_data():
+    datasets = ["final_all_models_ordered_gaussian_random_rotations"]
+    x_values = [[0, 0.01, 0.02, 0.05]]
+    x_labels = ["Sigma"]
+    titles   = ["Gaussian and Rotations"]
+    return datasets, x_values, x_labels, titles
+
 def plot_and_save_all():
-    datasets    = ["Rotation", "Gaussian Original", "Gaussian Recomputed", "Occlusion", "Gaussian and Rotations"]
-    model_names = ["RGCNN", "RGCNN Bounding Box", "RGCNN Rotations and Bounding Box", "RGCNN Eig", "RGCNN Gaussian RR BB", "RGCNN Gaussian RR Eig"]
-    model_names = ["RGCNN", "RGCNN Bounding Box", "RGCNN Rotations and Bounding Box", "RGCNN Eig"]
-    model_names = ["RGCNN", "RGCNN Bounding Box", "RGCNN Rotations and Bounding Box", "RGCNN Eig"]
     
-    x_values    = [[0, 10, 20, 30 ,40], [0, 0.01, 0.02, 0.05], [0, 0.01, 0.02, 0.05],
-                   [0, 0.1, 0.15, 0.2], [0, 0.01, 0.02, 0.05]]
-    titles      = ["Random Rotations", "Gaussian Noise with Original Normals", "Gaussian Noise with Recomputed Normals",
-                   "Occlusion Noise", "Gaussian and Rotations"]
+    # datasets    = ["Rotation", "Gaussian Original", "Gaussian Recomputed", "Occlusion", "Gaussian and Rotations"]
+    # datasets    = ["gaussian", "Rotation"]
+    # datasets = ["final_all_models_ordered_gaussian"]
+    # model_names = ["RGCNN", "RGCNN Bounding Box", "RGCNN Rotations and Bounding Box", "RGCNN Eig", "RGCNN Gaussian RR BB", "RGCNN Gaussian RR Eig"]
+    # model_names = ["RGCNN", "RGCNN Bounding Box", "RGCNN Rotations and Bounding Box", "RGCNN Eig"]
+    # model_names = ["RGCNN gauss", "RGCNN gauss rr bb", "RGCNN gauss rr eig"]
+    # model_names = ["RGCNN", "RGCNN Bounding Box", "RGCNN Eig "]
+    
+    
+    # x_values    = [[0, 10, 20, 30 ,40], [0, 0.01, 0.02, 0.05], [0, 0.01, 0.02, 0.05],
+    #                [0, 0.1, 0.15, 0.2], [0, 0.01, 0.02, 0.05]]
+    
+    # x_values    = [[0, 10, 20, 30 ,40], [0, 0.01, 0.02, 0.05], [0, 0.01, 0.02, 0.05],
+    #                [0, 0.1, 0.15, 0.2], [0, 0.01, 0.02, 0.05]]
+    # x_values    = [[0, 0.01, 0.02, 0.05]]
+    
+    
+    
+    # x_labels    = ["Degrees", "Sigma", "Sigma", "Radius", "Sigma"]
+    # x_labels    = ["Sigma"]
+    
+    datasets, x_values, x_labels, titles = get_gaussian_data()
+    # datasets, x_values, x_labels, titles = get_gaussian_original_data()
+    # datasets, x_values, x_labels, titles = get_rotated_data()
+    # datasets, x_values, x_labels, titles = get_occlusion_data()
+    datasets, x_values, x_labels, titles = get_real_approx_data()
+
+    
+    # titles      = ["Random Rotations", "Gaussian Noise with original normals", "Gaussian Noise with recomputed normals",
+    #                "Occlusion Noise", "Gaussian and Rotations"]
+    model_names = ["Original", "Bounding Box", "Eig", "RR and Bounding Box", "Gaussian RR and Bounding Box", "Gaussian RR and Eig"]
+    # model_names = ["Original", "Bounding Box", "Eig", None, None, None,]
+    model_names = ["Original", None, None, None, "Gaussian RR and Bounding Box", "Gaussian RR and Eig"]
+
+    # model_names = ["Original", "Bounding Box", "Eig", None, "Gaussian RR and BB", "Gaussian RR and Eig"]
+
+    
+    # folder_name = input("Enter folder name: ")
+    folder_name = "final/segmentation/enhanced_models"
+    line_types  = ["o--", "X--", "P--", "*--", "^--", "v--"]
     y_label     = "mIoU"
-    x_labels    = ["Degrees", "Sigma", "Sigma", "Radius", "Sigma"]
-    folder_name = input("Enter folder name: ")
 
     for i, dataset in enumerate(datasets):
         acc, cat_iou, tot_iou = load_data(dataset)
@@ -94,7 +167,7 @@ def plot_and_save_all():
         title = titles[i]
         x_label = x_labels[i]
         data = prepare_data_rot(tot_iou)
-        plot_values(data, model_names, x_value, title=title, y_label=y_label, x_label=x_label, show=False, folder_name=folder_name)
+        plot_values(data, model_names, x_value, title=title, y_label=y_label, x_label=x_label, show=False, folder_name=folder_name, line_types=line_types)
         
 
 if __name__ == "__main__":
@@ -108,7 +181,8 @@ if __name__ == "__main__":
     print("\t4. Occlusion Noise")
     print("\t5. Gaussian and Rotations")
     print("\t6. Save all plots")
-    noise_type = input("Waiting: ")
+    # noise_type = input("Waiting: ")
+    noise_type = "6"
     if noise_type == "6":
         plot_and_save_all()
         sys.exit(0)

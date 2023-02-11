@@ -103,6 +103,7 @@ class seg_model(nn.Module):
         # L = self.get_laplacian(x)
         L = self.get_laplacian(x[:,:,:3])
         
+
         if cat is not None:
             cat = one_hot(cat, num_classes=16)
             cat = torch.tile(cat, [1, self.vertice, 1])
@@ -132,6 +133,7 @@ class seg_model(nn.Module):
             out = self.batch_norm_list_fc[i](out.transpose(1, 2))
             out = out.transpose(1, 2)
         return out, self.x, self.L
+    
     
 if __name__ == "__main__":
     F = [128, 512, 1024]  # Outputs size of convolutional filter.

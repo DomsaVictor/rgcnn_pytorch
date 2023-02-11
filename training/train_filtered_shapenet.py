@@ -193,7 +193,7 @@ if __name__ == '__main__':
     
     # root_dir MUST BE A Path(...) 
     dataset_train = FilteredShapeNet(root_dir=dataset_path, folder="train", transform=transforms)
-    dataset_test = FilteredShapeNet(root_dir=dataset_path, folder="test", transform=transforms)
+    dataset_test  = FilteredShapeNet(root_dir=dataset_path, folder="test",  transform=transforms)
 
     # Define loss criterion.
     criterion = torch.nn.CrossEntropyLoss()

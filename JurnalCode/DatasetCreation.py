@@ -283,6 +283,27 @@ def save_gauss_rr_dataset():
             save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/Gaussian_Concatenated_RR_{num_points}/"), split=split)
 
 
+
+def save_all_noises_dataset(points_number = 2048, sigma = [0.01, 0.03, 0.05], rot_levels = [10, 20, 30, 40], occlusion_levels = [0.1, 0.15, 0.2], splits = ['train', 'test']):
+    fp = FixedPoints(points_number)
+    counter = 0
+    for s in sigma:
+        for rot in rot_levels:
+            for occlusion in occlusion_levels:
+                rr = Compose([RandomRotate(rot, 0), RandomRotate(rot, 1), RandomRotate(rot, 2)])
+                gn = utils.GaussianNoiseTransform(mu=0, sigma=s, recompute_normals=True)
+                on = utils.Sphere_Occlusion_Transform(occlusion, num_points=2048)
+                
+                print(f"Creating dataset for: {points_number} - {s} - {rot} - {occlusion} ({counter}/{len(sigma) * len(rot_levels) * len(occlusion_levels)})")
+                counter += 1
+                for split in splits:
+                    print(f"{split}")
+                    final_transform = Compose([on, fp, gn, rr])
+                    save_dataset(root=imports.dataset_path + "/ShapeNet", transform=final_transform, 
+                            save_path=Path(f"{imports.dataset_path}/Journal/ShapeNetCustom/AllNoises_{points_number}p_{s}_{rot}_{occlusion}/"), split=split)
+
+
+
 if __name__ == '__main__':
     # test_rotation()
 
@@ -292,4 +313,6 @@ if __name__ == '__main__':
     
     # occlusion_transform([0.2])
 
-    test()
+    # test()
+    
+    save_all_noises_dataset()

@@ -38,7 +38,6 @@ def train(model, optimizer, loader, regularization, criterion, min_category=0):
     if (len(loader.dataset.categories) == 1):
         add_cat = False
 
-
     for i, data in enumerate(loader):
         optimizer.zero_grad()
         cat = None

@@ -114,7 +114,6 @@ def test_all_models(dataset_names: list, model_name="2048p_seg_all200.pt", trans
     model.load_state_dict(torch.load(f"{imports.curr_path}/{model_name}"))
     model.eval()
 
-    
     if not os.path.isdir(Path(imports.curr_path)/"results/"):
         os.makedirs(Path(imports.curr_path)/"results/")
     

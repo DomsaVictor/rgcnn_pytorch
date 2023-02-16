@@ -186,7 +186,8 @@ def test():
 def test_forward_time():
     pass
 
-if __name__ == '__main__':
+
+def old_test():
     # dataset_names = [
     #     "Gaussian_Original_2048_0.01", "Gaussian_Original_2048_0.02",  "Gaussian_Original_2048_0.05",
     #     "Gaussian_Recomputed_2048_0.01", "Gaussian_Recomputed_2048_0.02", "Gaussian_Recomputed_2048_0.05",
@@ -269,3 +270,33 @@ if __name__ == '__main__':
     # test_all_models(dataset_names=dataset_names, transform=transforms, model_name=model_name)
     # end_time   = time.time()
     # print(f"Total Test Time: - {end_time - start_time}")
+
+def new_test():
+    dataset_names = ["Original_2048"]
+    file_name = 'test'
+    model_names = ["final_models/2048_seg_clean.pt"]
+    transforms = [Compose([NormalizeScale()])]
+    
+    for_model_acc = []
+    for_model_tot_iou = []
+    for_model_cat_iou = []
+
+    for i in range(len(model_names)):
+        model = model_names[i]
+        transform = transforms[i]
+        all_acc, all_tot_iou, all_cat_iou = test_all_models(dataset_names=dataset_names, transform=transform, model_name=model)
+        for_model_acc.append(all_acc)
+        for_model_tot_iou.append(all_tot_iou)
+        for_model_cat_iou.append(all_cat_iou)
+
+    with open(f"{file_name}_acc", "wb") as fp:
+        pickle.dump(for_model_acc, fp)
+    with open(f"{file_name}_tot_iou", "wb") as fp:
+        pickle.dump(for_model_tot_iou, fp)
+    with open(f"{file_name}_cat_iou", "wb") as fp:
+        pickle.dump(for_model_cat_iou, fp)
+        
+        
+if __name__ == '__main__':
+    # old_test()
+    new_test()
